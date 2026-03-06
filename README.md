@@ -10,9 +10,12 @@ Kết thúc: * Merge xong -> Xóa branch -> Thông báo cho mọi người.
 ##**Cấu trúc thư mục** 
 NT106.Solution
 │
-├── Healthcare.Shared(Class Library)
+├── Healthcare.Shared 
 │   ├── Constants
-│   ├── Data Transfer Objects
+│   ├── Cryptography                   
+│   │   ├── AESManager.cs       (Mã hóa đối xứng file/hồ sơ bệnh án)
+│   │   └── RSAManager.cs       (Mã hóa bất đối xứng khóa AES)
+│   ├── Data Transfer Objects 
 │   ├── Enums
 │   └── Models
 │       ├── Appointment.cs
@@ -25,44 +28,43 @@ NT106.Solution
 │   │   ├── AppointmentController.cs
 │   │   ├── AuthController.cs
 │   │   └── PatientController.cs
-│   ├── Cryptography
-│   │   ├── AESManager.cs (Mã hóa đối xứng hồ sơ bệnh án)
-│   │   ├── HashHelper.cs (Băm mật khẩu PBKDF2 + Salt)
-│   │   └── RSAManager.cs (Mã hóa bất đối xứng)
+│   ├── Cryptography                 
+│   │   └── HashHelper.cs              (Băm mật khẩu PBKDF2 + Salt)
 │   ├── Data
-│   │   ├── AppDbContext.cs (Tích hợp PostgreSQL qua Npgsql)
-│   │   └── Migrations (Nơi chứa các file cập nhật CSDL)
+│   │   ├── AppDbContext.cs            
+│   │   └── Migrations                 (Nơi chứa các file cập nhật CSDL)
 │   ├── Hubs
-│   │   └── ChatHub.cs (Quản lý kết nối SignalR Real-time)
+│   │   └── ChatHub.cs                 (Quản lý kết nối Socket/SignalR real-time)
 │   ├── Network
 │   │   ├── Email
-│   │   │   └── MailProvider.cs (Cấu hình gửi OTP)
+│   │   │   └── MailProvider.cs        (Cấu hình gửi OTP qua SMTP)
 │   │   └── FileTransfer
-│   │       └── FileService.cs
+│   │       └── FileService.cs         (Xử lý lưu trữ file X-Quang, hồ sơ mã hóa)
 │   ├── Services
-│   │   ├── CryptoService.cs
+│   │   ├── CryptoService.cs           (Xử lý logic giải mã tại server)
 │   │   ├── EmailService.cs
 │   │   └── PaymentService.cs
-│   ├── appsettings.json (Chứa Connection String của PostgreSQL)
-│   └── Program.cs (Cấu hình DI, JWT, Npgsql)
+│   ├── appsettings.json               (Chứa Connection String của PostgreSQL)
+│   └── Program.cs                     (Cấu hình DI, JWT, Npgsql)
 │
-├── Healthcare.Client (Project: Windows Forms)
+├── Healthcare.Client (Windows Forms)
 │   ├── APIClient
 │   │   ├── AuthClient.cs
-│   │   ├── BaseHttpClient.cs (Tự động đính kèm JWT Token)
+│   │   ├── BaseHttpClient.cs          
+│   │   ├── FileTransferClient.cs     
 │   │   └── HealthRecordClient.cs
 │   ├── Assets
 │   │   ├── Icons
 │   │   └── Styles
 │   ├── Helpers
-│   │   └── TokenStorage.cs (Lưu trữ JWT trong phiên làm việc)
+│   │   └── TokenStorage.cs           
 │   ├── Media
-│   │   └── WebRtcPeerConnection.cs (Xử lý Video Call/Telemedicine)
+│   │   └── WebRtcPeerConnection.cs   
 │   ├── Monitoring
 │   │   ├── NetworkDiagnostics.cs
 │   │   └── TrafficAnalyzer.cs
 │   ├── RealTimeClient
-│   │   └── ChatSignalRClient.cs (Lắng nghe tin nhắn từ Hub)
+│   │   └── ChatSignalRClient.cs      
 │   ├── UI
 │   │   ├── Auth
 │   │   │   ├── LoginForm.cs
