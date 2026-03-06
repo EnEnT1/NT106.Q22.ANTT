@@ -54,7 +54,7 @@ NT106.Solution
 │   ├── Helpers
 │   │   └── TokenStorage.cs (Lưu trữ JWT trong phiên làm việc)
 │   ├── Media
-│   │   └── WebRtcPeerConnection.cs (Xử lý Video Call/Telemedicine)
+│   │   └── WebRtcPeerConnection.cs (Xử lý Video Call)
 │   ├── Monitoring
 │   │   ├── NetworkDiagnostics.cs
 │   │   └── TrafficAnalyzer.cs
