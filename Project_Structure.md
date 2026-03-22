@@ -1,15 +1,14 @@
-##**Cấu trúc thư mục** 
 NT106.Solution
 │
-├── Healthcare.Shared 
+├── Healthcare.Shared (Class Library)
 │   ├── Constants
 │   ├── Cryptography                   
-│   │   ├── AESManager.cs       (Mã hóa đối xứng file/hồ sơ bệnh án)
-│   │   └── RSAManager.cs       (Mã hóa bất đối xứng khóa AES)
+│   │   ├── AESManager.cs              (Mã hóa đối xứng file/hồ sơ bệnh án từ Client)
+│   │   └── RSAManager.cs              (Mã hóa bất đối xứng khóa AES)
 │   ├── Data Transfer Objects 
 │   ├── Enums
 │   └── Models
-│       ├── Appointment.cs
+│       ├── Appointment.cs             
 │       ├── HealthIndicator.cs
 │       ├── PatientRecord.cs
 │       └── User.cs
@@ -17,45 +16,44 @@ NT106.Solution
 ├── Healthcare.Server (ASP.NET Core Web API)
 │   ├── Controllers
 │   │   ├── AppointmentController.cs
-│   │   ├── AuthController.cs
+│   │   ├── AuthController.cs          (Nhận request đăng nhập từ Client, gọi Firebase xác thực)
 │   │   └── PatientController.cs
 │   ├── Cryptography                 
-│   │   └── HashHelper.cs              (Băm mật khẩu PBKDF2 + Salt)
+│   │   └── HashHelper.cs              (Có thể bỏ đi nếu Firebase Auth đã tự động băm mật khẩu)
 │   ├── Data
-│   │   ├── AppDbContext.cs            
-│   │   └── Migrations                 (Nơi chứa các file cập nhật CSDL)
+│   │   └── FirestoreRepository.cs    (Cloud Firestore)
 │   ├── Hubs
-│   │   └── ChatHub.cs                 (Quản lý kết nối Socket/SignalR real-time)
+│   │   └── ChatHub.cs                 (giao tiếp Firebase Realtime)
 │   ├── Network
-│   │   ├── Email
-│   │   │   └── MailProvider.cs        (Cấu hình gửi OTP qua SMTP)
+│   │   ├── Auth
+│   │   │   └── FirebaseAuthProvider.cs (Firebase lo toàn bộ việc gửi OTP Email)
 │   │   └── FileTransfer
-│   │       └── FileService.cs         (Xử lý lưu trữ file X-Quang, hồ sơ mã hóa)
+│   │       └── FirebaseStorageService.cs  (Thay thế lưu ổ cứng cục bộ bằng Firebase Storage)
 │   ├── Services
-│   │   ├── CryptoService.cs           (Xử lý logic giải mã tại server)
-│   │   ├── EmailService.cs
+│   │   ├── CryptoService.cs          
+│   │   ├── NotificationService.cs     (Dùng Firebase Cloud Messaging (FCM))
 │   │   └── PaymentService.cs
-│   ├── appsettings.json               (Chứa Connection String của PostgreSQL)
-│   └── Program.cs                     (Cấu hình DI, JWT, Npgsql)
+│   ├── appsettings.json               (Chứa đường dẫn tới file 'firebase-adminsdk.json' thay vì Connection String)
+│   └── Program.cs                     (Cấu hình DI, JWT, và khởi tạo FirebaseApp)
 │
 ├── Healthcare.Client (Windows Forms)
 │   ├── APIClient
 │   │   ├── AuthClient.cs
 │   │   ├── BaseHttpClient.cs          
-│   │   ├── FileTransferClient.cs     
+│   │   ├── FileTransferClient.cs      
 │   │   └── HealthRecordClient.cs
 │   ├── Assets
 │   │   ├── Icons
 │   │   └── Styles
 │   ├── Helpers
-│   │   └── TokenStorage.cs           
+│   │   └── TokenStorage.cs            (Lưu JWT Token do Firebase/Server cấp)
 │   ├── Media
-│   │   └── WebRtcPeerConnection.cs   
+│   │   └── WebRtcPeerConnection.cs    
 │   ├── Monitoring
 │   │   ├── NetworkDiagnostics.cs
 │   │   └── TrafficAnalyzer.cs
 │   ├── RealTimeClient
-│   │   └── ChatSignalRClient.cs      
+│   │   └── ChatSignalRClient.cs       
 │   ├── UI
 │   │   ├── Auth
 │   │   │   ├── LoginForm.cs
