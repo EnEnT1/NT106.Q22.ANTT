@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Code\\NT106 Project\\NT106\\NT106.csproj": {}
+    "C:\\Avalon\\Code\\NT106 Project\\NT106\\NT106.csproj": {}
   },
   "projects": {
-    "D:\\Code\\NT106 Project\\NT106\\NT106.csproj": {
+    "C:\\Avalon\\Code\\NT106 Project\\NT106\\NT106.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Code\\NT106 Project\\NT106\\NT106.csproj",
+        "projectUniqueName": "C:\\Avalon\\Code\\NT106 Project\\NT106\\NT106.csproj",
         "projectName": "NT106",
-        "projectPath": "D:\\Code\\NT106 Project\\NT106\\NT106.csproj",
-        "packagesPath": "C:\\Users\\Mr. Phu\\.nuget\\packages\\",
-        "outputPath": "D:\\Code\\NT106 Project\\NT106\\obj\\",
+        "projectPath": "C:\\Avalon\\Code\\NT106 Project\\NT106\\NT106.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "C:\\Avalon\\Code\\NT106 Project\\NT106\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Mr. Phu\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -25,7 +29,8 @@
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net8.0-windows7.0": {
+          "net8.0-windows": {
+            "framework": "net8.0-windows7.0",
             "targetAlias": "net8.0-windows",
             "projectReferences": {}
           }
@@ -39,10 +44,12 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
-        "net8.0-windows7.0": {
+        "net8.0-windows": {
+          "framework": "net8.0-windows7.0",
           "targetAlias": "net8.0-windows",
           "imports": [
             "net461",
@@ -63,7 +70,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
