@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Healthcare.Client (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Healthcare.Client (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
