@@ -1,46 +1,39 @@
-var builder = WebApplication.CreateBuilder(args);
+using Healthcare.Server.Services;
+using Healthcare.Server.SupabaseIntegration;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+var builder = WebApplication.CreateBuilder(args);
+DotNetEnv.Env.Load();
+// 1. Khai báo các Controller API
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(); 
+
+// 2. Đăng ký các Service (Dependency Injection)
+builder.Services.AddSingleton<SupabaseAdminHelper>();
+builder.Services.AddScoped<AiPrescriptionService>();
+builder.Services.AddScoped<PaymentService>();
+
+// 3. Đăng ký chạy ngầm (Background Service)
+builder.Services.AddHostedService<ScheduledWorker>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 4. Khởi tạo kết nối Supabase quyền Admin ngay khi Server chạy
+var supabaseAdmin = app.Services.GetRequiredService<SupabaseAdminHelper>();
+await supabaseAdmin.InitializeAsync();
+
+// 5. Cấu hình HTTP Pipeline
 if (app.Environment.IsDevelopment())
 {
-    if (app.Environment.IsDevelopment())
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI();
-    }
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.UseAuthorization();
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
