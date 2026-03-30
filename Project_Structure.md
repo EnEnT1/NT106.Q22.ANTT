@@ -1,109 +1,122 @@
 ```
 
-NT106.Solution (Thư mục gốc Solution)
+NNT106.Solution // Thư mục gốc Solution
 │
-├── Healthcare.Server (Project 1: ASP.NET Core Web API)
+├── Healthcare.Server // Project 1: ASP.NET Core Web API
 │   │
-│   ├── Controllers                      (Nơi nhận các HTTP Request từ WinForms hoặc VNPay)
-│   │   ├── AiController.cs              (Nhận ảnh đơn thuốc, trả về kết quả AI)
-│   │   └── PaymentController.cs         (Nhận Webhook từ VNPay/MoMo khi thanh toán xong)
+│   ├── Controllers                      // Nơi nhận các HTTP Request từ WinUI 3 hoặc VNPay
+│   │   ├── AiController.cs              // Nhận ảnh đơn thuốc, trả về kết quả AI
+│   │   └── PaymentController.cs         // Nhận Webhook từ VNPay/MoMo khi thanh toán xong
 │   │
-│   ├── Models                        (Class ánh xạ từ database)
+│   ├── Models                         
 │   │   ├── Identity
-│   │   │   ├── User.cs
-│   │   │   ├── PatientProfile.cs
-│   │   │   └── DoctorProfile.cs
+│   │   │   ├── User.cs                  // Bảng users
+│   │   │   ├── PatientProfile.cs        // Bảng patient_profiles
+│   │   │   └── DoctorProfile.cs         // Bảng doctor_profiles
 │   │   ├── Core
-│   │   │   ├── Appointment.cs
-│   │   │   ├── MedicalRecord.cs
-│   │   │   ├── Transaction.cs
-│   │   │   ├── HealthMetric.cs
-│   │   │   ├── LabResult.cs
-│   │   │   ├── MasterMedicine.cs
-│   │   │   └── MedicationReminder.cs
+│   │   │   ├── Appointment.cs           // Bảng appointments
+│   │   │   ├── MedicalRecord.cs         // Bảng medical_records
+│   │   │   ├── Transaction.cs           // Bảng transactions
+│   │   │   ├── HealthMetric.cs          // Bảng health_metrics
+│   │   │   ├── LabResult.cs             // Bảng lab_results
+│   │   │   ├── MasterMedicine.cs        // Bảng master_medicines
+│   │   │   └── MedicationReminder.cs    // Bảng medication_reminders
 │   │   ├── Communication
-│   │   │   ├── ChatMessage.cs
-│   │   │   ├── WebrtcSignal.cs
-│   │   │   ├── Notification.cs
-│   │   │   └── Review.cs
+│   │   │   ├── ChatMessage.cs           // Bảng chat_messages
+│   │   │   ├── WebrtcSignal.cs          // Bảng webrtc_signals
+│   │   │   ├── Notification.cs          // Bảng notifications
+│   │   │   └── Review.cs                // Bảng reviews
 │   │   └── Security
-│   │       └── AuditLog.cs
+│   │       └── AuditLog.cs              // Bảng audit_logs
 │   │
-│   ├── Services                         (Logic nghiệp vụ ẩn phía sau Server)
-│   │   ├── AiPrescriptionService.cs     (Code gọi API trí tuệ nhân tạo OCR)
-│   │   ├── PaymentService.cs            (Kiểm tra chữ ký bảo mật giao dịch)
-│   │   └── ScheduledWorker.cs           (Tiến trình chạy ngầm quét giờ uống thuốc để báo thức)
+│   ├── Services                         // Logic nghiệp vụ ẩn phía sau Server
+│   │   ├── AiPrescriptionService.cs     // Code gọi API trí tuệ nhân tạo OCR
+│   │   ├── PaymentService.cs            // Kiểm tra chữ ký bảo mật giao dịch
+│   │   └── ScheduledWorker.cs           // Tiến trình chạy ngầm quét giờ uống thuốc
 │   │
 │   ├── SupabaseIntegration              
-│   │   └── SupabaseAdminHelper.cs       (Xác thực Token JWT xem ai đang gọi API)
+│   │   └── SupabaseAdminHelper.cs       // Xác thực Token JWT xem ai đang gọi API
 │   │
 │   ├── Properties
-│   │   └── launchSettings.json          (Cấu hình cổng mạng Port chạy Server, vd: localhost:5000)
-│   ├── appsettings.json                 (Chứa Secret Keys: VNPay Key, AI Key, Supabase Service Role)
-│   ├── Program.cs                       (File khởi chạy Server, cài đặt Dependency Injection)
+│   │   └── launchSettings.json          // Cấu hình cổng mạng Port chạy Server
+│   ├── appsettings.json                 // Chứa VNPay Key, AI Key, Supabase Service Role
+│   ├── Program.cs                       // File khởi chạy Server, cài đặt Dependency Injection
 │   └── Healthcare.Server.csproj         
 │
-└── Healthcare.Client (Project 2: Win UI 3)
+└── Healthcare.Client // Project 2: WinUI 3 / Windows App SDK
     │
-    ├── APIClient                        (Nối Server C# nội bộ)
-    │   ├── AiClient.cs                  (Gói ảnh gửi lên Server phân tích)
-    │   ├── PaymentClient.cs             (Gửi request lấy URL thanh toán VNPay)
-    │   └── BaseHttpClient.cs            (Cấu hình HttpClient chung, tự động nhét Token)
+    ├── APIClient                        // Giao tiếp nhánh 1: Chọc về Server nội bộ
+    │   ├── AiClient.cs                  // Gói ảnh gửi lên Server phân tích
+    │   ├── PaymentClient.cs             // Gửi request lấy URL thanh toán VNPay
+    │   └── BaseHttpClient.cs            // Cấu hình HttpClient chung, tự động nhét Token
     │
-    ├── SupabaseIntegration              (Nối thẳng lên Cloud Database)
-    │   ├── SupabaseManager.cs           (Singleton khởi tạo kết nối mạng)
-    │   ├── SupabaseAuthService.cs       (Hàm Sign In, Sign Up)
-    │   ├── SupabaseDbService.cs         (Hàm CRUD cơ bản: Add, Get, Update, Delete)
-    │   ├── SupabaseStorageService.cs    (Hàm Upload file ảnh avatar, kết quả X-Quang)
-    │   └── SupabaseRealtimeService.cs   (WebSockets lắng nghe tin nhắn Chat & Tín hiệu gọi Video)
+    ├── SupabaseIntegration              // Giao tiếp nhánh 2: Chọc thẳng lên Cloud Database
+    │   ├── SupabaseManager.cs           // Singleton khởi tạo kết nối mạng
+    │   ├── SupabaseAuthService.cs       // Hàm Sign In, Sign Up
+    │   ├── SupabaseDbService.cs         // Hàm CRUD cơ bản: Add, Get, Update, Delete
+    │   ├── SupabaseStorageService.cs    // Hàm Upload file ảnh avatar, kết quả X-Quang
+    │   └── SupabaseRealtimeService.cs   // WebSockets lắng nghe tin nhắn Chat & Tín hiệu gọi Video
     │
-    ├── Models                           
-    │   ├── Identity                     (User.cs, PatientProfile.cs, DoctorProfile.cs)
-    │   ├── Core                         (Appointment.cs, MedicalRecord.cs, ...)
-    │   ├── Communication                (ChatMessage.cs, WebrtcSignal.cs, ...)
-    │   └── Security                     (AuditLog.cs)
+    ├── Models                          
+    │   ├── Identity
+    │   │   ├── User.cs                  // Bảng users
+    │   │   ├── PatientProfile.cs        // Bảng patient_profiles
+    │   │   └── DoctorProfile.cs         // Bảng doctor_profiles
+    │   ├── Core
+    │   │   ├── Appointment.cs           // Bảng appointments
+    │   │   ├── MedicalRecord.cs         // Bảng medical_records
+    │   │   ├── Transaction.cs           // Bảng transactions
+    │   │   ├── HealthMetric.cs          // Bảng health_metrics
+    │   │   ├── LabResult.cs             // Bảng lab_results
+    │   │   ├── MasterMedicine.cs        // Bảng master_medicines
+    │   │   └── MedicationReminder.cs    // Bảng medication_reminders
+    │   ├── Communication
+    │   │   ├── ChatMessage.cs           // Bảng chat_messages
+    │   │   ├── WebrtcSignal.cs          // Bảng webrtc_signals
+    │   │   ├── Notification.cs          // Bảng notifications
+    │   │   └── Review.cs                // Bảng reviews
+    │   └── Security
+    │       └── AuditLog.cs              // Bảng audit_logs
     │
-    ├── Cryptography                     (Bảo mật cục bộ máy Client)
-    │   ├── AESManager.cs                (Mã hóa tin nhắn trước khi đẩy lên Supabase)
-    │   └── RSAManager.cs                (Tạo khóa Public/Private Key)
+    ├── Cryptography                     // Bảo mật cục bộ máy Client
+    │   ├── AESManager.cs                // Mã hóa tin nhắn trước khi đẩy lên Supabase
+    │   └── RSAManager.cs                // Tạo khóa Public/Private Key
     │
-    ├── Helpers                          (Các class tiện ích dùng chung)
-    │   └── SessionStorage.cs            (Lưu thông tin User đang đăng nhập hiện tại)
+    ├── Helpers                          // Các class tiện ích dùng chung
+    │   └── SessionStorage.cs            // Lưu thông tin User đang đăng nhập hiện tại
     │
-    ├── Media                            (Xử lý âm thanh, hình ảnh cục bộ)
-    │   └── WebRtcPeerConnection.cs      (Thuật toán bắt Camera & Micro cho Video Call P2P)
+    ├── Media                            // Xử lý âm thanh, hình ảnh cục bộ
+    │   └── WebRtcPeerConnection.cs      // Thuật toán bắt Camera & Micro cho Video Call P2P
     │
-    ├── UI                               (Thư mục Giao diện WinForms)
-    │   ├── Auth                             (Phân hệ Đăng nhập/Xác thực)
-    │   │   ├── LoginForm.cs                     (Màn hình Login / Register gốc)
-    │   │   └── ForgotPasswordForm.cs        (Màn hình nhập Email gửi link reset pass)
+    ├── UI                               // Giao diện WinUI 3 XAML
+    │   ├── App.xaml / .cs               // Điểm bắt đầu app, khởi tạo SupabaseManager
+    │   ├── MainWindow.xaml / .cs        // Cửa sổ gốc chứa NavigationView và Frame điều hướng
     │   │
-    │   ├── Controls.Patient                 (Phân hệ dành riêng cho BỆNH NHÂN)
-    │   │   ├── PatientHomeUC.cs             (Trang chủ: Nhắc nhở uống thuốc, Lịch khám sắp tới)
-    │   │   ├── BookAppointmentUC.cs         (Tìm kiếm Bác sĩ, Chọn giờ rảnh & Đặt lịch)
-    │   │   ├── PaymentCheckoutUC.cs         (Quét mã QR VNPay/MoMo để thanh toán trước khi khám)
-    │   │   ├── MyRecordsUC.cs               (Xem lại Bệnh án cũ, xem đơn thuốc AI đọc)
-    │   │   ├── HealthMetricsUC.cs           (Giao diện tự nhập số đo: Huyết áp, Nhịp tim, Đường huyết)
-    │   │   └── LabResultsUC.cs              (Kho lưu trữ ảnh X-Quang, file PDF xét nghiệm)
+    │   ├── Views                        // Các trang giao diện (Pages)
+    │   │   ├── Auth                     
+    │   │   │   ├── LoginPage.xaml / .cs          // Trang Đăng nhập / Đăng ký
+    │   │   │   └── ForgotPasswordPage.xaml / .cs // Trang khôi phục mật khẩu
+    │   │   ├── Patient                  // Giao diện cho Bệnh nhân
+    │   │   │   ├── PatientHomePage.xaml / .cs    // Trang chủ Bệnh nhân
+    │   │   │   ├── BookAppointmentPage.xaml / .cs// Đặt lịch khám
+    │   │   │   ├── PaymentCheckoutPage.xaml / .cs// Thanh toán viện phí
+    │   │   │   ├── MyRecordsPage.xaml / .cs      // Hồ sơ bệnh án
+    │   │   │   ├── HealthMetricsPage.xaml / .cs  // Chỉ số sức khỏe
+    │   │   │   └── LabResultsPage.xaml / .cs     // Kết quả xét nghiệm
+    │   │   └── Doctor                   // Giao diện cho Bác sĩ
+    │   │       ├── DoctorHomePage.xaml / .cs     // Trang chủ Bác sĩ (Hàng chờ)
+    │   │       ├── ManageSchedulePage.xaml / .cs // Quản lý lịch trực
+    │   │       ├── ExaminationPage.xaml / .cs    // Khám bệnh trực tuyến
+    │   │       ├── PatientHistoryPage.xaml / .cs // Tiền sử bệnh nhân
+    │   │       └── RevenuePage.xaml / .cs        // Thống kê doanh thu
     │   │
-    │   ├── Controls.Doctor                  (Phân hệ dành riêng cho BÁC SĨ)
-    │   │   ├── DoctorHomeUC.cs              (Trang chủ: Danh sách hàng chờ bệnh nhân hôm nay)
-    │   │   ├── ManageScheduleUC.cs          (Đăng ký khung giờ rảnh để bệnh nhân biết mà đặt lịch)
-    │   │   ├── ExaminationUC.cs             (Màn hình Khám Bệnh: Vừa gọi Video, vừa gõ Bệnh án bên cạnh)
-    │   │   ├── PatientHistoryUC.cs          (Xem tiền sử dị ứng, bệnh nền của bệnh nhân trước khi kê đơn)
-    │   │   └── RevenueUC.cs                 (Biểu đồ thống kê tiền khám bệnh kiếm được trong tháng)
-    │   │
-    │   ├── Controls.Shared                  (Phân hệ dùng chung cho CẢ 2 ĐỐI TƯỢNG)
-    │   │   │   ├── ChatControlUC.cs             (Khung chat giống Messenger, mã hóa tin nhắn)
-    │   │   ├── NotificationPanelUC.cs       (Bảng thả xuống khi bấm vào icon Quả chuông)
-    │   │   ├── ProfileUC.cs                 (Cập nhật thông tin cá nhân, đổi Avatar, đổi mật khẩu)
-    │   │   └── VideoCallForm.cs             (Lưu ý: Cái này phải là FORM để có thể phóng to Toàn màn hình)
-    │   │
-    │   └── Main                             (Khung xương của ứng dụng)
-    │       └── MainDashboard.cs             (Form chính chứa Sidebar Menu bên trái và Panel chứa UC bên phải)
+    │   └── Components                   // Các UserControl XAML tái sử dụng
+    │       ├── ChatControl.xaml / .cs            // Khung chat nhắn tin
+    │       ├── NotificationPanel.xaml / .cs      // Bảng thông báo
+    │       ├── ProfileControl.xaml / .cs         // Cập nhật thông tin cá nhân
+    │       └── VideoCallWindow.xaml / .cs        // Cửa sổ Popup cho Video Call
     │
-    ├── Assets                           (Thư mục chứa tài nguyên tĩnh)
+    ├── Assets                           // Thư mục chứa tài nguyên tĩnh
     │
-    ├── Program.cs                       (Khởi động app, chờ SupabaseManager nối mạng)
-    └── Healthcare.Client.csproj
+    └── Healthcare.Client.csproj         // File cấu hình Project Client
 ```
