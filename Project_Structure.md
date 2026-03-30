@@ -43,7 +43,7 @@ NT106.Solution
 │   ├── Program.cs                       (File khởi chạy Server, cài đặt Dependency Injection)
 │   └── Healthcare.Server.csproj         
 │
-└── Healthcare.Client (Project 2: Windows Forms Application)
+└── Healthcare.Client 
     │
     ├── APIClient                        (Giao tiếp nhánh 1: Chọc về Server C# nội bộ)
     │   ├── AiClient.cs                  (Gói ảnh gửi lên Server phân tích)
@@ -87,9 +87,6 @@ NT106.Solution
     │       └── MainDashboard.cs         (Giao diện chính chứa Menu trái và các khung hiển thị)
     │
     ├── Assets                           (Thư mục chứa tài nguyên tĩnh)
-    │   ├── icon_doctor.png
-    │   ├── logo_app.ico
-    │   └── sound_ringtone.wav           (Tiếng chuông khi có người gọi Video)
     │
     ├── Program.cs                       (Khởi động app, chờ SupabaseManager nối mạng)
     └── Healthcare.Client.csproj
