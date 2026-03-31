@@ -1,0 +1,117 @@
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
+using System;
+using System.Threading.Tasks;
+
+namespace Healthcare.Client.UI.Auth
+{
+    public sealed partial class LoginPage : Page
+    {
+        private bool _isPasswordRevealed = false;
+
+        public LoginPage()
+        {
+            this.InitializeComponent();
+        }
+
+        // ──────────────────────────────────────────────
+        // Toggle hiện/ẩn mật khẩu
+        // ──────────────────────────────────────────────
+        private void RevealBtn_Click(object sender, RoutedEventArgs e)
+        {
+            _isPasswordRevealed = !_isPasswordRevealed;
+
+            if (_isPasswordRevealed)
+            {
+                PasswordBox.PasswordRevealMode = PasswordRevealMode.Visible;
+                RevealIcon.Glyph = "\uED1A"; // Eye-off icon
+            }
+            else
+            {
+                PasswordBox.PasswordRevealMode = PasswordRevealMode.Hidden;
+                RevealIcon.Glyph = "\uE7B3"; // Eye icon
+            }
+        }
+
+        // ──────────────────────────────────────────────
+        // Đăng nhập
+        // ──────────────────────────────────────────────
+        private async void LoginBtn_Click(object sender, RoutedEventArgs e)
+        {
+            string username = UsernameBox.Text.Trim();
+            string password = PasswordBox.Password;
+
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                await ShowDialogAsync("Thông tin chưa đầy đủ", "Vui lòng nhập tên đăng nhập và mật khẩu.");
+                return;
+            }
+
+            LoginBtn.IsEnabled = false;
+
+            try
+            {
+                // TODO: Gọi SupabaseAuthService.SignInAsync(username, password)
+                // Ví dụ:
+                // var session = await SupabaseAuthService.SignInAsync(username, password);
+                // SessionStorage.Current.SetUser(session.User);
+
+                // TODO: Navigate sang MainDashboard sau khi đăng nhập thành công
+                // Frame.Navigate(typeof(Main.MainDashboard), null,
+                //     new SlideNavigationTransitionInfo { Effect = SlideNavigationTransitionEffect.FromRight });
+            }
+            catch (Exception ex)
+            {
+                await ShowDialogAsync("Đăng nhập thất bại", ex.Message);
+            }
+            finally
+            {
+                LoginBtn.IsEnabled = true;
+            }
+        }
+
+        // ──────────────────────────────────────────────
+        // Quên mật khẩu
+        // ──────────────────────────────────────────────
+        private void ForgotPassword_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(
+                typeof(ForgotPasswordPage),
+                null,
+                new SlideNavigationTransitionInfo { Effect = SlideNavigationTransitionEffect.FromRight }
+            );
+        }
+
+        // ──────────────────────────────────────────────
+        // Yêu cầu cấp quyền truy cập
+        // ──────────────────────────────────────────────
+        private void RequestAccess_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(
+                typeof(RegisterPage),
+                null,
+                new SlideNavigationTransitionInfo
+                {
+                    Effect = SlideNavigationTransitionEffect.FromRight
+                });
+        }
+
+
+        // ──────────────────────────────────────────────
+        // Helper: Hiển thị dialog thông báo
+        // ──────────────────────────────────────────────
+        private async Task ShowDialogAsync(string title, string message)
+        {
+            var dialog = new ContentDialog
+            {
+                Title = title,
+                Content = message,
+                CloseButtonText = "Đóng",
+                XamlRoot = this.XamlRoot,
+                DefaultButton = ContentDialogButton.Close
+            };
+            await dialog.ShowAsync();
+        }
+    }
+}
