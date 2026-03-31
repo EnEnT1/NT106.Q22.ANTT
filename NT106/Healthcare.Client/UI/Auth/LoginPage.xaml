@@ -1,0 +1,380 @@
+<Page
+    x:Class="Healthcare.Client.UI.Auth.LoginPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <!-- Primary Blue Color -->
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#0059BB"/>
+        <SolidColorBrush x:Key="PrimaryDarkBrush" Color="#004493"/>
+        <SolidColorBrush x:Key="PrimaryContainerBrush" Color="#0070EA"/>
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#F8F9FA"/>
+        <SolidColorBrush x:Key="SurfaceContainerBrush" Color="#EDEEEF"/>
+        <SolidColorBrush x:Key="OnSurfaceBrush" Color="#191C1D"/>
+        <SolidColorBrush x:Key="OnSurfaceVariantBrush" Color="#414754"/>
+        <SolidColorBrush x:Key="SecondaryBrush" Color="#46607F"/>
+        <SolidColorBrush x:Key="OutlineVariantBrush" Color="#C1C6D7"/>
+        <SolidColorBrush x:Key="PrimaryFixedDimBrush" Color="#ADC7FF"/>
+        <SolidColorBrush x:Key="PrimaryFixedBrush" Color="#D8E2FF"/>
+        <SolidColorBrush x:Key="WhiteBrush" Color="#FFFFFF"/>
+
+        <!-- Custom TextBox Style -->
+        <Style x:Key="AuthTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="#191C1D"/>
+            <Setter Property="BorderBrush" Value="#C1C6D7"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="44,14,16,14"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="MinHeight" Value="52"/>
+        </Style>
+
+        <!-- Custom PasswordBox Style -->
+        <Style x:Key="AuthPasswordBoxStyle" TargetType="PasswordBox">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="#191C1D"/>
+            <Setter Property="BorderBrush" Value="#C1C6D7"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="44,14,44,14"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="MinHeight" Value="52"/>
+        </Style>
+
+        <!-- Primary Button Style -->
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#0059BB"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Height" Value="52"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="RootBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                Height="{TemplateBinding Height}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootBorder" Storyboard.TargetProperty="Background">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="#004493"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootBorder" Storyboard.TargetProperty="Background">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="#003A8A"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootBorder" Storyboard.TargetProperty="Background">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="#C1C6D7"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Outline Button Style (Register) -->
+        <Style x:Key="OutlineButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#46607F"/>
+            <Setter Property="BorderBrush" Value="#C1C6D7"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Padding" Value="24,8"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="RootBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootBorder" Storyboard.TargetProperty="Background">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="#EBF2FF"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootBorder" Storyboard.TargetProperty="BorderBrush">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="#0059BB"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootBorder" Storyboard.TargetProperty="Background">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="#D8E2FF"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid Background="{StaticResource SurfaceBrush}">
+        <Grid.ColumnDefinitions>
+            <!-- Left panel hidden on small windows, visible when width > 900 -->
+            <ColumnDefinition Width="*" MinWidth="0"/>
+            <ColumnDefinition Width="440"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- LEFT PANEL: Hero / Branding                 -->
+        <!-- ═══════════════════════════════════════════ -->
+        <Border Grid.Column="0" Background="#0059BB" CornerRadius="0">
+            <Grid>
+                <!-- Background Image -->
+                <Image Source="https://lh3.googleusercontent.com/aida-public/AB6AXuCZKs0sUp2PmIOumCFqwfuGNpBR6zp4Sn-HLbOvWYR74hgoSArIuJITwAnjNbdTH5_cOjTvMeOECV4gVfASRtMvq9NFycBkJLVhpSSgePRvzJKLHRTuPJX3P6W5bG7SvLCmighB2uqFoFmvFCuIBkS_GCJQrl4wwo0_CNAwfRYTmEmT2MfNR5gxLVo-Np_sVayFyUNYE83aH94erHT6Iw6Xg_Hv4v49iHoalj_W_jXv1BX4WfQ4BadNhbLuvSRSMfOOo3JBpvWDlRA"
+                       Stretch="UniformToFill"
+                       Opacity="0.35"/>
+
+                <!-- Gradient Overlay bottom -->
+                <Border>
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="Transparent" Offset="0.3"/>
+                            <GradientStop Color="#CC003A8A" Offset="1.0"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                </Border>
+
+                <!-- Text Content bottom-left -->
+                <StackPanel VerticalAlignment="Bottom"
+                            HorizontalAlignment="Left"
+                            Margin="48,0,48,64"
+                            Spacing="12">
+
+                    <TextBlock Text="DIGITAL SANCTUARY"
+                               Foreground="#ADC7FF"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               CharacterSpacing="200"/>
+
+                    <TextBlock FontSize="40"
+                               FontWeight="ExtraBold"
+                               Foreground="#FFFFFF"
+                               LineHeight="52">
+                        <Run Text="Kiến tạo tương lai"/>
+                        <LineBreak/>
+                        <Run Text="ngành y tế."/>
+                    </TextBlock>
+
+                    <TextBlock Text="Hệ thống quản lý thông minh, tinh gọn và bảo mật tuyệt đối dành cho các cơ sở y tế hiện đại."
+                               Foreground="#ADC7FF"
+                               FontSize="15"
+                               FontWeight="Light"
+                               LineHeight="26"
+                               TextWrapping="Wrap"
+                               MaxWidth="420"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- RIGHT PANEL: Login Form                     -->
+        <!-- ═══════════════════════════════════════════ -->
+        <ScrollViewer Grid.Column="1"
+                      Background="{StaticResource SurfaceBrush}"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Width="360"
+                        Spacing="0"
+                        Margin="0,48,0,32">
+
+                <!-- Brand Logo + Title -->
+                <StackPanel Spacing="12" Margin="0,0,0,40">
+                    <Border Width="52" Height="52"
+                            Background="#0059BB"
+                            CornerRadius="14"
+                            HorizontalAlignment="Left">
+                        <FontIcon Glyph="&#xEA37;"
+                                  FontSize="28"
+                                  Foreground="White"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="Quản Lý Y Tế"
+                               FontSize="28"
+                               FontWeight="ExtraBold"
+                               Foreground="#0059BB"/>
+                    <TextBlock Text="Chào mừng trở lại. Vui lòng đăng nhập."
+                               FontSize="14"
+                               Foreground="{StaticResource OnSurfaceVariantBrush}"
+                               FontWeight="Medium"/>
+                </StackPanel>
+
+                <!-- ─── FORM ─── -->
+                <StackPanel Spacing="20">
+
+                    <!-- Username Field -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="TÊN ĐĂNG NHẬP"
+                                   FontSize="11"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource SecondaryBrush}"
+                                   CharacterSpacing="100"/>
+                        <Grid>
+                            <TextBox x:Name="UsernameBox"
+                                     Style="{StaticResource AuthTextBoxStyle}"
+                                     PlaceholderText="Nhập tên đăng nhập"/>
+                            <!-- Icon Left -->
+                            <FontIcon Glyph="&#xE77B;"
+                                      FontSize="18"
+                                      Foreground="#717786"
+                                      HorizontalAlignment="Left"
+                                      VerticalAlignment="Center"
+                                      Margin="14,0,0,0"
+                                      IsHitTestVisible="False"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Password Field -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="MẬT KHẨU"
+                                   FontSize="11"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource SecondaryBrush}"
+                                   CharacterSpacing="100"/>
+                        <Grid>
+                            <PasswordBox x:Name="PasswordBox"
+                                         Style="{StaticResource AuthPasswordBoxStyle}"
+                                         PlaceholderText="••••••••"
+                                         PasswordRevealMode="Hidden"/>
+                            <!-- Lock Icon Left -->
+                            <FontIcon Glyph="&#xE72E;"
+                                      FontSize="18"
+                                      Foreground="#717786"
+                                      HorizontalAlignment="Left"
+                                      VerticalAlignment="Center"
+                                      Margin="14,0,0,0"
+                                      IsHitTestVisible="False"/>
+                            <!-- Reveal Button Right -->
+                            <Button x:Name="RevealBtn"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Padding="8"
+                                    Margin="0,0,6,0"
+                                    Click="RevealBtn_Click"
+                                    ToolTipService.ToolTip="Hiện mật khẩu">
+                                <FontIcon x:Name="RevealIcon"
+                                          Glyph="&#xE7B3;"
+                                          FontSize="16"
+                                          Foreground="#717786"/>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Remember Me + Forgot Password -->
+                    <Grid Margin="2,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox x:Name="RememberMeBox"
+                                  Grid.Column="0"
+                                  Content="Ghi nhớ đăng nhập"
+                                  FontSize="13"
+                                  Foreground="{StaticResource OnSurfaceVariantBrush}"/>
+
+                        <HyperlinkButton Grid.Column="1"
+                                         Content="Quên mật khẩu?"
+                                         FontSize="13"
+                                         FontWeight="SemiBold"
+                                         Foreground="#0059BB"
+                                         Padding="0"
+                                         Click="ForgotPassword_Click"/>
+                    </Grid>
+
+                    <!-- Login Button -->
+                    <Button x:Name="LoginBtn"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Click="LoginBtn_Click"
+                            Margin="0,8,0,0">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Đăng nhập ngay"
+                                       FontSize="15"
+                                       FontWeight="Bold"
+                                       Foreground="White"
+                                       VerticalAlignment="Center"/>
+                            
+                        </StackPanel>
+                    </Button>
+
+                </StackPanel>
+                <!-- ─── END FORM ─── -->
+
+                <!-- Divider + Register -->
+                <StackPanel Spacing="16" Margin="0,36,0,0">
+                    <Border Height="1" Background="#EDEEEF"/>
+                    <TextBlock Text="Chưa có tài khoản hệ thống?"
+                               FontSize="13"
+                               Foreground="{StaticResource OnSurfaceVariantBrush}"
+                               HorizontalAlignment="Center"/>
+                    <Button Content="Yêu cầu cấp quyền truy cập"
+                            Style="{StaticResource OutlineButtonStyle}"
+                            HorizontalAlignment="Center"
+                            Click="RequestAccess_Click"/>
+                </StackPanel>
+
+                <!-- Footer -->
+                <StackPanel Spacing="8" Margin="0,48,0,0">
+                    <Border Height="1" Background="#EDEEEF"/>
+                    <TextBlock FontSize="11"
+                               Foreground="#717786"
+                               TextAlignment="Center"
+                               Margin="0,8,0,0">
+                        <Run Text="© 2024 Hệ Thống Quản Lý Y Tế Digital Sanctuary. Bảo lưu mọi quyền."/>
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Spacing="16">
+                        <HyperlinkButton Content="Điều khoản sử dụng" FontSize="11" Foreground="#717786" Padding="0"/>
+                        <HyperlinkButton Content="Chính sách bảo mật" FontSize="11" Foreground="#717786" Padding="0"/>
+                        <HyperlinkButton Content="Liên hệ" FontSize="11" Foreground="#717786" Padding="0"/>
+                    </StackPanel>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+
+    </Grid>
+</Page>

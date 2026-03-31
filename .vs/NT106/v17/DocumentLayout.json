@@ -1,7 +1,44 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Code\\NT106 Project\\",
-  "Documents": [],
+  "WorkspaceRootPath": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\auth\\loginpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\auth\\loginpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\auth\\loginpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\auth\\loginpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\auth\\forgotpasswordpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\auth\\forgotpasswordpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\auth\\forgotpasswordpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\auth\\forgotpasswordpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\auth\\registerpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\auth\\registerpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\auth\\registerpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\auth\\registerpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\healthcare.client.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\healthcare.client.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,11 +46,128 @@
       "DocumentGroups": [
         {
           "DockedWidth": 459,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
-              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "LoginPage.xaml.cs",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\LoginPage.xaml.cs",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Auth\\LoginPage.xaml.cs",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\LoginPage.xaml.cs",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Auth\\LoginPage.xaml.cs",
+              "ViewState": "AgIAACcAAAAAAAAAAAAYwFYAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-30T13:00:32.386Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "LoginPage.xaml",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\LoginPage.xaml",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Auth\\LoginPage.xaml",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\LoginPage.xaml",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Auth\\LoginPage.xaml",
+              "ViewState": "AgIAAAgBAAAAAAAAAAAAAAUBAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-03-30T12:57:58.037Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ForgotPasswordPage.xaml.cs",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\ForgotPasswordPage.xaml.cs",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Auth\\ForgotPasswordPage.xaml.cs",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\ForgotPasswordPage.xaml.cs",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Auth\\ForgotPasswordPage.xaml.cs",
+              "ViewState": "AgIAAPQAAAAAAAAAAAAIwAABAABIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-31T08:34:51.666Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\MainWindow.xaml.cs",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\MainWindow.xaml.cs",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\MainWindow.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-30T13:16:24.168Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\MainWindow.xaml",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\MainWindow.xaml",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\MainWindow.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-03-30T13:17:39.284Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "RegisterPage.xaml.cs",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\RegisterPage.xaml.cs",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Auth\\RegisterPage.xaml.cs",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\RegisterPage.xaml.cs",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Auth\\RegisterPage.xaml.cs",
+              "ViewState": "AgIAAEYAAAAAAAAAAADwv30AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-31T08:12:19.305Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "RegisterPage.xaml",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\RegisterPage.xaml",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Auth\\RegisterPage.xaml",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\RegisterPage.xaml",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Auth\\RegisterPage.xaml",
+              "ViewState": "AgIAAEYBAAAAAAAAAAAIwGABAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-03-31T08:09:02.499Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ForgotPasswordPage.xaml",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\ForgotPasswordPage.xaml",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Auth\\ForgotPasswordPage.xaml",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\ForgotPasswordPage.xaml",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Auth\\ForgotPasswordPage.xaml",
+              "ViewState": "AgIAAIQBAAAAAAAAAAAIwKoBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-03-30T13:02:07.426Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Healthcare.Client.csproj",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\Healthcare.Client.csproj",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\Healthcare.Client.csproj",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\Healthcare.Client.csproj",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\Healthcare.Client.csproj",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAewB0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-03-30T12:19:52.89Z",
+              "EditorCaption": ""
             }
           ]
         }
