@@ -9,7 +9,7 @@ namespace Healthcare.Client.UI.Auth
     public sealed partial class ForgotPasswordPage : Page
     {
         private int _currentStep = 1;
-        private string _phoneNumber = "";
+        private string _email = "";
         private bool _isNewPasswordRevealed = false;
         private bool _isConfirmPasswordRevealed = false;
 
@@ -50,9 +50,9 @@ namespace Healthcare.Client.UI.Auth
         // ──────────────────────────────────────────────
         private async void SendOtp_Click(object sender, RoutedEventArgs e)
         {
-            _phoneNumber = PhoneBox.Text.Trim();
+            _email = PhoneBox.Text.Trim();
 
-            if (string.IsNullOrEmpty(_phoneNumber))
+            if (string.IsNullOrEmpty(_email))
             {
                 await ShowDialogAsync("Thiếu thông tin", "Vui lòng nhập số điện thoại.");
                 return;
@@ -64,9 +64,9 @@ namespace Healthcare.Client.UI.Auth
                 // await SupabaseAuthService.SendOtpAsync(_phoneNumber);
 
                 // Hiển thị số điện thoại bị che ở step 2
-                string masked = _phoneNumber.Length >= 6
-                    ? _phoneNumber[..3] + "***" + _phoneNumber[^4..]
-                    : _phoneNumber;
+                string masked = _email.Contains('@')
+                    ? _email[..3] + "***" + _email[_email.IndexOf('@')..]
+                    : _email;
                 MaskedPhoneText.Text = masked;
 
                 // Bắt đầu đếm ngược
