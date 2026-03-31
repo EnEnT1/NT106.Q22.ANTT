@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using System;
 using System.Threading.Tasks;
+using Healthcare.Client.SupabaseIntegration;
 
 namespace Healthcare.Client.UI.Auth
 {
@@ -60,16 +61,12 @@ namespace Healthcare.Client.UI.Auth
 
             try
             {
-                // TODO: Gọi API gửi OTP về số điện thoại
-                // await SupabaseAuthService.SendOtpAsync(_phoneNumber);
+                await SupabaseAuthService.SendResetPasswordEmailAsync(_email);
 
-                // Hiển thị số điện thoại bị che ở step 2
                 string masked = _email.Contains('@')
                     ? _email[..3] + "***" + _email[_email.IndexOf('@')..]
                     : _email;
                 MaskedPhoneText.Text = masked;
-
-                // Bắt đầu đếm ngược
                 StartCountdown();
 
                 GoToStep(2);
@@ -96,9 +93,7 @@ namespace Healthcare.Client.UI.Auth
 
             try
             {
-                // TODO: Gọi API xác thực OTP
-                // await SupabaseAuthService.VerifyOtpAsync(_phoneNumber, otp);
-
+                await SupabaseAuthService.VerifyOtpAsync(_email, otp);
                 _countdownTimer?.Stop();
                 GoToStep(3);
             }
@@ -165,7 +160,7 @@ namespace Healthcare.Client.UI.Auth
             try
             {
                 // TODO: Gọi API đặt lại mật khẩu
-                // await SupabaseAuthService.UpdatePasswordAsync(newPass);
+                await SupabaseAuthService.UpdatePasswordAsync(newPass);
 
                 await ShowDialogAsync("Thành công", "Mật khẩu đã được cập nhật. Vui lòng đăng nhập lại.");
                 BackToLogin_Click(sender, e);

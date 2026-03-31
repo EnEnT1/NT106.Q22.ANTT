@@ -3,6 +3,10 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using System;
 using System.Threading.Tasks;
+using Healthcare.Client.Helpers;
+using Healthcare.Client.SupabaseIntegration;
+using Healthcare.Client.UI.Patient;
+using Healthcare.Client.UI.Doctor;
 
 namespace Healthcare.Client.UI.Auth
 {
@@ -52,14 +56,31 @@ namespace Healthcare.Client.UI.Auth
 
             try
             {
-                // TODO: Gọi SupabaseAuthService.SignInAsync(username, password)
-                // Ví dụ:
-                // var session = await SupabaseAuthService.SignInAsync(username, password);
-                // SessionStorage.Current.SetUser(session.User);
+                var result = await SupabaseAuthService.SignInAsync(username, password);
 
-                // TODO: Navigate sang MainDashboard sau khi đăng nhập thành công
-                // Frame.Navigate(typeof(Main.MainDashboard), null,
-                //     new SlideNavigationTransitionInfo { Effect = SlideNavigationTransitionEffect.FromRight });
+                if (!result.Success)
+                {
+                    await ShowDialogAsync("Đăng nhập thất bại", result.Message);
+                    return;
+                }
+
+                if (result.Role.Equals("Doctor", StringComparison.OrdinalIgnoreCase))
+                {
+                    Frame.Navigate(typeof(DoctorHomePage), null,
+                        new SlideNavigationTransitionInfo
+                        {
+                            Effect = SlideNavigationTransitionEffect.FromRight
+                        });
+                }
+                else
+                {
+                    Frame.Navigate(typeof(PatientHomePage), null,
+                        new SlideNavigationTransitionInfo
+                        {
+                            Effect = SlideNavigationTransitionEffect.FromRight
+                        });
+                }
+
             }
             catch (Exception ex)
             {
