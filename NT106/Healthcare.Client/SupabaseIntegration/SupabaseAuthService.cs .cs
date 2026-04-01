@@ -78,12 +78,37 @@ namespace Healthcare.Client.SupabaseIntegration
                 if (session == null || session.User == null)
                     throw new Exception("Không tạo được tài khoản.");
 
-                var appUser = MapToAppUser(session.User, "Patient");
+                string newUserID = session.User.Id;
 
+                var newUser = new User
+                {
+                    Id = newUserID,
+                    Email = email,
+                    FullName = fullName,
+                    Phone = phone,
+                    Role = "Patient",
+                    CreatedAt = DateTime.Now,
+                };
+                
+                var newPatientProfile = new PatientProfile
+                {
+                    PatientId = newUserID,
+                };
+
+                var insertUserTask = client.From<User>().Insert(newUser);
+                
+                await insertUserTask;
+
+                
+                var insertProfileTask = client.From<PatientProfile>().Insert(newPatientProfile);
+                await insertProfileTask;
+
+                await Task.WhenAll(insertUserTask, insertProfileTask);
+                var appUser = MapToAppUser(session.User, "Patient");
                 return new AuthResult
                 {
                     Success = true,
-                    Message = "Đăng ký thành công. Vui lòng kiểm tra email để xác nhận.",
+                    Message = "Đăng ký thành công! Bạn có thể đăng nhập ngay lập tức.",
                     Role = "Patient",
                     AppUser = appUser
                 };
@@ -119,14 +144,23 @@ namespace Healthcare.Client.SupabaseIntegration
         // =========================================================
         public static async Task VerifyOtpAsync(string email, string otp)
         {
-            await Task.Delay(300);
+            try
+            {
+                var client = SupabaseManager.Instance.Client;
 
-            if (string.IsNullOrWhiteSpace(otp) || otp.Length != 6)
-                throw new Exception("Mã OTP không hợp lệ.");
+                // Gửi 6 số OTP lên Supabase để xác minh quyền khôi phục (Recovery)
+                var session = await client.Auth.VerifyOTP(email, otp, Supabase.Gotrue.Constants.EmailOtpType.Recovery);
 
-            // TODO thật sự:
-            // Nếu dùng OTP SMS/email code thật, thay chỗ này bằng API verify thật.
-            // Hiện tại chỉ giữ flow UI 3 bước để app chạy được.
+                if (session == null || session.User == null)
+                    throw new Exception("Xác thực thất bại.");
+
+                // Nếu thành công, Supabase sẽ tự động đăng nhập ngầm user này, 
+                // lúc này hàm UpdatePasswordAsync ở Step 3 mới được phép chạy!
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Mã OTP không đúng hoặc đã hết hạn.");
+            }
         }
 
         // =========================================================
@@ -146,7 +180,6 @@ namespace Healthcare.Client.SupabaseIntegration
 
                 await client.Auth.Update(attrs);
 
-                await client.Auth.Update(attrs);
             }
             catch (Exception ex)
             {

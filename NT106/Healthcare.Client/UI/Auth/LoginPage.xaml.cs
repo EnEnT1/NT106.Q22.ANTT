@@ -51,9 +51,9 @@ namespace Healthcare.Client.UI.Auth
                 await ShowDialogAsync("Thông tin chưa đầy đủ", "Vui lòng nhập tên đăng nhập và mật khẩu.");
                 return;
             }
-
+            var originalButtonContent = LoginBtn.Content;
             LoginBtn.IsEnabled = false;
-
+            LoginBtn.Content = "Đang xác thực...";
             try
             {
                 var result = await SupabaseAuthService.SignInAsync(username, password);
@@ -88,6 +88,7 @@ namespace Healthcare.Client.UI.Auth
             }
             finally
             {
+                LoginBtn.Content = originalButtonContent;
                 LoginBtn.IsEnabled = true;
             }
         }

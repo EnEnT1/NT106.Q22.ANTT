@@ -55,7 +55,7 @@ namespace Healthcare.Client.UI.Auth
 
             if (string.IsNullOrEmpty(_email))
             {
-                await ShowDialogAsync("Thiếu thông tin", "Vui lòng nhập số điện thoại.");
+                await ShowDialogAsync("Thiếu thông tin", "Vui lòng nhập email.");
                 return;
             }
 
@@ -83,9 +83,10 @@ namespace Healthcare.Client.UI.Auth
         private async void VerifyOtp_Click(object sender, RoutedEventArgs e)
         {
             string otp = Otp1.Text + Otp2.Text + Otp3.Text +
-                         Otp4.Text + Otp5.Text + Otp6.Text;
+                         Otp4.Text + Otp5.Text + Otp6.Text +
+                         Otp7.Text + Otp8.Text;
 
-            if (otp.Length < 6)
+            if (otp.Length < 8)
             {
                 await ShowDialogAsync("Mã OTP chưa đầy đủ", "Vui lòng nhập đủ 6 chữ số.");
                 return;
@@ -106,7 +107,7 @@ namespace Healthcare.Client.UI.Auth
         // Auto-focus ô tiếp theo khi nhập OTP
         private void OtpBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var boxes = new[] { Otp1, Otp2, Otp3, Otp4, Otp5, Otp6 };
+            var boxes = new[] { Otp1, Otp2, Otp3, Otp4, Otp5, Otp6, Otp7, Otp8 };
             var current = sender as TextBox;
             int idx = Array.IndexOf(boxes, current);
 
@@ -117,17 +118,25 @@ namespace Healthcare.Client.UI.Auth
         // ──────────────────────────────────────────────
         // STEP 2: Gửi lại OTP
         // ──────────────────────────────────────────────
-        private void ResendOtp_Click(object sender, RoutedEventArgs e)
+        private async void ResendOtp_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Gọi lại API gửi OTP
-            ClearOtpBoxes();
-            StartCountdown();
+            try
+            {
+                await SupabaseAuthService.SendResetPasswordEmailAsync(_email);
+                ClearOtpBoxes();
+                StartCountdown();
+
+            }
+            catch (Exception ex)
+            {
+                ShowDialogAsync("Gửi lại OTP thất bại", ex.Message);
+            }
         }
 
         private void ClearOtpBoxes()
         {
-            Otp1.Text = Otp2.Text = Otp3.Text = "";
-            Otp4.Text = Otp5.Text = Otp6.Text = "";
+            Otp1.Text = Otp2.Text = Otp3.Text = Otp4.Text = "";
+            Otp5.Text = Otp6.Text = Otp7.Text = Otp8.Text = "";
             Otp1.Focus(FocusState.Programmatic);
         }
 
