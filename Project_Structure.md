@@ -79,8 +79,7 @@ NNT106.Solution // Thư mục gốc Solution
     │       └── AuditLog.cs              // Bảng audit_logs
     │
     ├── Cryptography                     // Bảo mật cục bộ máy Client
-    │   ├── AESManager.cs                // Mã hóa tin nhắn trước khi đẩy lên Supabase
-    │   └── RSAManager.cs                // Tạo khóa Public/Private Key
+    │   └── RSAManager.cs                // Tạo khóa Public/Private Key/Mã hóa tin nhắn trước khi đưa lên supabase
     │
     ├── Helpers                          // Các class tiện ích dùng chung
     │   └── SessionStorage.cs            // Lưu thông tin User đang đăng nhập hiện tại
@@ -89,26 +88,23 @@ NNT106.Solution // Thư mục gốc Solution
     │   └── WebRtcPeerConnection.cs      // Thuật toán bắt Camera & Micro cho Video Call P2P
     │
     ├── UI                               // Giao diện WinUI 3 XAML
-    │   ├── App.xaml / .cs               // Điểm bắt đầu app, khởi tạo SupabaseManager
-    │   ├── MainWindow.xaml / .cs        // Cửa sổ gốc chứa NavigationView và Frame điều hướng
-    │   │
-    │   ├── Views                        // Các trang giao diện (Pages)
-    │   │   ├── Auth                     
-    │   │   │   ├── LoginPage.xaml / .cs          // Trang Đăng nhập / Đăng ký
-    │   │   │   └── ForgotPasswordPage.xaml / .cs // Trang khôi phục mật khẩu
-    │   │   ├── Patient                  // Giao diện cho Bệnh nhân
-    │   │   │   ├── PatientHomePage.xaml / .cs    // Trang chủ Bệnh nhân
-    │   │   │   ├── BookAppointmentPage.xaml / .cs// Đặt lịch khám
-    │   │   │   ├── PaymentCheckoutPage.xaml / .cs// Thanh toán viện phí
-    │   │   │   ├── MyRecordsPage.xaml / .cs      // Hồ sơ bệnh án
-    │   │   │   ├── HealthMetricsPage.xaml / .cs  // Chỉ số sức khỏe
-    │   │   │   └── LabResultsPage.xaml / .cs     // Kết quả xét nghiệm
-    │   │   └── Doctor                   // Giao diện cho Bác sĩ
-    │   │       ├── DoctorHomePage.xaml / .cs     // Trang chủ Bác sĩ (Hàng chờ)
-    │   │       ├── ManageSchedulePage.xaml / .cs // Quản lý lịch trực
-    │   │       ├── ExaminationPage.xaml / .cs    // Khám bệnh trực tuyến
-    │   │       ├── PatientHistoryPage.xaml / .cs // Tiền sử bệnh nhân
-    │   │       └── RevenuePage.xaml / .cs        // Thống kê doanh thu
+    │   │ // Các trang giao diện (Pages)
+    │   ├── Auth                     
+    │   │    ├── LoginPage.xaml / .cs          // Trang Đăng nhập / Đăng ký
+    │   │    ├── ForgotPasswordPage.xaml / .cs // Trang khôi phục mật khẩu
+    │   ├── Patient                  // Giao diện cho Bệnh nhân
+    │   │    ├── PatientHomePage.xaml / .cs    // Trang chủ Bệnh nhân
+    │   │    ├── BookAppointmentPage.xaml / .cs// Đặt lịch khám
+    │   │    ├── PaymentCheckoutPage.xaml / .cs// Thanh toán viện phí
+    │   │    ├── MyRecordsPage.xaml / .cs      // Hồ sơ bệnh án
+    │   │    ├── HealthMetricsPage.xaml / .cs  // Chỉ số sức khỏe
+    │   │    ├── LabResultsPage.xaml / .cs     // Kết quả xét nghiệm
+    │   ├── Doctor                   // Giao diện cho Bác sĩ
+    │   │    ├── DoctorHomePage.xaml / .cs     // Trang chủ Bác sĩ (Hàng chờ)
+    │   │    ├── ManageSchedulePage.xaml / .cs // Quản lý lịch trực
+    │   │    ├── ExaminationPage.xaml / .cs    // Khám bệnh trực tuyến
+    │   │    ├── PatientHistoryPage.xaml / .cs // Tiền sử bệnh nhân
+    │   │    └── RevenuePage.xaml / .cs        // Thống kê doanh thu
     │   │
     │   └── Components                   // Các UserControl XAML tái sử dụng
     │       ├── ChatControl.xaml / .cs            // Khung chat nhắn tin
@@ -118,5 +114,7 @@ NNT106.Solution // Thư mục gốc Solution
     │
     ├── Assets                           // Thư mục chứa tài nguyên tĩnh
     │
-    └── Healthcare.Client.csproj         // File cấu hình Project Client
+    ├── Healthcare.Client.csproj         // File cấu hình Project Client
+    ├── App.xaml / .cs               // Điểm bắt đầu app, khởi tạo SupabaseManager
+    └── MainWindow.xaml / .cs        // Cửa sổ gốc chứa NavigationView và Frame điều hướng
 ```
