@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using System;
 using System.Threading.Tasks;
+using Healthcare.Client.SupabaseIntegration;
 
 namespace Healthcare.Client.UI.Auth
 {
@@ -72,13 +73,18 @@ namespace Healthcare.Client.UI.Auth
 
             try
             {
-                // TODO: Gọi SupabaseAuthService.SignUpAsync(email, password)
-                // TODO: Lưu thêm thông tin fullName, phone vào bảng PatientProfile
+                var result = await SupabaseAuthService.SignUpAsync(fullName, email, phone, password);
 
-                await ShowDialogAsync("Đăng ký thành công", "Tài khoản đã được tạo. Vui lòng kiểm tra email để xác nhận.");
+                await ShowDialogAsync("Đăng ký thành công", result.Message);
 
-                // Quay lại trang đăng nhập
-                Frame.GoBack();
+                if (Frame.CanGoBack)
+                    Frame.GoBack();
+                else
+                    Frame.Navigate(typeof(LoginPage), null,
+                        new SlideNavigationTransitionInfo
+                        {
+                            Effect = SlideNavigationTransitionEffect.FromLeft
+                        });
             }
             catch (Exception ex)
             {
