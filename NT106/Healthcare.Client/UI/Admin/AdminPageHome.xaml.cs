@@ -3,8 +3,10 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Healthcare.Client.Models.Identity;
 using Healthcare.Client.Models.Core;
+using Healthcare.Client.Models.Communication;
 using Healthcare.Client.SupabaseIntegration;
 using Healthcare.Client.APIClient;
+using Healthcare.Client.UI.Auth;
 using System;
 using System.Threading.Tasks;
 
@@ -17,35 +19,33 @@ namespace Healthcare.Client.UI.Admin
         public AdminHomePage()
         {
             this.InitializeComponent();
-            LoadDataAsync(); 
+            LoadDataAsync();
         }
 
         private async void LoadDataAsync()
         {
             try
             {
-                // Dùng SupabaseDbService để kéo dữ liệu trực tiếp từ Database
                 switch (_currentTab)
                 {
                     case "Patient":
                         AdminDataGrid.ItemsSource = await SupabaseDbService.GetAllAsync<PatientProfile>();
+                        ActionButtonsPanel.Visibility = Visibility.Visible;
                         break;
                     case "Doctor":
                         AdminDataGrid.ItemsSource = await SupabaseDbService.GetAllAsync<DoctorProfile>();
+                        ActionButtonsPanel.Visibility = Visibility.Visible;
                         break;
-                    case "Appointment":
-                        AdminDataGrid.ItemsSource = await SupabaseDbService.GetAllAsync<Appointment>();
-                        break;
-                    case "Transaction":
-                        AdminDataGrid.ItemsSource = await SupabaseDbService.GetAllAsync<Transaction>();
+                    default:
+                        if (_currentTab == "Appointment") AdminDataGrid.ItemsSource = await SupabaseDbService.GetAllAsync<Appointment>();
+                        else AdminDataGrid.ItemsSource = await SupabaseDbService.GetAllAsync<Transaction>();
+                        ActionButtonsPanel.Visibility = Visibility.Collapsed;
                         break;
                 }
             }
-            catch (Exception ex)
-            {
-                await ShowDialogAsync("Lỗi tải dữ liệu", ex.Message);
-            }
+            catch (Exception ex) { await ShowDialogAsync("Lỗi", ex.Message); }
         }
+
         private void AdminNav_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
             if (args.InvokedItemContainer.Tag != null)
@@ -56,63 +56,56 @@ namespace Healthcare.Client.UI.Admin
             }
         }
 
-        private async void AdminDataGrid_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        // 🚀 SỰ KIỆN NÚT ĐĂNG XUẤT (GÓC TRÁI PHÍA TRÊN)
+        private void LogoutBtn_Click(object sender, RoutedEventArgs e)
         {
-            var selectedItem = AdminDataGrid.SelectedItem;
-            if (selectedItem == null) return;
+            // Điều hướng về trang đăng nhập
+            Frame.Navigate(typeof(LoginPage));
+        }
 
-            if (selectedItem is not PatientProfile && selectedItem is not DoctorProfile)
-                return;
+        private async void AddBtn_Click(object sender, RoutedEventArgs e)
+        {
+            TextBox emailBox = new TextBox { Header = "Email", Margin = new Thickness(0, 0, 0, 10) };
+            PasswordBox passBox = new PasswordBox { Header = "Mật khẩu", Margin = new Thickness(0, 0, 0, 10) };
+            TextBox nameBox = new TextBox { Header = "Họ tên", Margin = new Thickness(0, 0, 0, 10) };
+            StackPanel panel = new StackPanel { Children = { emailBox, passBox, nameBox } };
 
-            ContentDialog deleteDialog = new ContentDialog
+            string role = _currentTab == "Doctor" ? "Doctor" : "Patient";
+            ContentDialog dialog = new ContentDialog { Title = $"Thêm {role}", Content = panel, PrimaryButtonText = "Tạo", CloseButtonText = "Hủy", XamlRoot = this.XamlRoot };
+
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
             {
-                Title = "Cảnh báo xóa vĩnh viễn",
-                Content = "Bạn có chắc chắn muốn xóa tài khoản này? Hành động này sẽ xóa hoàn toàn thông tin đăng nhập và hồ sơ của họ trên toàn hệ thống.",
-                PrimaryButtonText = "Xóa ngay",
-                CloseButtonText = "Hủy",
-                DefaultButton = ContentDialogButton.Close,
-                XamlRoot = this.XamlRoot
-            };
-
-            var result = await deleteDialog.ShowAsync();
-
-            if (result == ContentDialogResult.Primary)
-            {
-                string userIdToDelete = string.Empty;
-
-                if (selectedItem is PatientProfile p)
-                    userIdToDelete = p.PatientId;
-                else if (selectedItem is DoctorProfile d)
-                    userIdToDelete = d.DoctorId;
-
-                if (!string.IsNullOrEmpty(userIdToDelete))
-                {
-                    // GỌI API LÊN SERVER CỦA BẠN ĐỂ XÓA (Cách Pro)
-                    bool isSuccess = await AdminApiClient.DeleteUserViaServerAsync(userIdToDelete);
-
-                    if (isSuccess)
-                    {
-                        await ShowDialogAsync("Thành công", "Đã xóa tài khoản khỏi hệ thống.");
-                        LoadDataAsync(); // Refresh lại bảng
-                    }
-                    else
-                    {
-                        await ShowDialogAsync("Thất bại", "Không thể xóa tài khoản. Vui lòng kiểm tra lại Server ASP.NET Core đã chạy chưa.");
-                    }
-                }
+                bool success = await AdminApiClient.CreateUserViaServerAsync(emailBox.Text, passBox.Password, nameBox.Text, role);
+                if (success) { await ShowDialogAsync("Thành công", "Đã tạo tài khoản."); LoadDataAsync(); }
             }
         }
 
-        private async Task ShowDialogAsync(string title, string message)
+        private async void DeleteBtn_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new ContentDialog
+            if (AdminDataGrid.SelectedItem == null) return;
+            await ExecuteDelete(AdminDataGrid.SelectedItem);
+        }
+
+        private async void AdminDataGrid_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            if (AdminDataGrid.SelectedItem != null) await ExecuteDelete(AdminDataGrid.SelectedItem);
+        }
+
+        private async Task ExecuteDelete(object item)
+        {
+            if (item is not PatientProfile && item is not DoctorProfile) return;
+            ContentDialog dialog = new ContentDialog { Title = "Xác nhận xóa", Content = "Xóa vĩnh viễn tài khoản này?", PrimaryButtonText = "Xóa", CloseButtonText = "Hủy", XamlRoot = this.XamlRoot };
+
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
             {
-                Title = title,
-                Content = message,
-                CloseButtonText = "Đóng",
-                XamlRoot = this.XamlRoot
-            };
-            await dialog.ShowAsync();
+                string id = (item is PatientProfile p) ? p.PatientId : ((DoctorProfile)item).DoctorId;
+                if (await AdminApiClient.DeleteUserViaServerAsync(id)) { LoadDataAsync(); }
+            }
+        }
+
+        private async Task ShowDialogAsync(string t, string m)
+        {
+            await new ContentDialog { Title = t, Content = m, CloseButtonText = "Đóng", XamlRoot = this.XamlRoot }.ShowAsync();
         }
     }
 }

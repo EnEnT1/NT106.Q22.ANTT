@@ -11,13 +11,13 @@ namespace Healthcare.Server.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                Console.WriteLine($"[Worker] Đang quét lịch uống thuốc lúc: {DateTime.Now}");
+                Console.WriteLine($"[Worker] Đang quet lich uong thuoc: {DateTime.Now}");
 
                 // TODO: Gọi Supabase lấy danh sách MedicationReminder
                 // Nếu giờ hiện tại trùng với giờ uống thuốc -> Đẩy 1 dòng vào bảng Notification
 
-                // Cho tiến trình ngủ 1 phút rồi chạy lại
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                // Cho tiến trình ngủ 30 phút rồi chạy lại
+                await Task.Delay(TimeSpan.FromMinutes(30), stoppingToken);
             }
         }
     }

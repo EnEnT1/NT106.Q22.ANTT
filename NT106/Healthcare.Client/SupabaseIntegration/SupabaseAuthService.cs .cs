@@ -17,37 +17,39 @@ namespace Healthcare.Client.SupabaseIntegration
 
     public static class SupabaseAuthService
     {
-        public static async Task<AuthResult> SignInAsync(string email, string password)
+        public static async Task<(bool Success, string Message, string Role)> SignInAsync(string email, string password)
         {
             try
             {
                 var client = SupabaseManager.Instance.Client;
 
+                // 1. Xác thực qua hệ thống Auth của Supabase
                 var session = await client.Auth.SignIn(email, password);
 
-                if (session == null || session.User == null)
-                    throw new Exception("Không thể đăng nhập. Phiên đăng nhập không hợp lệ.");
-
-                // Lấy role từ user metadata/app metadata
-                string role = GetRoleFromSupabaseUser(session.User);
-
-                // Map sang model User của app
-                var appUser = MapToAppUser(session.User, role);
-
-                // Lưu phiên đăng nhập
-                SessionStorage.CurrentUser = appUser;
-
-                return new AuthResult
+                if (session != null && session.User != null)
                 {
-                    Success = true,
-                    Message = "Đăng nhập thành công.",
-                    Role = role,
-                    AppUser = appUser
-                };
+                    // 2. LẤY ROLE TỪ BẢNG public.users DỰA VÀO ID VỪA ĐĂNG NHẬP
+                    var userRecord = await client.From<User>()
+                                                 .Where(x => x.Id == session.User.Id)
+                                                 .Single();
+
+                    if (userRecord != null)
+                    {
+                        // Trả về đúng Role đang lưu trong database (Admin, Doctor, hoặc Patient)
+                        return (true, "Đăng nhập thành công", userRecord.Role);
+                    }
+                    else
+                    {
+                        // Trường hợp Supabase Auth có tài khoản nhưng bảng Users chưa có dữ liệu
+                        return (false, "Lỗi: Không tìm thấy hồ sơ người dùng trong hệ thống.", "");
+                    }
+                }
+
+                return (false, "Sai email hoặc mật khẩu.", "");
             }
             catch (Exception ex)
             {
-                throw new Exception("Email hoặc mật khẩu không đúng. " + ex.Message);
+                return (false, ex.Message, "");
             }
         }
 

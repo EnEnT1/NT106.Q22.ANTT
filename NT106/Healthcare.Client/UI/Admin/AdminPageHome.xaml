@@ -2,13 +2,27 @@
     x:Class="Healthcare.Client.UI.Admin.AdminHomePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls">
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    RequestedTheme="Light">
 
     <Grid Background="#F8F9FA">
         <NavigationView x:Name="AdminNav"
                         PaneDisplayMode="Left"
                         IsSettingsVisible="False"
+                        IsBackButtonVisible="Collapsed"
                         ItemInvoked="AdminNav_ItemInvoked">
+
+            <NavigationView.PaneHeader>
+                <StackPanel Orientation="Horizontal" Padding="16,12,16,12">
+                    <Button x:Name="LogoutBtn" Background="Transparent" BorderThickness="0" Padding="0" Click="LogoutBtn_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE760;" FontSize="16" Foreground="#333"/>
+
+                            <TextBlock Text="Đăng xuất" FontSize="14" Opacity="0.7" Foreground="#333" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </NavigationView.PaneHeader>
 
             <NavigationView.MenuItems>
                 <NavigationViewItem Content="Quản lý Bệnh nhân" Tag="Patient" Icon="ContactInfo"/>
@@ -24,20 +38,24 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="0,0,0,20">
-                    <TextBlock x:Name="HeaderTitle" Text="Quản lý Bệnh nhân" FontSize="28" FontWeight="Bold" Foreground="#191C1D"/>
-                </StackPanel>
+                <Grid Margin="0,0,0,20">
+                    <TextBlock x:Name="HeaderTitle" Text="Quản lý Bệnh nhân" FontSize="28" FontWeight="Bold" Foreground="#191C1D" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 
-                <controls:DataGrid x:Name="AdminDataGrid" 
-                                   Grid.Row="1"
-                                   AutoGenerateColumns="True"
-                                   IsReadOnly="True"
-                                   GridLinesVisibility="Horizontal"
-                                   SelectionMode="Single"
-                                   DoubleTapped="AdminDataGrid_DoubleTapped"
-                                   Background="White"
-                                   BorderBrush="#E0E0E0"
-                                   BorderThickness="1"/>
+                    <StackPanel x:Name="ActionButtonsPanel" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                        <Button x:Name="AddBtn" Content="+ Thêm mới" 
+                                Background="#0059BB" Foreground="White" FontWeight="SemiBold"
+                                Width="110" Height="38" CornerRadius="6" Click="AddBtn_Click"/>
+
+                        <Button x:Name="DeleteBtn" Content="Xóa dòng" 
+                                Background="#D32F2F" Foreground="White" FontWeight="SemiBold"
+                                Width="100" Height="38" CornerRadius="6" Click="DeleteBtn_Click"/>
+                    </StackPanel>
+                </Grid>
+
+                <controls:DataGrid x:Name="AdminDataGrid" Grid.Row="1" AutoGenerateColumns="True"
+                                   IsReadOnly="True" GridLinesVisibility="Horizontal" SelectionMode="Single"
+                                   DoubleTapped="AdminDataGrid_DoubleTapped" Background="White" Foreground="Black"
+                                   RowBackground="White" AlternatingRowBackground="#F0F4F8" BorderBrush="#E0E0E0" BorderThickness="1"/>
             </Grid>
         </NavigationView>
     </Grid>

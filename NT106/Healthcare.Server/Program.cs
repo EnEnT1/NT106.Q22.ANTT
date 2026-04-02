@@ -3,22 +3,26 @@ using Healthcare.Server.SupabaseIntegration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using Healthcare.Server.Services;
+using DotNetEnv;
 var builder = WebApplication.CreateBuilder(args);
+
 DotNetEnv.Env.Load();
+builder.Configuration.AddEnvironmentVariables();
 // 1. Khai báo các Controller API
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); 
-
+builder.Services.AddSwaggerGen();
 // 2. Đăng ký các Service (Dependency Injection)
 builder.Services.AddSingleton<SupabaseAdminHelper>();
 builder.Services.AddScoped<AiPrescriptionService>();
 builder.Services.AddScoped<PaymentService>();
+builder.Services.AddSingleton<SupabaseAdminService>();
+
 
 // 3. Đăng ký chạy ngầm (Background Service)
 builder.Services.AddHostedService<ScheduledWorker>();
-
+builder.Services.AddControllers();
 var app = builder.Build();
 
 // 4. Khởi tạo kết nối Supabase quyền Admin ngay khi Server chạy
@@ -32,7 +36,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
