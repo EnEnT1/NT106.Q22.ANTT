@@ -1,0 +1,44 @@
+<Page
+    x:Class="Healthcare.Client.UI.Admin.AdminHomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls">
+
+    <Grid Background="#F8F9FA">
+        <NavigationView x:Name="AdminNav"
+                        PaneDisplayMode="Left"
+                        IsSettingsVisible="False"
+                        ItemInvoked="AdminNav_ItemInvoked">
+
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="Quản lý Bệnh nhân" Tag="Patient" Icon="ContactInfo"/>
+                <NavigationViewItem Content="Quản lý Bác sĩ" Tag="Doctor" Icon="Contact"/>
+                <NavigationViewItemSeparator/>
+                <NavigationViewItem Content="Danh sách Lịch hẹn" Tag="Appointment" Icon="Calendar"/>
+                <NavigationViewItem Content="Lịch sử Giao dịch" Tag="Transaction" Icon="Calculator"/>
+            </NavigationView.MenuItems>
+
+            <Grid Padding="24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="0,0,0,20">
+                    <TextBlock x:Name="HeaderTitle" Text="Quản lý Bệnh nhân" FontSize="28" FontWeight="Bold" Foreground="#191C1D"/>
+                </StackPanel>
+
+                <controls:DataGrid x:Name="AdminDataGrid" 
+                                   Grid.Row="1"
+                                   AutoGenerateColumns="True"
+                                   IsReadOnly="True"
+                                   GridLinesVisibility="Horizontal"
+                                   SelectionMode="Single"
+                                   DoubleTapped="AdminDataGrid_DoubleTapped"
+                                   Background="White"
+                                   BorderBrush="#E0E0E0"
+                                   BorderThickness="1"/>
+            </Grid>
+        </NavigationView>
+    </Grid>
+</Page>

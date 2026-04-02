@@ -7,6 +7,7 @@ using Healthcare.Client.Helpers;
 using Healthcare.Client.SupabaseIntegration;
 using Healthcare.Client.UI.Patient;
 using Healthcare.Client.UI.Doctor;
+using Healthcare.Client.UI.Admin;
 
 namespace Healthcare.Client.UI.Auth
 {
@@ -51,9 +52,11 @@ namespace Healthcare.Client.UI.Auth
                 await ShowDialogAsync("Thông tin chưa đầy đủ", "Vui lòng nhập tên đăng nhập và mật khẩu.");
                 return;
             }
+
             var originalButtonContent = LoginBtn.Content;
             LoginBtn.IsEnabled = false;
             LoginBtn.Content = "Đang xác thực...";
+
             try
             {
                 var result = await SupabaseAuthService.SignInAsync(username, password);
@@ -63,8 +66,16 @@ namespace Healthcare.Client.UI.Auth
                     await ShowDialogAsync("Đăng nhập thất bại", result.Message);
                     return;
                 }
-
-                if (result.Role.Equals("Doctor", StringComparison.OrdinalIgnoreCase))
+                if (result.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Trỏ đúng đến namespace của AdminHomePage
+                    Frame.Navigate(typeof(Healthcare.Client.UI.Admin.AdminHomePage), null,
+                        new SlideNavigationTransitionInfo
+                        {
+                            Effect = SlideNavigationTransitionEffect.FromRight
+                        });
+                }
+                else if (result.Role.Equals("Doctor", StringComparison.OrdinalIgnoreCase))
                 {
                     Frame.Navigate(typeof(DoctorHomePage), null,
                         new SlideNavigationTransitionInfo
@@ -72,7 +83,7 @@ namespace Healthcare.Client.UI.Auth
                             Effect = SlideNavigationTransitionEffect.FromRight
                         });
                 }
-                else
+                else if (result.Role.Equals("Patient", StringComparison.OrdinalIgnoreCase))
                 {
                     Frame.Navigate(typeof(PatientHomePage), null,
                         new SlideNavigationTransitionInfo
@@ -80,7 +91,10 @@ namespace Healthcare.Client.UI.Auth
                             Effect = SlideNavigationTransitionEffect.FromRight
                         });
                 }
-
+                else
+                {
+                    await ShowDialogAsync("Lỗi phân quyền", "Tài khoản của bạn chưa được phân quyền hệ thống hợp lệ.");
+                }
             }
             catch (Exception ex)
             {
