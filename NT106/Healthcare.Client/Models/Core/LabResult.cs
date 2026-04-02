@@ -1,19 +1,24 @@
-using System;
-using System.Collections.Generic;
-using Postgrest.Models;
 using Postgrest.Attributes;
+using Postgrest.Models;
+using System;
 
 namespace Healthcare.Client.Models.Core
 {
     [Table("lab_results")]
     public class LabResult : BaseModel
     {
-        [PrimaryKey("id", false)] public string Id { get; set; } = Guid.NewGuid().ToString();
-        [Column("patient_id")] public string PatientId { get; set; } = string.Empty;
-        [Column("appointment_id")] public string AppointmentId { get; set; } = string.Empty;
-        [Column("test_type")] public string TestType { get; set; } = string.Empty;
-        [Column("file_url")] public string FileUrl { get; set; } = string.Empty;
-        [Column("doctor_notes")] public string DoctorNotes { get; set; } = string.Empty;
+        [PrimaryKey("id", false)] public string Id { get; set; }
+
+        [Column("patient_id")] public string PatientId { get; set; }
+
+        [Column("appointment_id")] public string AppointmentId { get; set; }
+
+        [Column("test_type")] public string TestType { get; set; }
+
+        [Column("file_url")] public string FileUrl { get; set; }
+
+        [Column("doctor_notes")] public string DoctorNotes { get; set; }
+
         [Column("uploaded_at")] public DateTime UploadedAt { get; set; }
     }
 }
