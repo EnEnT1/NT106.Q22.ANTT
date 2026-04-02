@@ -6,8 +6,8 @@ NNT106.Solution // Thư mục gốc Solution
 │   │
 │   ├── Controllers                      // Nơi nhận các HTTP Request từ WinUI 3 hoặc VNPay
 │   │   ├── AiController.cs              // Nhận ảnh đơn thuốc, trả về kết quả AI
-│   │   └── PaymentController.cs         // Nhận Webhook từ VNPay/MoMo khi thanh toán xong
-│   │
+│   │   ├── PaymentController.cs         // Nhận Webhook từ VNPay/MoMo khi thanh toán xong
+│   │   └── AdminController.cs           // API hứng Request Xóa User từ Role Admin ở Client
 │   ├── Models                         
 │   │   ├── Identity
 │   │   │   ├── User.cs                  // Bảng users
@@ -32,7 +32,8 @@ NNT106.Solution // Thư mục gốc Solution
 │   ├── Services                         // Logic nghiệp vụ ẩn phía sau Server
 │   │   ├── AiPrescriptionService.cs     // Code gọi API trí tuệ nhân tạo OCR
 │   │   ├── PaymentService.cs            // Kiểm tra chữ ký bảo mật giao dịch
-│   │   └── ScheduledWorker.cs           // Tiến trình chạy ngầm quét giờ uống thuốc
+│   │   ├── ScheduledWorker.cs           // Tiến trình chạy ngầm quét giờ uống thuốc
+│   │   └── SupabaseAdminService.cs      // Chứa Service Role Key để chọc vào auth.users
 │   │
 │   ├── SupabaseIntegration              
 │   │   └── SupabaseAdminHelper.cs       // Xác thực Token JWT xem ai đang gọi API
@@ -48,7 +49,8 @@ NNT106.Solution // Thư mục gốc Solution
     ├── APIClient                        // Giao tiếp nhánh 1: Chọc về Server nội bộ
     │   ├── AiClient.cs                  // Gói ảnh gửi lên Server phân tích
     │   ├── PaymentClient.cs             // Gửi request lấy URL thanh toán VNPay
-    │   └── BaseHttpClient.cs            // Cấu hình HttpClient chung, tự động nhét Token
+    │   ├── BaseHttpClient.cs            // Cấu hình HttpClient chung, tự động nhét Token
+    │   └── AdminApiClient.cs            // API hứng Request Xóa User từ Role Admin ở Client
     │
     ├── SupabaseIntegration              // Giao tiếp nhánh 2: Chọc thẳng lên Cloud Database
     │   ├── SupabaseManager.cs           // Singleton khởi tạo kết nối mạng
