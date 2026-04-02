@@ -38,11 +38,11 @@ namespace Healthcare.Server.Services
 
                 if (res.IsSuccessStatusCode)
                 {
-                    Console.WriteLine("[SUCCESS] Đã xóa User thành công!");
+                    Console.WriteLine("[SUCCESS] Da xoa user thanh cong!");
                     return true;
                 }
 
-                Console.WriteLine($"[FAILED] Supabase từ chối xóa: {await res.Content.ReadAsStringAsync()}");
+                Console.WriteLine($"[FAILED] Supabase tu choi xoa: {await res.Content.ReadAsStringAsync()}");
                 return false;
             }
             catch (Exception ex)
@@ -56,44 +56,79 @@ namespace Healthcare.Server.Services
         {
             try
             {
-                // BƯỚC 1: TẠO AUTH BẰNG HTTP
+                Console.WriteLine($"\n[CREATE] Đang tạo tài khoản: {email}");
+
                 using var http = new HttpClient();
                 http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _key);
                 http.DefaultRequestHeaders.Add("apikey", _key);
+                http.DefaultRequestHeaders.Add("Prefer", "return=representation");
 
+                // 1. TẠO AUTH USER (Bước này của bạn đã chạy thành công)
                 var authPayload = new { email = email, password = pass, email_confirm = true };
                 var authRes = await http.PostAsync($"{_url}/auth/v1/admin/users",
                     new StringContent(JsonSerializer.Serialize(authPayload), Encoding.UTF8, "application/json"));
 
                 if (!authRes.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"[FAILED] Lỗi tạo Auth: {await authRes.Content.ReadAsStringAsync()}");
+                    Console.WriteLine($"[FAILED] Loi tao Auth: {await authRes.Content.ReadAsStringAsync()}");
                     return false;
                 }
 
                 string uid = JsonDocument.Parse(await authRes.Content.ReadAsStringAsync()).RootElement.GetProperty("id").GetString();
-                await Task.Delay(1000); // Chờ Trigger Database đồng bộ
+                Console.WriteLine($"[SUCCESS] Đa tao Auth UID: {uid}");
 
-                // BƯỚC 2: DÙNG SUPABASE_ADMIN_HELPER (SDK) ĐỂ CẬP NHẬT DATABASE
+                await Task.Delay(1000); // Chờ Trigger Database đồng bộ 1 giây
 
-                // Update bảng users
-                var userUpdate = new AppUser { Id = uid, FullName = name, Role = role };
-                await _adminHelper.AdminClient.From<AppUser>().Update(userUpdate);
+                // 2. THÊM MỚI VÀO BẢNG USERS (Vì Supabase chưa có Trigger tự động)
+                var userPayload = new Dictionary<string, string>
+                {
+                    {    "id", uid }, 
+                    { "full_name", name },
+                    { "role", role },
+                    { "email", email }
+                }  ;
 
-                // Insert Profile
+                
+                var userRes = await http.PostAsync($"{_url}/rest/v1/users",
+                    new StringContent(JsonSerializer.Serialize(userPayload), Encoding.UTF8, "application/json"));
+
+                if (!userRes.IsSuccessStatusCode)
+                {
+                    // Nếu lỗi trùng lặp (23505) tức là bạn đã có Trigger ngầm, bỏ qua lỗi này
+                    var err = await userRes.Content.ReadAsStringAsync();
+                    if (!err.Contains("23505"))
+                    {
+                        Console.WriteLine($"[FAILED] Loi bang users: {err}");
+                        return false;
+                    }
+                }
+                // 3. TẠO DÒNG PROFILE TƯƠNG ỨNG
+                string table = role == "Doctor" ? "doctor_profiles" : "patient_profiles";
+                string col = role == "Doctor" ? "doctor_id" : "patient_id";
+
+                var profilePayload = new Dictionary<string, string>
+        {
+            { col, uid }
+        };
+
+
+                // Nếu là Bác sĩ, chèn thêm cột specialty để Database không báo lỗi NOT NULL
                 if (role == "Doctor")
                 {
-                    var docProfile = new DoctorProfileModel { DoctorId = uid };
-                    await _adminHelper.AdminClient.From<DoctorProfileModel>().Insert(docProfile);
+                    profilePayload.Add("specialty", "Đa khoa");
                 }
-                else
+                var profileRes = await http.PostAsync($"{_url}/rest/v1/{table}",
+                    new StringContent(JsonSerializer.Serialize(profilePayload), Encoding.UTF8, "application/json"));
+
+                if (profileRes.IsSuccessStatusCode)
                 {
-                    var patProfile = new PatientProfileModel { PatientId = uid };
-                    await _adminHelper.AdminClient.From<PatientProfileModel>().Insert(patProfile);
+                    Console.WriteLine("[SUCCESS] Tao tai khoan thanh cong");
+                    return true;
                 }
 
-                Console.WriteLine("[SUCCESS] Tạo tài khoản và Profile qua SDK thành công!");
-                return true;
+                Console.WriteLine($"[FAILED] Loi tao profile: {await profileRes.Content.ReadAsStringAsync()}");
+                return false;
+
             }
             catch (Exception ex)
             {
@@ -103,34 +138,5 @@ namespace Healthcare.Server.Services
         }
     }
 
-    // =====================================================================
-    // KHAI BÁO CÁC MODEL CHO SDK (NẰM NGAY TRONG FILE NÀY CHO TIỆN)
-    // =====================================================================
-
-    [Table("users")]
-    public class AppUser : BaseModel
-    {
-        [PrimaryKey("id", false)]
-        public string Id { get; set; }
-
-        [Column("full_name")]
-        public string FullName { get; set; }
-
-        [Column("role")]
-        public string Role { get; set; }
-    }
-
-    [Table("doctor_profiles")]
-    public class DoctorProfileModel : BaseModel
-    {
-        [PrimaryKey("doctor_id", false)]
-        public string DoctorId { get; set; }
-    }
-
-    [Table("patient_profiles")]
-    public class PatientProfileModel : BaseModel
-    {
-        [PrimaryKey("patient_id", false)]
-        public string PatientId { get; set; }
-    }
+    
 }
