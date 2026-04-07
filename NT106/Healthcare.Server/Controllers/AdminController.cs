@@ -19,7 +19,6 @@ namespace Healthcare.Server.Controllers
     {
         private readonly SupabaseAdminService _adminService;
 
-        // Tiêm Service vào Controller (Dependency Injection)
         public AdminController(SupabaseAdminService adminService)
         {
             _adminService = adminService;

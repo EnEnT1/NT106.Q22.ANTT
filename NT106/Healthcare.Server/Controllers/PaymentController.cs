@@ -14,14 +14,14 @@ namespace Healthcare.Server.Controllers
         {
             _paymentService = paymentService;
         }
-
+        //API xử lý callback từ VnPay sau khi người dùng hoàn tất thanh toán
         [HttpGet("vnpay-return")]
         public IActionResult VnpayReturn()
         {
-            // Lấy toàn bộ tham số từ URL VNPay trả về
+            
             var queryParams = HttpContext.Request.Query;
 
-            // Xác thực chữ ký
+            
             bool isValid = _paymentService.ValidateVnPaySignature(queryParams);
 
             if (isValid)

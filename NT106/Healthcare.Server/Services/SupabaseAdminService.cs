@@ -17,7 +17,7 @@ namespace Healthcare.Server.Services
         private readonly string _url;
         private readonly string _key;
 
-        // Tiêm cả Helper và Configuration vào
+        
         public SupabaseAdminService(SupabaseAdminHelper adminHelper, IConfiguration config)
         {
             _adminHelper = adminHelper;
@@ -29,7 +29,7 @@ namespace Healthcare.Server.Services
         {
             try
             {
-                // BƯỚC 1: XÓA AUTH BẰNG HTTP (Vì SDK C# của bạn thiếu hàm Admin)
+                // BƯỚC 1: XÓA AUTH BẰNG HTTP 
                 using var http = new HttpClient();
                 http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _key);
                 http.DefaultRequestHeaders.Add("apikey", _key);
@@ -56,14 +56,14 @@ namespace Healthcare.Server.Services
         {
             try
             {
-                Console.WriteLine($"\n[CREATE] Đang tạo tài khoản: {email}");
+                Console.WriteLine($"\n[CREATE] Dang tao tai khoan: {email}");
 
                 using var http = new HttpClient();
                 http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _key);
                 http.DefaultRequestHeaders.Add("apikey", _key);
                 http.DefaultRequestHeaders.Add("Prefer", "return=representation");
 
-                // 1. TẠO AUTH USER (Bước này của bạn đã chạy thành công)
+                // 1. TẠO AUTH USER 
                 var authPayload = new { email = email, password = pass, email_confirm = true };
                 var authRes = await http.PostAsync($"{_url}/auth/v1/admin/users",
                     new StringContent(JsonSerializer.Serialize(authPayload), Encoding.UTF8, "application/json"));
@@ -94,7 +94,6 @@ namespace Healthcare.Server.Services
 
                 if (!userRes.IsSuccessStatusCode)
                 {
-                    // Nếu lỗi trùng lặp (23505) tức là bạn đã có Trigger ngầm, bỏ qua lỗi này
                     var err = await userRes.Content.ReadAsStringAsync();
                     if (!err.Contains("23505"))
                     {
@@ -112,7 +111,7 @@ namespace Healthcare.Server.Services
         };
 
 
-                // Nếu là Bác sĩ, chèn thêm cột specialty để Database không báo lỗi NOT NULL
+                
                 if (role == "Doctor")
                 {
                     profilePayload.Add("specialty", "Đa khoa");

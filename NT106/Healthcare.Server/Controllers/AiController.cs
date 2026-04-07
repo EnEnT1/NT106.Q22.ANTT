@@ -16,7 +16,7 @@ namespace Healthcare.Server.Controllers
         {
             _aiService = aiService;
         }
-
+        //API nhận ảnh đơn thuốc, trả về kết quả phân tích dưới dạng JSON
         [HttpPost("analyze")]
         public async Task<IActionResult> AnalyzePrescription(IFormFile imageFile)
         {
