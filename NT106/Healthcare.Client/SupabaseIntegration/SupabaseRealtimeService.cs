@@ -19,7 +19,7 @@ namespace Healthcare.Client.SupabaseIntegration
             _client = client;
         }
 
-        //1. Hàm gửi tin nhắn: Mã hóa rồi gửi Supabase
+        //1. Hàm gửi tin nhắn mã hóa -> gửi Supabase
         public async Task<bool> SendMessageAsync(string senderId, string receiverId, string rawMessage)
         {
             try
@@ -51,7 +51,7 @@ namespace Healthcare.Client.SupabaseIntegration
         //2. Hàm sẽ được gọi khi vào trang Chat, để bắt đầu nghe tin nhắn mới
         public async Task StartListeningForMessages(string myUserId, string myPrivateKey)
         {
-            Console.WriteLine("[WebSockets] Bật ăng-ten nghe lén tin nhắn...");
+            Console.WriteLine("[WebSockets] Lang nghe tin nhan...");
 
             // 2.1 Tạo kênh và đăng ký theo dõi trực tiếp bảng "chat_messages" ở schema "public"
             _chatChannel = _client.Realtime.Channel("realtime", "public", "chat_messages");
