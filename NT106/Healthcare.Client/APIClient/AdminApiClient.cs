@@ -8,7 +8,7 @@ namespace Healthcare.Client.APIClient
 {
     public static class AdminApiClient
     {
-        // Nhớ đổi port 5001 thành port HTTPS thực tế của Server bạn đang chạy
+        // Lưu ý: Đảm bảo URL này khớp với URL mà Server đang lắng nghe
         private static readonly string ServerBaseUrl = "http://localhost:5246/api/admin";
 
         public static async Task<bool> DeleteUserViaServerAsync(string userId)
@@ -20,7 +20,6 @@ namespace Healthcare.Client.APIClient
 
                 if (!res.IsSuccessStatusCode)
                 {
-                    // Đọc nội dung lỗi từ Server gửi về
                     var error = await res.Content.ReadAsStringAsync();
                     System.Diagnostics.Debug.WriteLine($"Server báo lỗi: {error}");
                 }
@@ -28,7 +27,6 @@ namespace Healthcare.Client.APIClient
             }
             catch (Exception ex)
             {
-                // In lỗi ra cửa sổ Output của Visual Studio
                 System.Diagnostics.Debug.WriteLine($"KHÔNG GỌI ĐƯỢC SERVER: {ex.Message}");
                 return false;
             }

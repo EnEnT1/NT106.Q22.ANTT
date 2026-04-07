@@ -9,22 +9,19 @@ namespace Healthcare.Client.Models.Identity
     {
         [Column("id")] public string Id { get; set; }
 
-        [Column("role")]
-        public string Role { get; set; }
+        [Column("role")] public string Role { get; set; }
 
-        [Column("full_name")]
-        public string FullName { get; set; }
+        [Column("full_name")] public string FullName { get; set; }
 
-        [Column("email")]
-        public string Email { get; set; }
+        [Column("email")] public string Email { get; set; }
 
-        [Column("phone")]
-        public string Phone { get; set; }
+        [Column("phone")] public string Phone { get; set; }
 
-        [Column("avatar_url")]
-        public string AvatarUrl { get; set; }
+        [Column("avatar_url")] public string AvatarUrl { get; set; }
 
-        [Column("created_at")]
-        public DateTime CreatedAt { get; set; }
+        [Column("created_at")] public DateTime CreatedAt { get; set; }
+
+        [Column("public_key")] public string PublicKey { get; set; }
+        [Column("encrypted_private_key")] public string EncryptedPrivateKey { get; set; }
     }
 }
