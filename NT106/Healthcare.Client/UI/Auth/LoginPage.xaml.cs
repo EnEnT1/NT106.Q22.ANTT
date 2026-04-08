@@ -68,7 +68,6 @@ namespace Healthcare.Client.UI.Auth
                 }
                 if (result.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
                 {
-                    // Trỏ đúng đến namespace của AdminHomePage
                     Frame.Navigate(typeof(Healthcare.Client.UI.Admin.AdminHomePage), null,
                         new SlideNavigationTransitionInfo
                         {

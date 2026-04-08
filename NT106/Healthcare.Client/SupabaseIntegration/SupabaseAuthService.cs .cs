@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Healthcare.Client.Cryptography;
 using Healthcare.Client.Helpers;
 using Healthcare.Client.Models.Identity;
 using Healthcare.Client.UI.Doctor;
 using Healthcare.Client.UI.Patient;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.Chat;
 namespace Healthcare.Client.SupabaseIntegration
 {
     public class AuthResult
@@ -33,6 +35,23 @@ namespace Healthcare.Client.SupabaseIntegration
 
                     if (userRecord != null)
                     {
+                        if (string.IsNullOrEmpty(userRecord.PublicKey))
+                        {
+                            var keyPair = RSAManager.GenerateKeys();
+
+                            string encryptedPrivKey = AESManager.Encrypt(keyPair.PrivateKey, password);
+
+                            userRecord.PublicKey = keyPair.PublicKey;
+                            userRecord.EncryptedPrivateKey = encryptedPrivKey;
+
+                            await userRecord.Update<User>();
+                        }
+
+                        string rawPrivateKey = AESManager.Decrypt(userRecord.EncryptedPrivateKey, password);
+
+                        SessionStorage.CurrentUser = userRecord;
+                        SessionStorage.MyPrivateKey = rawPrivateKey;
+
                         return (true, "Đăng nhập thành công", userRecord.Role);
                     }
                     else

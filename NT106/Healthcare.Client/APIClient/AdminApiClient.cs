@@ -8,7 +8,7 @@ namespace Healthcare.Client.APIClient
 {
     public static class AdminApiClient
     {
-        // Lưu ý: Đảm bảo URL này khớp với URL mà Server đang lắng nghe
+        
         private static readonly string ServerBaseUrl = "http://localhost:5246/api/admin";
 
         public static async Task<bool> DeleteUserViaServerAsync(string userId)

@@ -33,7 +33,7 @@ NNT106.Solution // Thư mục gốc Solution
 │   │   ├── AiPrescriptionService.cs     // Code gọi API trí tuệ nhân tạo OCR
 │   │   ├── PaymentService.cs            // Kiểm tra chữ ký bảo mật giao dịch
 │   │   ├── ScheduledWorker.cs           // Tiến trình chạy ngầm quét giờ uống thuốc
-│   │   └── SupabaseAdminService.cs      // Chứa Service Role Key để chọc vào auth.users
+│   │   └── SupabaseAdminService.cs      // Chứa các hành động với auth.users
 │   │
 │   ├── SupabaseIntegration              
 │   │   └── SupabaseAdminHelper.cs       // Xác thực Token JWT xem ai đang gọi API
@@ -81,7 +81,8 @@ NNT106.Solution // Thư mục gốc Solution
     │       └── AuditLog.cs              // Bảng audit_logs
     │
     ├── Cryptography                     // Bảo mật cục bộ máy Client
-    │   └── RSAManager.cs                // Tạo khóa Public/Private Key/Mã hóa tin nhắn trước khi đưa lên supabase
+    │   ├── RSAManager.cs                // Tạo khóa Public/Private Key/Mã hóa tin nhắn trước khi đưa lên supabase
+    │   └── AESManager.cs                // Mã hóa AES
     │
     ├── Helpers                          // Các class tiện ích dùng chung
     │   └── SessionStorage.cs            // Lưu thông tin User đang đăng nhập hiện tại

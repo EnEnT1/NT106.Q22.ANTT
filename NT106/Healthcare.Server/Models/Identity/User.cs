@@ -15,5 +15,7 @@ namespace Healthcare.Server.Models.Identity
         [Column("phone")] public string Phone { get; set; } = string.Empty;
         [Column("avatar_url")] public string AvatarUrl { get; set; } = string.Empty;
         [Column("created_at")] public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        [Column("public_key")] public string PublicKey { get; set; } = string.Empty;
+        [Column("encryptedprivate_key")] public string PrivateKey { get; set; } = string.Empty;
     }
 }

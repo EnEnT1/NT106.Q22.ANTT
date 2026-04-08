@@ -13,14 +13,14 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// 2. Đăng ký các Service (Dependency Injection)
+// 2. Đăng ký các Service 
 builder.Services.AddSingleton<SupabaseAdminHelper>();
 builder.Services.AddScoped<AiPrescriptionService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddSingleton<SupabaseAdminService>();
 
 
-// 3. Đăng ký chạy ngầm (Background Service)
+// 3. Đăng ký chạy ngầm 
 builder.Services.AddHostedService<ScheduledWorker>();
 builder.Services.AddControllers();
 var app = builder.Build();

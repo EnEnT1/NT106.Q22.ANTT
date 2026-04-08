@@ -8,23 +8,22 @@ namespace Healthcare.Client.Cryptography
     {
         public class RsaKeyPair
         {
-            public string PublicKey { get; set; }  // Khóa công khai (Lưu lên Supabase cho người khác lấy)
-            public string PrivateKey { get; set; } // Khóa bí mật (Để ở máy client)
+            public string PublicKey { get; set; }  // Khóa công khai (Lưu lên Supabase)
+            public string PrivateKey { get; set; } // Khóa bí mật
         }
 
-        // 1. Tạo cặp khóa mới (hàm này được gọi khi đăng ký mới)
+        // 1. Tạo cặp khóa mới
         public static RsaKeyPair GenerateKeys()
         {
             using RSA rsa = RSA.Create(2048);
             return new RsaKeyPair
             {
-                // Xuất khóa ra chuỗi Base64 lưu vào Database
                 PublicKey = Convert.ToBase64String(rsa.ExportRSAPublicKey()),
                 PrivateKey = Convert.ToBase64String(rsa.ExportRSAPrivateKey())
             };
         }
 
-        // 2. Mã hóa tin nhắn (A gửi tin nhắn đến B -> A dùng Public Key của B để mã hóa)
+        // 2. Mã hóa tin nhắn 
         public static string Encrypt(string plainText, string receiverPublicKeyBase64)
         {
             if (string.IsNullOrEmpty(plainText)) return plainText;
@@ -39,7 +38,7 @@ namespace Healthcare.Client.Cryptography
             return Convert.ToBase64String(encryptedBytes);
         }
 
-        // 3. Giải mã tin nhắn (B nhận được tin nhắn từ A -> B dùng Private Key của chính mình để mở)
+        // 3. Giải mã tin nhắn 
         public static string Decrypt(string cipherTextBase64, string myPrivateKeyBase64)
         {
             if (string.IsNullOrEmpty(cipherTextBase64)) return cipherTextBase64;

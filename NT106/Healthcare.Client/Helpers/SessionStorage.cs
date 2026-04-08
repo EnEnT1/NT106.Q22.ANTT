@@ -8,6 +8,7 @@ namespace Healthcare.Client.Helpers
 
         public static bool IsLoggedIn => CurrentUser != null;
 
+        public static string MyPrivateKey { get; set; }
         public static void ClearSession()
         {
             CurrentUser = null;

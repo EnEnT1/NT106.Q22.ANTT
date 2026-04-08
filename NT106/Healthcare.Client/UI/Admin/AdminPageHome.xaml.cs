@@ -56,7 +56,7 @@ namespace Healthcare.Client.UI.Admin
             }
         }
 
-        // 🚀 SỰ KIỆN NÚT ĐĂNG XUẤT (GÓC TRÁI PHÍA TRÊN)
+        
         private void LogoutBtn_Click(object sender, RoutedEventArgs e)
         {
             // Điều hướng về trang đăng nhập
