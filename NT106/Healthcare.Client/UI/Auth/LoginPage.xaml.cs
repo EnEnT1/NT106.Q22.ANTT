@@ -8,6 +8,8 @@ using Healthcare.Client.SupabaseIntegration;
 using Healthcare.Client.UI.Patient;
 using Healthcare.Client.UI.Doctor;
 using Healthcare.Client.UI.Admin;
+// THÊM NAMESPACE CỦA SHELL VÀO ĐÂY
+using Healthcare.Client.UI.Shell;
 
 namespace Healthcare.Client.UI.Auth
 {
@@ -66,9 +68,12 @@ namespace Healthcare.Client.UI.Auth
                     await ShowDialogAsync("Đăng nhập thất bại", result.Message);
                     return;
                 }
+
+                // SỬA ĐIỀU HƯỚNG Ở ĐÂY: Trỏ toàn bộ tới SHELL thay vì HOMEPAGE
                 if (result.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
                 {
-                    Frame.Navigate(typeof(Healthcare.Client.UI.Admin.AdminHomePage), null,
+                    // Lưu ý: Nếu bạn có AdminShell thì dùng AdminShell, nếu chưa có thì giữ nguyên AdminHomePage
+                    Frame.Navigate(typeof(AdminHomePage), null,
                         new SlideNavigationTransitionInfo
                         {
                             Effect = SlideNavigationTransitionEffect.FromRight
@@ -76,7 +81,8 @@ namespace Healthcare.Client.UI.Auth
                 }
                 else if (result.Role.Equals("Doctor", StringComparison.OrdinalIgnoreCase))
                 {
-                    Frame.Navigate(typeof(DoctorHomePage), null,
+                    // ✅ Đã sửa: Điều hướng tới DoctorShell
+                    Frame.Navigate(typeof(DoctorShell), null,
                         new SlideNavigationTransitionInfo
                         {
                             Effect = SlideNavigationTransitionEffect.FromRight
@@ -84,7 +90,8 @@ namespace Healthcare.Client.UI.Auth
                 }
                 else if (result.Role.Equals("Patient", StringComparison.OrdinalIgnoreCase))
                 {
-                    Frame.Navigate(typeof(PatientHomePage), null,
+                    // ✅ Đã sửa: Điều hướng tới PatientShell
+                    Frame.Navigate(typeof(PatientShell), null,
                         new SlideNavigationTransitionInfo
                         {
                             Effect = SlideNavigationTransitionEffect.FromRight
@@ -131,7 +138,6 @@ namespace Healthcare.Client.UI.Auth
                     Effect = SlideNavigationTransitionEffect.FromRight
                 });
         }
-
 
         // ──────────────────────────────────────────────
         // Helper: Hiển thị dialog thông báo
