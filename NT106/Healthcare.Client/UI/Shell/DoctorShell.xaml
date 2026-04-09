@@ -1,0 +1,185 @@
+<Page
+    x:Class="Healthcare.Client.UI.Shell.DoctorShell"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    RequestedTheme="Light" 
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="64"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Background="#F3F3F3"
+                BorderBrush="#E0E0E0"
+                BorderThickness="0,0,0,1"
+                Padding="24,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <AutoSuggestBox Grid.Column="0"
+                                PlaceholderText="Tìm kiếm bệnh nhân, hồ sơ..."
+                                QueryIcon="Find"
+                                MaxWidth="380"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource TextFillColorPrimaryBrush}"/>
+
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            VerticalAlignment="Center">
+
+                    <Button x:Name="BtnNotification"
+                            Style="{StaticResource DefaultButtonStyle}"
+                            Width="40" Height="40"
+                            Padding="0"
+                            CornerRadius="20"
+                            ToolTipService.ToolTip="Thông báo"
+                            Click="BtnNotification_Click"
+                            Foreground="{StaticResource TextFillColorPrimaryBrush}">
+                        <FontIcon Glyph="&#xEA8F;" FontSize="18"/>
+                    </Button>
+
+                    <Button x:Name="BtnSettings"
+                            Style="{StaticResource DefaultButtonStyle}"
+                            Width="40" Height="40"
+                            Padding="0"
+                            CornerRadius="20"
+                            ToolTipService.ToolTip="Cài đặt"
+                            Click="BtnSettings_Click"
+                            Foreground="{StaticResource TextFillColorPrimaryBrush}">
+                        <FontIcon Glyph="&#xE713;" FontSize="18"/>
+                    </Button>
+
+                    <Border Width="1" Height="28"
+                            Background="#E0E0E0"
+                            Margin="8,0"/>
+
+                    <StackPanel VerticalAlignment="Center" Spacing="2">
+                        <TextBlock x:Name="TxtDate"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Text="Thứ Hai, 24 Tháng 5"
+                                   Foreground="{StaticResource TextFillColorPrimaryBrush}"/>
+                        <TextBlock x:Name="TxtShift"
+                                   FontSize="10"
+                                   Foreground="#0078D4"
+                                   FontWeight="SemiBold"
+                                   Text="CA TRỰC: SÁNG"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <NavigationView
+            Grid.Row="1"
+            x:Name="NavView"
+            PaneDisplayMode="Left"
+            IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="False"
+            CompactModeThresholdWidth="0"
+            OpenPaneLength="240"
+            SelectionChanged="NavView_SelectionChanged"
+            Loaded="NavView_Loaded"
+            Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
+
+            <NavigationView.Resources>
+                <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="#0078D4" />
+                <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="#005A9E" />
+                <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPressed" Color="#004578" />
+
+                <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="Transparent" />
+                <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPointerOver" Color="#0A000000" />
+
+                <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#0078D4" />
+            </NavigationView.Resources>
+
+            <NavigationView.PaneHeader>
+                <Border Padding="12,8,12,16"
+                        BorderBrush="#E0E0E0"
+                        BorderThickness="0,0,0,1"
+                        Margin="0,0,0,4"
+                        Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <PersonPicture x:Name="DoctorAvatar"
+                                       Width="40" Height="40"
+                                       DisplayName="Dr. Minh Tâm"/>
+                        <StackPanel VerticalAlignment="Center" Spacing="2">
+                            <TextBlock x:Name="TxtDoctorName"
+                                       Text="Dr. Minh Tâm"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock x:Name="TxtDepartment"
+                                       Text="Khoa Nội Tổng Quát"
+                                       FontSize="10"
+                                       Foreground="#666666"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </NavigationView.PaneHeader>
+
+            <NavigationView.MenuItems>
+                <NavigationViewItem Tag="DoctorHomePage" Content="Trang chủ">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE80F;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem Tag="ManageSchedulePage" Content="Lịch trực">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE787;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem Tag="ExaminationPage" Content="Khám trực tuyến">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE714;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem Tag="PatientHistoryPage" Content="Tiền sử bệnh">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9F9;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem Tag="RevenuePage" Content="Thống kê">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D2;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <NavigationView.FooterMenuItems>
+                <NavigationViewItem Content="Hỗ trợ">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE897;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem x:Name="NavLogout"
+                                    Content="Đăng xuất"
+                                    Tapped="NavLogout_Tapped">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xF3B1;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.FooterMenuItems>
+
+            <Frame x:Name="ContentFrame"
+                   Margin="0"
+                   Background="{StaticResource ApplicationPageBackgroundThemeBrush}"/>
+
+        </NavigationView>
+    </Grid>
+</Page>
