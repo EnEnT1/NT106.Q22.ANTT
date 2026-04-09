@@ -1,29 +1,20 @@
 ﻿using System;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Healthcare.Client.APIClient
 {
-    public static class AdminApiClient
+    // Kế thừa BaseHttpClient 
+    public class AdminApiClient : BaseHttpClient
     {
-        
-        private static readonly string ServerBaseUrl = "http://localhost:5246/api/admin";
+        public AdminApiClient() : base("http://localhost:5246/api/")
+        {
+        }
 
-        public static async Task<bool> DeleteUserViaServerAsync(string userId)
+        public async Task<bool> DeleteUserViaServerAsync(string userId)
         {
             try
             {
-                using var client = new HttpClient();
-                var res = await client.DeleteAsync($"{ServerBaseUrl}/users/{userId}");
-
-                if (!res.IsSuccessStatusCode)
-                {
-                    var error = await res.Content.ReadAsStringAsync();
-                    System.Diagnostics.Debug.WriteLine($"Server báo lỗi: {error}");
-                }
-                return res.IsSuccessStatusCode;
+                return await DeleteAsync($"admin/users/{userId}");
             }
             catch (Exception ex)
             {
@@ -32,17 +23,12 @@ namespace Healthcare.Client.APIClient
             }
         }
 
-        public static async Task<bool> CreateUserViaServerAsync(string email, string password, string fullName, string role)
+        public async Task<bool> CreateUserViaServerAsync(string email, string password, string fullName, string role)
         {
             try
             {
                 var payload = new { Email = email, Password = password, FullName = fullName, Role = role };
-                var json = JsonSerializer.Serialize(payload);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                using var client = new HttpClient();
-                var response = await client.PostAsync($"{ServerBaseUrl}/users", content);
-                return response.IsSuccessStatusCode;
+                return await PostAsync("admin/users", payload);
             }
             catch (Exception ex)
             {

@@ -1,36 +1,27 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Healthcare.Client.APIClient
 {
-    public class PaymentClient
+    // Kế thừa BaseHttpClient
+    public class PaymentApiClient : BaseHttpClient
     {
-        private readonly HttpClient _httpClient;
-
-        public PaymentClient()
+        public PaymentApiClient() : base("http://localhost:5246/api/")
         {
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri("https://localhost:5246/api/");
         }
+
         public async Task<string> GetVNPayUrlAsync(string appointmentId, double amount)
         {
             try
             {
                 var requestData = new { AppointmentId = appointmentId, Amount = amount };
-                var response = await _httpClient.PostAsJsonAsync("payment/create-url", requestData);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadFromJsonAsync<PaymentUrlResponse>();
-                    return result?.PaymentUrl;
-                }
-                return null;
+                // Sử dụng hàm PostAsync có sẵn từ BaseHttpClient
+                var result = await PostAsync<object, PaymentUrlResponse>("payment/create-url", requestData);
+
+                return result?.PaymentUrl;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Lỗi gọi API Thanh toán: {ex.Message}");
                 return null;
             }
         }
