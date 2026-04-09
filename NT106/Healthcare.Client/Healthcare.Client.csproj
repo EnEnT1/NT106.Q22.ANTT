@@ -32,10 +32,40 @@
     <None Remove="UI\Auth\ForgotPasswordPage.xaml" />
     <None Remove="UI\Auth\LoginPage.xaml" />
     <None Remove="UI\Auth\RegisterPage.xaml" />
+    <None Remove="UI\Doctor\DoctorHomePage.xaml" />
+    <None Remove="UI\Doctor\ExaminationPage.xaml" />
+    <None Remove="UI\Doctor\ManageSchedulePage.xaml" />
+    <None Remove="UI\Doctor\PatientHistoryPage.xaml" />
+    <None Remove="UI\Doctor\RevenuePage.xaml" />
+    <None Remove="UI\Shell\DoctorShell.xaml" />
   </ItemGroup>
 
   <ItemGroup>
     <Page Remove="UI\App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Doctor\RevenuePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Doctor\PatientHistoryPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Doctor\ExaminationPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Doctor\ManageSchedulePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>
@@ -56,6 +86,18 @@
 
   <ItemGroup>
     <Page Update="UI\Admin\AdminPageHome.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Shell\DoctorShell.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Doctor\DoctorHomePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
