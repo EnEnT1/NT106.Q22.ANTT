@@ -82,8 +82,7 @@ NNT106.Solution // Thư mục gốc Solution
     │
     ├── Cryptography                     // Bảo mật cục bộ máy Client
     │   ├── RSAManager.cs                // Tạo khóa Public/Private Key/Mã hóa tin nhắn trước khi đưa lên supabase
-    │   └── AESManager.cs                // Mã hóa AES
-    │
+    │   └── AESManager.cs                // Mã hóa AES  
     ├── Helpers                          // Các class tiện ích dùng chung
     │   └── SessionStorage.cs            // Lưu thông tin User đang đăng nhập hiện tại
     │
