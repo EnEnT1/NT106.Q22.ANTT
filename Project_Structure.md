@@ -94,6 +94,9 @@ NNT106.Solution // Thư mục gốc Solution
     │   ├── Auth                     
     │   │    ├── LoginPage.xaml / .cs          // Trang Đăng nhập / Đăng ký
     │   │    ├── ForgotPasswordPage.xaml / .cs // Trang khôi phục mật khẩu
+    │   ├── Shell                    // Cửa sổ Shell chứa TopBar, Sidebar và Frame điều hướng
+    │   │    ├── DoctorShell.xaml / .cs        // Shell dành cho Bác sĩ
+    │   │    └── PatientShell.xaml / .cs       // Shell dành cho Bệnh nhân
     │   ├── Patient                  // Giao diện cho Bệnh nhân
     │   │    ├── PatientHomePage.xaml / .cs    // Trang chủ Bệnh nhân
     │   │    ├── BookAppointmentPage.xaml / .cs// Đặt lịch khám
