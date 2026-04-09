@@ -29,9 +29,7 @@ namespace Healthcare.Client.SupabaseIntegration
 
                 if (session != null && session.User != null)
                 {
-                    var userRecord = await client.From<User>()
-                                                 .Where(x => x.Id == session.User.Id)
-                                                 .Single();
+                    var userRecord = await client.From<User>().Where(x => x.Id == session.User.Id).Single();
 
                     if (userRecord != null)
                     {
