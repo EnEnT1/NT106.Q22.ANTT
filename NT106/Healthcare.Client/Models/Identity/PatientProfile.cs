@@ -1,6 +1,6 @@
 using Postgrest.Attributes;
 using Postgrest.Models;
-using System.Collections.Generic; // Bắt buộc phải có để dùng List
+using System.Collections.Generic; 
 
 namespace Healthcare.Client.Models.Identity
 {

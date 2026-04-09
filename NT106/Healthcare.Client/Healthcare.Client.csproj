@@ -32,6 +32,7 @@
     <None Remove="UI\Auth\ForgotPasswordPage.xaml" />
     <None Remove="UI\Auth\LoginPage.xaml" />
     <None Remove="UI\Auth\RegisterPage.xaml" />
+    <None Remove="UI\Components\VideoCallWindow.xaml" />
     <None Remove="UI\Doctor\DoctorHomePage.xaml" />
     <None Remove="UI\Doctor\ExaminationPage.xaml" />
     <None Remove="UI\Doctor\ManageSchedulePage.xaml" />
@@ -98,6 +99,12 @@
 
   <ItemGroup>
     <Page Update="UI\Doctor\DoctorHomePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Components\VideoCallWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

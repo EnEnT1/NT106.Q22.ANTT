@@ -15,6 +15,8 @@ namespace Healthcare.Client.Models.Core
 
         [Column("appointment_date")] public DateTime AppointmentDate { get; set; }
 
+        [Column("start_time")] public TimeSpan StartTime { get; set; }
+
         [Column("status")] public string Status { get; set; }
 
         [Column("room_code")] public string RoomCode { get; set; }
