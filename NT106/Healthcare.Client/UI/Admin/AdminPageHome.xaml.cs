@@ -75,7 +75,7 @@ namespace Healthcare.Client.UI.Admin
 
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)
             {
-                bool success = await AdminApiClient.CreateUserViaServerAsync(emailBox.Text, passBox.Password, nameBox.Text, role);
+                bool success = await new AdminApiClient().CreateUserViaServerAsync(emailBox.Text, passBox.Password, nameBox.Text, role);
                 if (success) { await ShowDialogAsync("Thành công", "Đã tạo tài khoản."); LoadDataAsync(); }
             }
         }
@@ -99,7 +99,7 @@ namespace Healthcare.Client.UI.Admin
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)
             {
                 string id = (item is PatientProfile p) ? p.PatientId : ((DoctorProfile)item).DoctorId;
-                if (await AdminApiClient.DeleteUserViaServerAsync(id)) { LoadDataAsync(); }
+                if (await new AdminApiClient().DeleteUserViaServerAsync(id)) { LoadDataAsync(); }
             }
         }
 
