@@ -1,38 +1,35 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Healthcare.Server.Services;
-using System.Threading.Tasks;
-using System;
 
 namespace Healthcare.Server.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/ai")]
     public class AiController : ControllerBase
     {
-        private readonly AiPrescriptionService _aiService;
+        private readonly AiPrescriptionService _aiPrescriptionService;
 
-        public AiController(AiPrescriptionService aiService)
+        public AiController(AiPrescriptionService aiPrescriptionService)
         {
-            _aiService = aiService;
+            _aiPrescriptionService = aiPrescriptionService;
         }
-        //API nhận ảnh đơn thuốc, trả về kết quả phân tích dưới dạng JSON
-        [HttpPost("analyze")]
-        public async Task<IActionResult> AnalyzePrescription(IFormFile imageFile)
-        {
-            if (imageFile == null || imageFile.Length == 0)
-                return BadRequest("Không tìm thấy file ảnh.");
 
-            try
+        [HttpPost("analyze-prescription")]
+        public async Task<IActionResult> AnalyzePrescription(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("Vui lòng chọn ảnh đơn thuốc.");
+
+            using var stream = file.OpenReadStream();
+            var medicines = await _aiPrescriptionService.AnalyzeImageAsync(stream);
+
+            return Ok(new
             {
-                using var stream = imageFile.OpenReadStream();
-                var result = await _aiService.AnalyzeImageAsync(stream);
-                return Ok(new { success = true, data = result });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
+                success = true,
+                medicines = medicines
+            });
         }
     }
 }
