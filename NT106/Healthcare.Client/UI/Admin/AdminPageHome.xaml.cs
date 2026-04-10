@@ -15,6 +15,7 @@ namespace Healthcare.Client.UI.Admin
     public sealed partial class AdminHomePage : Page
     {
         private string _currentTab = "Patient";
+        private readonly AdminApiClient _adminApiClient = new AdminApiClient();
 
         public AdminHomePage()
         {

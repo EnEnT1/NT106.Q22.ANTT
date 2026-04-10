@@ -6,9 +6,1247 @@
     xmlns:local="using:Healthcare.Client.UI.Doctor"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
+    <Page.Resources>
+        <!-- Color Brushes -->
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#0059BB"/>
+        <SolidColorBrush x:Key="PrimaryLightBrush" Color="#EFF4FF"/>
+        <SolidColorBrush x:Key="RedBrush" Color="#DC2626"/>
+        <SolidColorBrush x:Key="RedLightBrush" Color="#FEF2F2"/>
+        <SolidColorBrush x:Key="OrangeBrush" Color="#EA580C"/>
+        <SolidColorBrush x:Key="OrangeLightBrush" Color="#FFF7ED"/>
+        <SolidColorBrush x:Key="GreenBrush" Color="#16A34A"/>
+        <SolidColorBrush x:Key="GreenLightBrush" Color="#F0FDF4"/>
+        <SolidColorBrush x:Key="TealBrush" Color="#0D9488"/>
+        <SolidColorBrush x:Key="PurpleBrush" Color="#7C3AED"/>
+        <SolidColorBrush x:Key="EmeraldBrush" Color="#059669"/>
+        <SolidColorBrush x:Key="EmeraldLightBrush" Color="#ECFDF5"/>
+        <SolidColorBrush x:Key="RoseBrush" Color="#E11D48"/>
+        <SolidColorBrush x:Key="BlueBrush" Color="#2563EB"/>
+        <SolidColorBrush x:Key="IndigoBrush" Color="#4F46E5"/>
+        <SolidColorBrush x:Key="SlateBorderBrush" Color="#E2E8F0"/>
+        <SolidColorBrush x:Key="SlateTextBrush" Color="#1E293B"/>
+        <SolidColorBrush x:Key="SlateSubtextBrush" Color="#64748B"/>
+        <SolidColorBrush x:Key="SlateLightBrush" Color="#F8FAFC"/>
+        <SolidColorBrush x:Key="WhiteBrush" Color="#FFFFFF"/>
 
-    </Grid>
+        <!-- Card Style -->
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="Padding" Value="24"/>
+        </Style>
+
+        <!-- Section Title Style -->
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="ExtraBold"/>
+            <Setter Property="Foreground" Value="#1E293B"/>
+        </Style>
+
+        <!-- Label Style -->
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="9"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#94A3B8"/>
+            <Setter Property="CharacterSpacing" Value="100"/>
+        </Style>
+
+        <!-- Value Style -->
+        <Style x:Key="ValueStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="ExtraBold"/>
+            <Setter Property="Foreground" Value="#1E293B"/>
+        </Style>
+
+        <!-- Edit Button Style -->
+        <Style x:Key="EditButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#DBEAFE"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <!-- Action Button Style -->
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="12,14"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="ExtraBold"/>
+            <Setter Property="Foreground" Value="#334155"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+    </Page.Resources>
+
+    <!-- Root: Outer ScrollViewer -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="300"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ═══════════════════════════════════════════
+                 MAIN CONTENT (Left + Center)
+            ═══════════════════════════════════════════ -->
+            <ScrollViewer Grid.Column="0"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="24,24,12,24">
+                <StackPanel Spacing="20">
+
+                    <!-- ╔══════════════════════════════════════╗
+                         ║  1. PATIENT SUMMARY HEADER          ║
+                         ╚══════════════════════════════════════╝ -->
+                    <Border Style="{StaticResource CardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Patient Info -->
+                            <!-- TODO [SUPABASE]: Toàn bộ block này bind từ bảng 'patients' -->
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="32">
+                                <!-- Avatar + Name -->
+                                <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                                    <Grid>
+                                        <Ellipse Width="56" Height="56">
+                                            <Ellipse.Fill>
+                                                <!-- TODO [SUPABASE]: ImageSource="{x:Bind ViewModel.Patient.AvatarUrl}" -->
+                                                <ImageBrush ImageSource="ms-appx:///Assets/patient_avatar.png" Stretch="UniformToFill"/>
+                                            </Ellipse.Fill>
+                                        </Ellipse>
+                                        <!-- Online dot -->
+                                        <Ellipse Width="14" Height="14"
+                                                 Fill="#22C55E"
+                                                 Stroke="White" StrokeThickness="2"
+                                                 HorizontalAlignment="Right"
+                                                 VerticalAlignment="Bottom"/>
+                                    </Grid>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="HỒ SƠ BỆNH NHÂN"
+                                                   FontSize="9" FontWeight="Bold"
+                                                   Foreground="#94A3B8"
+                                                   CharacterSpacing="150"/>
+                                        <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.Patient.FullName}" -->
+                                        <TextBlock Text="Nguyễn Văn A"
+                                                   FontSize="20" FontWeight="ExtraBold"
+                                                   Foreground="#1E293B"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- Quick Stats -->
+                                <StackPanel Orientation="Horizontal" Spacing="32" VerticalAlignment="Center">
+                                    <StackPanel>
+                                        <TextBlock Text="MÃ BN" Style="{StaticResource LabelStyle}"/>
+                                        <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.Patient.PatientCode}" -->
+                                        <TextBlock Text="#127335" FontSize="13" FontWeight="Bold" Foreground="#334155"/>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="CÂN NẶNG" Style="{StaticResource LabelStyle}"/>
+                                        <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.VitalSigns.Weight}" -->
+                                        <TextBlock Text="65kg" FontSize="13" FontWeight="Bold" Foreground="#334155"/>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="TRẠNG THÁI" Style="{StaticResource LabelStyle}"/>
+                                        <Border Background="#DCFCE7" CornerRadius="4" Padding="8,3">
+                                            <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.Patient.Status}" -->
+                                            <TextBlock Text="Bình thường"
+                                                       FontSize="11" FontWeight="Bold"
+                                                       Foreground="#15803D"/>
+                                        </Border>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Allergy Alert -->
+                            <!-- TODO [SUPABASE]: Hiển thị tổng hợp dị ứng nghiêm trọng từ bảng 'allergies' -->
+                            <Border Grid.Column="1"
+                                    CornerRadius="12"
+                                    Padding="1"
+                                    VerticalAlignment="Center">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Color="#DC2626" Offset="0"/>
+                                        <GradientStop Color="#F43F5E" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border Background="#FEF2F2" CornerRadius="11" Padding="16,10">
+                                    <StackPanel Orientation="Horizontal" Spacing="14">
+                                        <Border Background="#DC2626" CornerRadius="8" Padding="6">
+                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7BA;"
+                                                      FontSize="16" Foreground="White"/>
+                                        </Border>
+                                        <StackPanel>
+                                            <TextBlock Text="CẢNH BÁO DỊ ỨNG"
+                                                       FontSize="9" FontWeight="Bold"
+                                                       Foreground="#DC2626"
+                                                       CharacterSpacing="150"/>
+                                            <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.AllergyAlertSummary}" -->
+                                            <!-- AllergyAlertSummary = chuỗi ghép tên các allergen nghiêm trọng -->
+                                            <TextBlock Text="Amoxicillin, Đậu phộng"
+                                                       FontSize="13" FontWeight="ExtraBold"
+                                                       Foreground="#7F1D1D"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- ╔══════════════════════════════════════╗
+                         ║  2x2 GRID: Vital Signs + Allergies  ║
+                         ╚══════════════════════════════════════╝ -->
+                    <Grid ColumnSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- ── Card 1: Dấu hiệu sinh tồn ── -->
+                        <Border Grid.Column="0"
+                                CornerRadius="16"
+                                BorderThickness="0,1,1,1"
+                                BorderBrush="#E2E8F0"
+                                Padding="24">
+                            <!-- Left accent bar -->
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#EEF4FF" Offset="0"/>
+                                    <GradientStop Color="#F8FAFC" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Grid>
+                                <!-- Left blue border via grid trick -->
+                                <Border HorizontalAlignment="Left" Width="4"
+                                        Background="#0059BB" CornerRadius="4,0,0,4"
+                                        Margin="-24,0,0,0"/>
+                                <StackPanel Margin="8,0,0,0">
+                                    <!-- Header -->
+                                    <Grid Margin="0,0,0,20">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEA92;"
+                                                      FontSize="18" Foreground="#0059BB"/>
+                                            <TextBlock Text="1. Dấu hiệu sinh tồn"
+                                                       Style="{StaticResource SectionTitleStyle}"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1"
+                                                x:Name="BtnEditVitals"
+                                                Content="+ Sửa"
+                                                Style="{StaticResource EditButtonStyle}"
+                                                Foreground="#0059BB"
+                                                Click="BtnEditVitals_Click"/>
+                                    </Grid>
+
+                                    <!-- Vitals Grid -->
+                                    <!-- TODO [SUPABASE]: Toàn bộ UniformGrid này bind từ bảng 'vital_signs' -->
+                                    <!-- Vitals: 2 rows x 3 cols (UniformGrid không có trong WinUI 3) -->
+                                    <Grid RowSpacing="16" ColumnSpacing="8">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Row 0 -->
+                                        <StackPanel Grid.Row="0" Grid.Column="0">
+                                            <TextBlock Text="CHIỀU CAO" Style="{StaticResource LabelStyle}"/>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                                                <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.VitalSigns.Height}" -->
+                                                <TextBlock x:Name="TxtHeight" Text="170" Style="{StaticResource ValueStyle}"/>
+                                                <TextBlock Text=" cm" FontSize="11" Foreground="#94A3B8"
+                                                           VerticalAlignment="Bottom" Margin="0,0,0,2"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="0" Grid.Column="1">
+                                            <TextBlock Text="CÂN NẶNG" Style="{StaticResource LabelStyle}"/>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                                                <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.VitalSigns.Weight}" -->
+                                                <TextBlock x:Name="TxtWeight" Text="65" Style="{StaticResource ValueStyle}"/>
+                                                <TextBlock Text=" kg" FontSize="11" Foreground="#94A3B8"
+                                                           VerticalAlignment="Bottom" Margin="0,0,0,2"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="0" Grid.Column="2">
+                                            <TextBlock Text="CHỈ SỐ BMI" Style="{StaticResource LabelStyle}"/>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="6">
+                                                <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.VitalSigns.Bmi}" -->
+                                                <TextBlock x:Name="TxtBmi" Text="22.5" Style="{StaticResource ValueStyle}"/>
+                                                <Border Background="#DCFCE7" CornerRadius="4" Padding="4,2"
+                                                        VerticalAlignment="Center">
+                                                    <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.VitalSigns.BmiLabel}" -->
+                                                    <TextBlock Text="Bình thường"
+                                                               FontSize="9" FontWeight="Bold"
+                                                               Foreground="#16A34A"/>
+                                                </Border>
+                                            </StackPanel>
+                                            <!-- TODO [SUPABASE]: Value="{x:Bind ViewModel.VitalSigns.BmiPercent}" -->
+                                            <ProgressBar Value="60" Maximum="100"
+                                                         Height="4" CornerRadius="2"
+                                                         Foreground="#22C55E"
+                                                         Background="#F1F5F9"
+                                                         Margin="0,4,4,0"/>
+                                        </StackPanel>
+
+                                        <!-- Row 1 -->
+                                        <StackPanel Grid.Row="1" Grid.Column="0">
+                                            <TextBlock Text="HUYẾT ÁP" Style="{StaticResource LabelStyle}"/>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                                                <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.VitalSigns.BloodPressure}" -->
+                                                <TextBlock x:Name="TxtBloodPressure" Text="120/80" Style="{StaticResource ValueStyle}"/>
+                                                <TextBlock Text=" mmHg" FontSize="11" Foreground="#94A3B8"
+                                                           VerticalAlignment="Bottom" Margin="0,0,0,2"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="1" Grid.Column="1">
+                                            <TextBlock Text="NHỊP TIM" Style="{StaticResource LabelStyle}"/>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                                                <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.VitalSigns.HeartRate}" -->
+                                                <TextBlock x:Name="TxtHeartRate" Text="75" Style="{StaticResource ValueStyle}"/>
+                                                <TextBlock Text=" bpm" FontSize="11" Foreground="#94A3B8"
+                                                           VerticalAlignment="Bottom" Margin="0,0,0,2"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="1" Grid.Column="2">
+                                            <TextBlock Text="NHIỆT ĐỘ" Style="{StaticResource LabelStyle}"/>
+                                            <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.VitalSigns.Temperature}" -->
+                                            <TextBlock x:Name="TxtTemperature" Text="36.8°C" Style="{StaticResource ValueStyle}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- ── Card 2: Tiền sử dị ứng ── -->
+                        <Border Grid.Column="1"
+                                Background="#FFF8F8"
+                                CornerRadius="16"
+                                BorderThickness="0,1,1,1"
+                                BorderBrush="#FECACA"
+                                Padding="24">
+                            <Grid>
+                                <Border HorizontalAlignment="Left" Width="4"
+                                        Background="#DC2626" CornerRadius="4,0,0,4"
+                                        Margin="-24,0,0,0"/>
+                                <StackPanel Margin="8,0,0,0">
+                                    <!-- Header -->
+                                    <Grid Margin="0,0,0,20">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEB51;"
+                                                      FontSize="18" Foreground="#DC2626"/>
+                                            <TextBlock Text="2. Tiền sử dị ứng"
+                                                       Style="{StaticResource SectionTitleStyle}"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1"
+                                                x:Name="BtnAddAllergy"
+                                                Content="+ Thêm"
+                                                Style="{StaticResource EditButtonStyle}"
+                                                Foreground="#DC2626"
+                                                BorderBrush="#FECACA"
+                                                Click="BtnAddAllergy_Click"/>
+                                    </Grid>
+
+                                    <!-- Allergy Items -->
+                                    <!--
+                                        TODO [SUPABASE]: Thay toàn bộ StackPanel tĩnh này bằng ItemsRepeater:
+
+                                        <ItemsRepeater ItemsSource="{x:Bind ViewModel.Allergies}">
+                                            <ItemsRepeater.ItemTemplate>
+                                                <DataTemplate x:DataType="models:AllergyModel">
+                                                    ... (1 item template dùng chung cho mọi dị ứng)
+                                                </DataTemplate>
+                                            </ItemsRepeater.ItemTemplate>
+                                        </ItemsRepeater>
+
+                                        Các field cần bind trong AllergyModel:
+                                          - Name          : tên dị ứng nguyên (AMOXICILLIN, ĐẬU PHỘNG ...)
+                                          - SeverityLabel : nhãn mức độ (NGHIÊM TRỌNG / TRUNG BÌNH / NHẸ)
+                                          - SeverityColor : màu badge
+                                          - Symptoms      : biểu hiện lâm sàng
+                                    -->
+                                    <StackPanel x:Name="AllergyList" Spacing="10">
+                                        <!-- Amoxicillin - TODO [SUPABASE]: xóa item cứng này khi dùng ItemsRepeater -->
+                                        <Border Background="White" CornerRadius="12"
+                                                BorderThickness="1" BorderBrush="#FECACA"
+                                                Padding="14,12">
+                                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                                <Border Background="#FEE2E2" CornerRadius="20"
+                                                        Width="40" Height="40">
+                                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECAA;"
+                                                              FontSize="18" Foreground="#DC2626"
+                                                              VerticalAlignment="Center"
+                                                              HorizontalAlignment="Center"/>
+                                                </Border>
+                                                <StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,4">
+                                                        <Border Background="#DC2626" CornerRadius="3" Padding="5,2">
+                                                            <TextBlock Text="NGHIÊM TRỌNG"
+                                                                       FontSize="8" FontWeight="Black"
+                                                                       Foreground="White"
+                                                                       CharacterSpacing="50"/>
+                                                        </Border>
+                                                        <TextBlock Text="AMOXICILLIN"
+                                                                   FontSize="13" FontWeight="ExtraBold"
+                                                                   Foreground="#1E293B"/>
+                                                    </StackPanel>
+                                                    <TextBlock Text="Biểu hiện: Sốc phản vệ"
+                                                               FontSize="11" FontWeight="Bold"
+                                                               Foreground="#B91C1C"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Đậu phộng - TODO [SUPABASE]: xóa item cứng này khi dùng ItemsRepeater -->
+                                        <Border Background="White" CornerRadius="12"
+                                                BorderThickness="1" BorderBrush="#FED7AA"
+                                                Padding="14,12">
+                                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                                <Border Background="#FFEDD5" CornerRadius="20"
+                                                        Width="40" Height="40">
+                                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE734;"
+                                                              FontSize="18" Foreground="#EA580C"
+                                                              VerticalAlignment="Center"
+                                                              HorizontalAlignment="Center"/>
+                                                </Border>
+                                                <StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,4">
+                                                        <Border Background="#F97316" CornerRadius="3" Padding="5,2">
+                                                            <TextBlock Text="TRUNG BÌNH"
+                                                                       FontSize="8" FontWeight="Black"
+                                                                       Foreground="White"
+                                                                       CharacterSpacing="50"/>
+                                                        </Border>
+                                                        <TextBlock Text="ĐẬU PHỘNG"
+                                                                   FontSize="13" FontWeight="ExtraBold"
+                                                                   Foreground="#1E293B"/>
+                                                    </StackPanel>
+                                                    <TextBlock Text="Biểu hiện: Phát ban ngoài da"
+                                                               FontSize="11" FontWeight="Bold"
+                                                               Foreground="#C2410C"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <!-- ╔══════════════════════════════════════╗
+                         ║  3. Tiền sử bệnh lý cá nhân        ║
+                         ╚══════════════════════════════════════╝ -->
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <!-- Header -->
+                            <Grid Margin="0,0,0,20">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE9D9;"
+                                              FontSize="18" Foreground="#7C3AED"/>
+                                    <TextBlock Text="3. Tiền sử bệnh lý cá nhân"
+                                               Style="{StaticResource SectionTitleStyle}"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" x:Name="BtnEditMedHistory" Content="+ Sửa"
+                                        Style="{StaticResource EditButtonStyle}"
+                                        Foreground="#64748B" BorderBrush="#E2E8F0"
+                                        Click="BtnEditMedHistory_Click"/>
+                            </Grid>
+
+                            <!-- 3 Sub-cards -->
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Bệnh nền -->
+                                <!-- TODO [SUPABASE]: Card này bind từ bảng 'medical_history' (type = 'chronic') -->
+                                <Border Grid.Column="0" CornerRadius="14"
+                                        BorderThickness="1" BorderBrush="#BFDBFE"
+                                        Padding="18">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#EFF6FF" Offset="0"/>
+                                            <GradientStop Color="#FFFFFF" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,14">
+                                            <Border Background="#2563EB" CornerRadius="10"
+                                                    Width="36" Height="36">
+                                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECAA;"
+                                                          FontSize="16" Foreground="White"
+                                                          HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="BỆNH NỀN"
+                                                       FontSize="11" FontWeight="Black"
+                                                       Foreground="#1E3A8A"
+                                                       CharacterSpacing="80"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.ChronicDisease.Name}" -->
+                                        <TextBlock x:Name="TxtChronicName" Text="Cao huyết áp"
+                                                   FontSize="15" FontWeight="ExtraBold"
+                                                   Foreground="#1E293B"/>
+                                        <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.ChronicDisease.DiagnosedYear, Converter={...}}" -->
+                                        <TextBlock x:Name="TxtChronicYear" Text="Phát hiện từ: 2020"
+                                                   FontSize="11" FontWeight="Bold"
+                                                   Foreground="#2563EB"
+                                                   FontStyle="Italic"
+                                                   Margin="0,4,0,0"/>
+                                        <Border BorderThickness="0,1,0,0" BorderBrush="#BFDBFE"
+                                                Margin="0,10,0,0" Padding="0,8,0,0">
+                                            <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.ChronicDisease.Notes}" -->
+                                            <TextBlock x:Name="TxtChronicNote" Text="Kiểm soát ổn định bằng thuốc Lisinopril hàng ngày."
+                                                       FontSize="11" Foreground="#64748B"
+                                                       TextWrapping="Wrap"/>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Phẫu thuật -->
+                                <!-- TODO [SUPABASE]: Card này bind từ bảng 'medical_history' (type = 'surgery') -->
+                                <Border Grid.Column="1" CornerRadius="14"
+                                        BorderThickness="1" BorderBrush="#C7D2FE"
+                                        Padding="18">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#EEF2FF" Offset="0"/>
+                                            <GradientStop Color="#FFFFFF" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,14">
+                                            <Border Background="#4F46E5" CornerRadius="10"
+                                                    Width="36" Height="36">
+                                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74C;"
+                                                          FontSize="16" Foreground="White"
+                                                          HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="PHẪU THUẬT"
+                                                       FontSize="11" FontWeight="Black"
+                                                       Foreground="#3730A3"
+                                                       CharacterSpacing="80"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.Surgery.Name}" -->
+                                        <TextBlock x:Name="TxtSurgeryName" Text="Mổ ruột thừa"
+                                                   FontSize="15" FontWeight="ExtraBold"
+                                                   Foreground="#1E293B"/>
+                                        <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.Surgery.Year, Converter={...}}" -->
+                                        <TextBlock x:Name="TxtSurgeryYear" Text="Năm thực hiện: 2015"
+                                                   FontSize="11" FontWeight="Bold"
+                                                   Foreground="#4F46E5"
+                                                   FontStyle="Italic"
+                                                   Margin="0,4,0,0"/>
+                                        <Border BorderThickness="0,1,0,0" BorderBrush="#C7D2FE"
+                                                Margin="0,10,0,0" Padding="0,8,0,0">
+                                            <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.Surgery.Notes}" -->
+                                            <TextBlock Text="Thực hiện tại BV Chợ Rẫy, không biến chứng sau mổ."
+                                                       FontSize="11" Foreground="#64748B"
+                                                       TextWrapping="Wrap"/>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Tiêm chủng -->
+                                <!-- TODO [SUPABASE]: Card này bind từ bảng 'medical_history' (type = 'vaccination') -->
+                                <Border Grid.Column="2" CornerRadius="14"
+                                        BorderThickness="1" BorderBrush="#A7F3D0"
+                                        Padding="18">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#ECFDF5" Offset="0"/>
+                                            <GradientStop Color="#FFFFFF" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,14">
+                                            <Border Background="#059669" CornerRadius="10"
+                                                    Width="36" Height="36">
+                                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECAA;"
+                                                          FontSize="16" Foreground="White"
+                                                          HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="TIÊM CHỦNG"
+                                                       FontSize="11" FontWeight="Black"
+                                                       Foreground="#064E3B"
+                                                       CharacterSpacing="80"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.Vaccination.Name}" -->
+                                        <TextBlock x:Name="TxtVaccinationName" Text="Cúm mùa &amp; Phế cầu"
+                                                   FontSize="15" FontWeight="ExtraBold"
+                                                   Foreground="#1E293B"/>
+                                        <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.Vaccination.LastDate, Converter={...}}" -->
+                                        <TextBlock x:Name="TxtVaccinationYear" Text="Gần nhất: 2023"
+                                                   FontSize="11" FontWeight="Bold"
+                                                   Foreground="#059669"
+                                                   FontStyle="Italic"
+                                                   Margin="0,4,0,0"/>
+                                        <Border BorderThickness="0,1,0,0" BorderBrush="#A7F3D0"
+                                                Margin="0,10,0,0" Padding="0,8,0,0">
+                                            <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.Vaccination.Notes}" -->
+                                            <TextBlock Text="Tiêm nhắc lại hàng năm đầy đủ theo lịch hẹn."
+                                                       FontSize="11" Foreground="#64748B"
+                                                       TextWrapping="Wrap"/>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ╔══════════════════════════════════════╗
+                         ║  4. Tiền sử dùng thuốc             ║
+                         ╚══════════════════════════════════════╝ -->
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <!-- Header -->
+                            <Grid Margin="0,0,0,20">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECAA;"
+                                              FontSize="18" Foreground="#0D9488"/>
+                                    <TextBlock Text="4. Tiền sử dùng thuốc"
+                                               Style="{StaticResource SectionTitleStyle}"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" x:Name="BtnEditMedication" Content="+ Sửa"
+                                        Style="{StaticResource EditButtonStyle}"
+                                        Foreground="#64748B" BorderBrush="#E2E8F0"
+                                        Click="BtnEditMedication_Click"/>
+                            </Grid>
+
+                            <!-- Table Header -->
+                            <Border Background="#F8FAFC" CornerRadius="12,12,0,0"
+                                    BorderThickness="1,1,1,0" BorderBrush="#E2E8F0"
+                                    Padding="16,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="1.5*"/>
+                                        <ColumnDefinition Width="1.5*"/>
+                                        <ColumnDefinition Width="2*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="TÊN THUỐC" Style="{StaticResource LabelStyle}"/>
+                                    <TextBlock Grid.Column="1" Text="LIỀU LƯỢNG" Style="{StaticResource LabelStyle}"/>
+                                    <TextBlock Grid.Column="2" Text="THỜI GIAN" Style="{StaticResource LabelStyle}"/>
+                                    <TextBlock Grid.Column="3" Text="TRẠNG THÁI" Style="{StaticResource LabelStyle}"/>
+                                    <TextBlock Grid.Column="4" Text="TP CHỨC NĂNG" Style="{StaticResource LabelStyle}"/>
+                                </Grid>
+                            </Border>
+
+                            <!--
+                                TODO [SUPABASE]: Thay Border tĩnh này bằng ItemsRepeater bind từ bảng 'medications':
+
+                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.Medications}">
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate x:DataType="models:MedicationModel">
+                                            ... (1 row template)
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+
+                                Các field cần bind trong MedicationModel:
+                                  - Name          : tên thuốc + hàm lượng
+                                  - Dosage        : liều dùng
+                                  - Period        : thời gian dùng
+                                  - StatusLabel   : trạng thái (ĐANG DÙNG / ĐÃ DỪNG)
+                                  - SideEffects   : tác phụng chức năng
+                            -->
+                            <!-- Table Row - TODO [SUPABASE]: xóa row cứng này khi dùng ItemsRepeater -->
+                            <Border Background="White" CornerRadius="0,0,12,12"
+                                    BorderThickness="1" BorderBrush="#E2E8F0"
+                                    Padding="16,14">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="1.5*"/>
+                                        <ColumnDefinition Width="1.5*"/>
+                                        <ColumnDefinition Width="2*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
+                                        <Ellipse Width="8" Height="8" Fill="#3B82F6"
+                                                 VerticalAlignment="Center"/>
+                                        <!-- TODO [SUPABASE]: Text="{x:Bind Name}" -->
+                                        <TextBlock x:Name="TxtMedName" Text="Lisinopril 10mg"
+                                                   FontSize="13" FontWeight="ExtraBold"
+                                                   Foreground="#1E293B"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <!-- TODO [SUPABASE]: Text="{x:Bind Dosage}" -->
+                                    <TextBlock x:Name="TxtMedDosage" Grid.Column="1"
+                                               Text="1 viên / sáng (sau ăn)"
+                                               FontSize="12" Foreground="#475569"
+                                               VerticalAlignment="Center"/>
+                                    <!-- TODO [SUPABASE]: Text="{x:Bind Period}" -->
+                                    <TextBlock x:Name="TxtMedPeriod" Grid.Column="2"
+                                               Text="2021 - Hiện tại"
+                                               FontSize="11" FontWeight="Bold"
+                                               Foreground="#94A3B8"
+                                               VerticalAlignment="Center"/>
+                                    <Border Grid.Column="3"
+                                            Background="#DCFCE7" CornerRadius="20"
+                                            Padding="10,3" VerticalAlignment="Center"
+                                            HorizontalAlignment="Left">
+                                        <!-- TODO [SUPABASE]: Text="{x:Bind StatusLabel}" -->
+                                        <TextBlock Text="ĐANG DÙNG"
+                                                   FontSize="9" FontWeight="Black"
+                                                   Foreground="#15803D"
+                                                   CharacterSpacing="50"/>
+                                    </Border>
+                                    <!-- TODO [SUPABASE]: Text="{x:Bind SideEffects}" -->
+                                    <TextBlock Grid.Column="4"
+                                               Text="Không ghi nhận"
+                                               FontSize="12" Foreground="#94A3B8"
+                                               FontStyle="Italic"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ╔══════════════════════════════════════╗
+                         ║  Row: Family History + Lifestyle    ║
+                         ╚══════════════════════════════════════╝ -->
+                    <Grid ColumnSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- ── Card 5: Tiền sử gia đình ── -->
+                        <Border Grid.Column="0" Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE902;"
+                                                  FontSize="18" Foreground="#E11D48"/>
+                                        <TextBlock Text="5. Tiền sử gia đình"
+                                                   Style="{StaticResource SectionTitleStyle}"/>
+                                    </StackPanel>
+                                    <Button Grid.Column="1" x:Name="BtnEditFamily" Content="+ Sửa"
+                                            Style="{StaticResource EditButtonStyle}"
+                                            Foreground="#64748B" BorderBrush="#E2E8F0"
+                                            Click="BtnEditFamily_Click"/>
+                                </Grid>
+
+                                <!-- TODO [SUPABASE]: Grid này bind từ bảng 'family_history' -->
+                                <Grid ColumnSpacing="10" Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Bố - TODO [SUPABASE]: bind ViewModel.FamilyHistory.Father -->
+                                    <Border Grid.Column="0"
+                                            Background="#EFF6FF"
+                                            CornerRadius="12"
+                                            BorderThickness="1" BorderBrush="#BFDBFE"
+                                            Padding="14,12">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <Border Background="#2563EB" CornerRadius="20"
+                                                    Width="40" Height="40">
+                                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE77B;"
+                                                          FontSize="18" Foreground="White"
+                                                          HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"/>
+                                            </Border>
+                                            <StackPanel>
+                                                <TextBlock Text="BỐ ĐẺ"
+                                                           FontSize="9" FontWeight="Black"
+                                                           Foreground="#2563EB"
+                                                           CharacterSpacing="100"/>
+                                                <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.FamilyHistory.FatherCondition}" -->
+                                                <TextBlock x:Name="TxtFatherCondition" Text="Cao huyết áp"
+                                                           FontSize="13" FontWeight="ExtraBold"
+                                                           Foreground="#1E293B"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Mẹ - TODO [SUPABASE]: bind ViewModel.FamilyHistory.Mother -->
+                                    <Border Grid.Column="1"
+                                            Background="#FFF1F2"
+                                            CornerRadius="12"
+                                            BorderThickness="1" BorderBrush="#FECDD3"
+                                            Padding="14,12">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <Border Background="#E11D48" CornerRadius="20"
+                                                    Width="40" Height="40">
+                                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE77B;"
+                                                          FontSize="18" Foreground="White"
+                                                          HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"/>
+                                            </Border>
+                                            <StackPanel>
+                                                <TextBlock Text="MẸ ĐẺ"
+                                                           FontSize="9" FontWeight="Black"
+                                                           Foreground="#E11D48"
+                                                           CharacterSpacing="100"/>
+                                                <!-- TODO [SUPABASE]: Text="{x:Bind ViewModel.FamilyHistory.MotherCondition}" -->
+                                                <TextBlock x:Name="TxtMotherCondition" Text="Tiểu đường T2"
+                                                           FontSize="13" FontWeight="ExtraBold"
+                                                           Foreground="#1E293B"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Risk Warning -->
+                                <Border Background="#FFFBEB"
+                                        CornerRadius="12"
+                                        BorderThickness="1" BorderBrush="#FDE68A"
+                                        Padding="14,10">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7BA;"
+                                                  FontSize="16" Foreground="#D97706"
+                                                  VerticalAlignment="Center"/>
+                                        <TextBlock FontSize="11" FontWeight="Bold"
+                                                   Foreground="#92400E"
+                                                   VerticalAlignment="Center">
+                                            <Run Text="NGUY CƠ CAO: " FontWeight="Black" FontSize="9"
+                                                 CharacterSpacing="50"/>
+                                            <Run Text="Bệnh lý Tim mạch di truyền"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ── Card 6: Lối sống ── -->
+                        <Border Grid.Column="1"
+                                Background="#F0FDF4"
+                                CornerRadius="16"
+                                BorderThickness="0,1,1,1"
+                                BorderBrush="#E2E8F0"
+                                Padding="24">
+                            <Grid>
+                                <Border HorizontalAlignment="Left" Width="4"
+                                        Background="#059669" CornerRadius="4,0,0,4"
+                                        Margin="-24,0,0,0"/>
+                                <StackPanel Margin="8,0,0,0">
+                                    <Grid Margin="0,0,0,20">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE734;"
+                                                      FontSize="18" Foreground="#059669"/>
+                                            <TextBlock Text="6. Lối sống"
+                                                       Style="{StaticResource SectionTitleStyle}"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1" x:Name="BtnEditLifestyle" Content="+ Sửa"
+                                                Style="{StaticResource EditButtonStyle}"
+                                                Foreground="#059669" BorderBrush="#A7F3D0"
+                                                Click="BtnEditLifestyle_Click"/>
+                                    </Grid>
+
+                                    <!-- Lifestyle: 2 rows x 2 cols (UniformGrid không có trong WinUI 3) -->
+                                    <Grid RowSpacing="8" ColumnSpacing="8">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Thuốc lá -->
+                                        <Border Grid.Row="0" Grid.Column="0"
+                                                Background="White" CornerRadius="12"
+                                                BorderThickness="1" BorderBrush="#F1F5F9"
+                                                Padding="12">
+                                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                                <Border Background="#FEE2E2" CornerRadius="8"
+                                                        Width="36" Height="36">
+                                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC30;"
+                                                              FontSize="16" Foreground="#DC2626"
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center"/>
+                                                </Border>
+                                                <StackPanel>
+                                                    <TextBlock Text="THUỐC LÁ"
+                                                               FontSize="9" FontWeight="Black"
+                                                               Foreground="#1E293B"
+                                                               CharacterSpacing="80"/>
+                                                    <TextBlock x:Name="TxtSmoking" Text="1 bao/ngày, 10 năm"
+                                                               FontSize="10" Foreground="#64748B"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Rượu bia -->
+                                        <Border Grid.Row="0" Grid.Column="1"
+                                                Background="White" CornerRadius="12"
+                                                BorderThickness="1" BorderBrush="#F1F5F9"
+                                                Padding="12">
+                                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                                <Border Background="#FEF3C7" CornerRadius="8"
+                                                        Width="36" Height="36">
+                                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEB5B;"
+                                                              FontSize="16" Foreground="#D97706"
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center"/>
+                                                </Border>
+                                                <StackPanel>
+                                                    <TextBlock Text="RƯỢU BIA"
+                                                               FontSize="9" FontWeight="Black"
+                                                               Foreground="#1E293B"
+                                                               CharacterSpacing="80"/>
+                                                    <TextBlock x:Name="TxtAlcohol" Text="1-2 lần / tuần"
+                                                               FontSize="10" Foreground="#64748B"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Vận động -->
+                                        <Border Grid.Row="1" Grid.Column="0"
+                                                Background="White" CornerRadius="12"
+                                                BorderThickness="1" BorderBrush="#F1F5F9"
+                                                Padding="12">
+                                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                                <Border Background="#DCFCE7" CornerRadius="8"
+                                                        Width="36" Height="36">
+                                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEAD4;"
+                                                              FontSize="16" Foreground="#16A34A"
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center"/>
+                                                </Border>
+                                                <StackPanel>
+                                                    <TextBlock Text="VẬN ĐỘNG"
+                                                               FontSize="9" FontWeight="Black"
+                                                               Foreground="#1E293B"
+                                                               CharacterSpacing="80"/>
+                                                    <TextBlock x:Name="TxtExercise" Text="Tập nhẹ (đi bộ)"
+                                                               FontSize="10" Foreground="#64748B"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Giấc ngủ -->
+                                        <Border Grid.Row="1" Grid.Column="1"
+                                                Background="White" CornerRadius="12"
+                                                BorderThickness="1" BorderBrush="#F1F5F9"
+                                                Padding="12">
+                                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                                <Border Background="#E0E7FF" CornerRadius="8"
+                                                        Width="36" Height="36">
+                                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE708;"
+                                                              FontSize="16" Foreground="#4F46E5"
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center"/>
+                                                </Border>
+                                                <StackPanel>
+                                                    <TextBlock Text="GIẤC NGỦ"
+                                                               FontSize="9" FontWeight="Black"
+                                                               Foreground="#1E293B"
+                                                               CharacterSpacing="80"/>
+                                                    <TextBlock x:Name="TxtSleep" Text="~ 7 tiếng / đêm"
+                                                               FontSize="10" Foreground="#64748B"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <!-- ── Save Button ── -->
+                    <StackPanel HorizontalAlignment="Right" Margin="0,8,0,32">
+                        <Button x:Name="SaveButton"
+                                Content="Lưu thông tin hồ sơ"
+                                Click="SaveButton_Click"
+                                Background="#0059BB"
+                                Foreground="White"
+                                CornerRadius="10"
+                                Padding="48,12"
+                                FontSize="13"
+                                FontWeight="ExtraBold"/>
+                    </StackPanel>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- ═══════════════════════════════════════════
+                 RIGHT SIDEBAR
+            ═══════════════════════════════════════════ -->
+            <Border Grid.Column="1"
+                    Background="White"
+                    BorderThickness="1,0,0,0"
+                    BorderBrush="#E2E8F0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
+                              Padding="24">
+                    <StackPanel Spacing="32">
+
+                        <!-- ── Lịch sử thăm khám ── -->
+                        <StackPanel>
+                            <Grid Margin="0,0,0,28">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Text="LỊCH SỬ THĂM KHÁM"
+                                           FontSize="10" FontWeight="ExtraBold"
+                                           Foreground="#1E293B"
+                                           CharacterSpacing="200"/>
+                                <Button Grid.Column="1"
+                                        Content="···"
+                                        Background="#F8FAFC"
+                                        BorderBrush="Transparent"
+                                        CornerRadius="8"
+                                        Padding="8,4"
+                                        FontSize="14"
+                                        Foreground="#94A3B8"/>
+                            </Grid>
+
+                            <!-- Timeline Items -->
+                            <!--
+                                TODO [SUPABASE]: Thay toàn bộ StackPanel tĩnh (3 visit cứng) này
+                                bằng ItemsRepeater bind từ bảng 'visit_history':
+
+                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.VisitHistory}">
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate x:DataType="models:VisitModel">
+                                            ... (1 timeline item template)
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+
+                                Các field cần bind trong VisitModel:
+                                  - VisitType     : loại khám (Tái khám / Cấp cứu / ...)
+                                  - VisitDate     : ngày khám (hiển thị "HÔM NAY", "3 THÁNG TRƯỚC" ...)
+                                  - DoctorName    : tên bác sĩ
+                                  - Summary       : tóm tắt kết quả khám
+                                  - IsLatest      : true → chấm xanh; false → chấm xám
+                            -->
+                            <StackPanel Spacing="0">
+
+                                <!-- Visit 1 - Today - TODO [SUPABASE]: xóa item cứng khi dùng ItemsRepeater -->
+                                <Grid Margin="0,0,0,28">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="24"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <!-- Dot + Line -->
+                                    <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                                        <Ellipse Width="16" Height="16"
+                                                 Fill="#2563EB"
+                                                 Stroke="White" StrokeThickness="3"
+                                                 Margin="0,2,0,0"/>
+                                        <Rectangle Width="2" Height="60"
+                                                   Fill="#E2E8F0"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0"
+                                                       Text="Tái khám định kỳ"
+                                                       FontSize="13" FontWeight="ExtraBold"
+                                                       Foreground="#1E293B"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="HÔM NAY"
+                                                       FontSize="9" FontWeight="Bold"
+                                                       Foreground="#94A3B8"
+                                                       CharacterSpacing="100"
+                                                       VerticalAlignment="Top"/>
+                                        </Grid>
+                                        <Border Background="#EFF6FF" CornerRadius="10"
+                                                BorderThickness="1" BorderBrush="#DBEAFE"
+                                                Padding="12,10">
+                                            <StackPanel>
+                                                <TextBlock Text="BS. Nguyễn Minh Tuấn"
+                                                           FontSize="11" FontWeight="Bold"
+                                                           Foreground="#334155"/>
+                                                <TextBlock Text="Huyết áp ổn định, tiếp tục duy trì phác đồ cũ..."
+                                                           FontSize="10" Foreground="#64748B"
+                                                           TextWrapping="Wrap"
+                                                           Margin="0,4,0,0"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Visit 2 -->
+                                <Grid Margin="0,0,0,28">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="24"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                                        <Ellipse Width="16" Height="16"
+                                                 Fill="#CBD5E1"
+                                                 Stroke="White" StrokeThickness="3"
+                                                 Margin="0,2,0,0"/>
+                                        <Rectangle Width="2" Height="60"
+                                                   Fill="#E2E8F0"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0"
+                                                       Text="Khám tim mạch"
+                                                       FontSize="13" FontWeight="ExtraBold"
+                                                       Foreground="#1E293B"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="3 THÁNG TRƯỚC"
+                                                       FontSize="9" FontWeight="Bold"
+                                                       Foreground="#94A3B8"
+                                                       CharacterSpacing="100"
+                                                       VerticalAlignment="Top"/>
+                                        </Grid>
+                                        <StackPanel Padding="4,0">
+                                            <TextBlock Text="BS. Lê Thị Thu Hà"
+                                                       FontSize="11" FontWeight="Bold"
+                                                       Foreground="#334155"/>
+                                            <TextBlock Text="Siêu âm tim bình thường, nhịp xoang đều..."
+                                                       FontSize="10" Foreground="#64748B"
+                                                       TextWrapping="Wrap"
+                                                       Margin="0,4,0,0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Visit 3 -->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="24"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Ellipse Grid.Column="0" Width="16" Height="16"
+                                             Fill="#CBD5E1"
+                                             Stroke="White" StrokeThickness="3"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Top"
+                                             Margin="0,2,0,0"/>
+                                    <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                                        <Grid Margin="0,0,0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0"
+                                                       Text="Cấp cứu nội"
+                                                       FontSize="13" FontWeight="ExtraBold"
+                                                       Foreground="#1E293B"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="1 NĂM TRƯỚC"
+                                                       FontSize="9" FontWeight="Bold"
+                                                       Foreground="#94A3B8"
+                                                       CharacterSpacing="100"
+                                                       VerticalAlignment="Top"/>
+                                        </Grid>
+                                        <TextBlock Text="Cơn tăng huyết áp đột ngột tại nhà..."
+                                                   FontSize="10" Foreground="#94A3B8"
+                                                   FontStyle="Italic"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- See All -->
+                            <Button Content="Xem toàn bộ nhật ký ▾"
+                                    Background="#F0F6FF"
+                                    BorderBrush="Transparent"
+                                    CornerRadius="10"
+                                    Padding="12,10"
+                                    FontSize="11" FontWeight="Black"
+                                    Foreground="#0059BB"
+                                    HorizontalAlignment="Stretch"
+                                    Margin="0,20,0,0"/>
+                        </StackPanel>
+
+                        <!-- ── Hành động nhanh ── -->
+                        <StackPanel Spacing="10">
+                            <Border BorderThickness="0,1,0,0" BorderBrush="#E2E8F0"
+                                    Padding="0,20,0,0">
+                                <TextBlock Text="HÀNH ĐỘNG NHANH"
+                                           FontSize="10" FontWeight="ExtraBold"
+                                           Foreground="#1E293B"
+                                           CharacterSpacing="200"
+                                           Margin="0,0,0,12"/>
+                            </Border>
+
+                            <Button Style="{StaticResource ActionButtonStyle}">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECAA;"
+                                              FontSize="18"/>
+                                    <TextBlock Text="Tạo đơn thuốc mới" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource ActionButtonStyle}">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE787;"
+                                              FontSize="18"/>
+                                    <TextBlock Text="Đặt lịch hẹn mới" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource ActionButtonStyle}">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8A9;"
+                                              FontSize="18"/>
+                                    <TextBlock Text="In hồ sơ tóm tắt" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </ScrollViewer>
 </Page>
