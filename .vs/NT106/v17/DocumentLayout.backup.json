@@ -3,16 +3,32 @@
   "WorkspaceRootPath": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\doctor\\patienthistorypage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\doctor\\patienthistorypage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\doctor\\manageschedulepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\doctor\\manageschedulepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\doctor\\manageschedulepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\doctor\\manageschedulepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\doctor\\doctorhomepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\doctor\\doctorhomepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\doctor\\patienthistorypage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\doctor\\patienthistorypage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\doctor\\doctorhomepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\doctor\\doctorhomepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -23,16 +39,8 @@
       "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\doctor\\examinationpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\doctor\\doctorhomepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\doctor\\doctorhomepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\doctor\\manageschedulepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\doctor\\manageschedulepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\shell\\doctorshell.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
@@ -49,10 +57,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\doctor\\revenuepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\doctor\\revenuepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\doctor\\patienthistorypage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|solutionrelative:nt106\\healthcare.client\\ui\\doctor\\patienthistorypage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0E620EAD-D973-BF79-E6B5-A9DF81CA3985}|NT106\\Healthcare.Client\\Healthcare.Client.csproj|d:\\ltmangcb\\doan\\nt106.q22.antt\\nt106\\healthcare.client\\ui\\auth\\loginpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
@@ -90,7 +94,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 459,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -99,32 +103,45 @@
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "App.xaml.cs",
-              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\App.xaml.cs",
-              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\App.xaml.cs",
-              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\App.xaml.cs",
-              "RelativeToolTip": "NT106\\Healthcare.Client\\App.xaml.cs",
-              "ViewState": "AgIAACIAAAAAAAAAAAAzwAAAAAAAAAAAAAAAAA==",
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\MainWindow.xaml.cs",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\MainWindow.xaml.cs",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\MainWindow.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-09T12:17:13.412Z",
+              "WhenOpened": "2026-03-30T13:16:24.168Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "DoctorHomePage.xaml.cs",
-              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\DoctorHomePage.xaml.cs",
-              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Doctor\\DoctorHomePage.xaml.cs",
-              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\DoctorHomePage.xaml.cs",
-              "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Doctor\\DoctorHomePage.xaml.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAAowA4AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-09T04:28:53.501Z",
+              "DocumentIndex": 2,
+              "Title": "ManageSchedulePage.xaml",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml",
+              "ViewState": "AgIAAAgBAAAAAAAAAAAAAOgCAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-04-09T04:27:18.088Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 0,
+              "Title": "PatientHistoryPage.xaml",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\PatientHistoryPage.xaml",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Doctor\\PatientHistoryPage.xaml",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\PatientHistoryPage.xaml",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Doctor\\PatientHistoryPage.xaml",
+              "ViewState": "AgIAAN8AAAAAAAAAAAAAAPQAAABSAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-04-09T04:27:49.745Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
               "Title": "ExaminationPage.xaml",
               "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\ExaminationPage.xaml",
               "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Doctor\\ExaminationPage.xaml",
@@ -138,6 +155,44 @@
             {
               "$type": "Document",
               "DocumentIndex": 6,
+              "Title": "DoctorHomePage.xaml.cs",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\DoctorHomePage.xaml.cs",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Doctor\\DoctorHomePage.xaml.cs",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\DoctorHomePage.xaml.cs",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Doctor\\DoctorHomePage.xaml.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAowA4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-09T04:28:53.501Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ManageSchedulePage.xaml.cs",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml.cs",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml.cs",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml.cs",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml.cs",
+              "ViewState": "AgIAADUAAAAAAAAAAAArwEYAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-09T12:12:04.582Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\MainWindow.xaml",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\MainWindow.xaml",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\MainWindow.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-03-30T13:17:39.284Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
               "Title": "DoctorHomePage.xaml",
               "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\DoctorHomePage.xaml",
               "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Doctor\\DoctorHomePage.xaml",
@@ -151,58 +206,31 @@
             {
               "$type": "Document",
               "DocumentIndex": 5,
-              "Title": "MainWindow.xaml",
-              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\MainWindow.xaml",
-              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\MainWindow.xaml",
-              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\MainWindow.xaml",
-              "RelativeToolTip": "NT106\\Healthcare.Client\\MainWindow.xaml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAA3AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-03-30T13:17:39.284Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "MainWindow.xaml.cs",
-              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\MainWindow.xaml.cs",
-              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\MainWindow.xaml.cs",
-              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\MainWindow.xaml.cs",
-              "RelativeToolTip": "NT106\\Healthcare.Client\\MainWindow.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAA0AAAAAAAAAA==",
+              "Title": "PatientHistoryPage.xaml.cs",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\PatientHistoryPage.xaml.cs",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Doctor\\PatientHistoryPage.xaml.cs",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\PatientHistoryPage.xaml.cs",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Doctor\\PatientHistoryPage.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAgwLABAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-30T13:16:24.168Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ManageSchedulePage.xaml",
-              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml",
-              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml",
-              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml",
-              "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHADAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-04-09T04:27:18.088Z",
+              "WhenOpened": "2026-04-10T02:51:06.32Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 7,
-              "Title": "ManageSchedulePage.xaml.cs",
-              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml.cs",
-              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml.cs",
-              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml.cs",
-              "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAPYBAAAAAAAAAAAAAA==",
+              "Title": "App.xaml.cs",
+              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\App.xaml.cs",
+              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\App.xaml.cs",
+              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\App.xaml.cs",
+              "RelativeToolTip": "NT106\\Healthcare.Client\\App.xaml.cs",
+              "ViewState": "AgIAACIAAAAAAAAAAAAzwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-09T12:12:04.582Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-09T12:17:13.412Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 11,
               "Title": "DoctorShell.xaml.cs",
               "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Shell\\DoctorShell.xaml.cs",
               "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Shell\\DoctorShell.xaml.cs",
@@ -214,7 +242,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 10,
               "Title": "DoctorShell.xaml",
               "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Shell\\DoctorShell.xaml",
               "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Shell\\DoctorShell.xaml",
@@ -227,7 +255,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 12,
               "Title": "App.xaml",
               "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\App.xaml",
               "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\App.xaml",
@@ -240,20 +268,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "PatientHistoryPage.xaml",
-              "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\PatientHistoryPage.xaml",
-              "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Doctor\\PatientHistoryPage.xaml",
-              "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\PatientHistoryPage.xaml",
-              "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Doctor\\PatientHistoryPage.xaml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-04-09T04:27:49.745Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 13,
               "Title": "RevenuePage.xaml",
               "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\RevenuePage.xaml",
               "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Doctor\\RevenuePage.xaml",
@@ -266,7 +281,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "LoginPage.xaml.cs",
               "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\LoginPage.xaml.cs",
               "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Auth\\LoginPage.xaml.cs",
@@ -278,7 +293,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "LoginPage.xaml",
               "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\LoginPage.xaml",
               "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Auth\\LoginPage.xaml",
@@ -291,7 +306,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "ForgotPasswordPage.xaml.cs",
               "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\ForgotPasswordPage.xaml.cs",
               "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Auth\\ForgotPasswordPage.xaml.cs",
@@ -303,7 +318,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 18,
               "Title": "RegisterPage.xaml.cs",
               "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\RegisterPage.xaml.cs",
               "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Auth\\RegisterPage.xaml.cs",
@@ -315,7 +330,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 19,
               "Title": "RegisterPage.xaml",
               "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\RegisterPage.xaml",
               "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Auth\\RegisterPage.xaml",
@@ -328,7 +343,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "ForgotPasswordPage.xaml",
               "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Auth\\ForgotPasswordPage.xaml",
               "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Auth\\ForgotPasswordPage.xaml",
@@ -341,7 +356,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 20,
               "Title": "Healthcare.Client.csproj",
               "DocumentMoniker": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\Healthcare.Client.csproj",
               "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\Healthcare.Client.csproj",
@@ -349,7 +364,8 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\Healthcare.Client.csproj",
               "ViewState": "AgIAAAsAAAAAAAAAAAAewB0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-03-30T12:19:52.89Z"
+              "WhenOpened": "2026-03-30T12:19:52.89Z",
+              "EditorCaption": ""
             }
           ]
         }

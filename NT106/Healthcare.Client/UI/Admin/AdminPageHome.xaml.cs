@@ -15,6 +15,7 @@ namespace Healthcare.Client.UI.Admin
     public sealed partial class AdminHomePage : Page
     {
         private string _currentTab = "Patient";
+        private readonly AdminApiClient _adminApiClient = new AdminApiClient();
 
         public AdminHomePage()
         {
@@ -75,7 +76,7 @@ namespace Healthcare.Client.UI.Admin
 
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)
             {
-                bool success = await AdminApiClient.CreateUserViaServerAsync(emailBox.Text, passBox.Password, nameBox.Text, role);
+                bool success = await _adminApiClient.CreateUserViaServerAsync(emailBox.Text, passBox.Password, nameBox.Text, role);
                 if (success) { await ShowDialogAsync("Thành công", "Đã tạo tài khoản."); LoadDataAsync(); }
             }
         }
@@ -99,7 +100,7 @@ namespace Healthcare.Client.UI.Admin
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)
             {
                 string id = (item is PatientProfile p) ? p.PatientId : ((DoctorProfile)item).DoctorId;
-                if (await AdminApiClient.DeleteUserViaServerAsync(id)) { LoadDataAsync(); }
+                if (await _adminApiClient.DeleteUserViaServerAsync(id)) { LoadDataAsync(); }
             }
         }
 
