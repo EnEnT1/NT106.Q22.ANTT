@@ -1,13 +1,12 @@
 ﻿using Healthcare.Client.Helpers;
-using Healthcare.Client.Models.Core;
-using Healthcare.Client.SupabaseIntegration;
 using Healthcare.Client.UI.Shell;
-using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI;
 
@@ -15,7 +14,6 @@ namespace Healthcare.Client.UI.Doctor
 {
     public sealed partial class DoctorHomePage : Page
     {
-        // ViewModel đơn giản cho Queue item
         public class QueueItemViewModel
         {
             public string QueueNumber { get; set; }
@@ -28,10 +26,9 @@ namespace Healthcare.Client.UI.Doctor
             public Brush NumberForeground { get; set; }
             public Brush BadgeBackground { get; set; }
             public Brush BadgeForeground { get; set; }
-            public string AppointmentId { get; set; } // để navigate sang ExaminationPage
+            public string AppointmentId { get; set; }
         }
 
-        // ViewModel cho Schedule item
         public class ScheduleItemViewModel
         {
             public string TimeRange { get; set; }
@@ -43,43 +40,43 @@ namespace Healthcare.Client.UI.Doctor
 
         private ObservableCollection<QueueItemViewModel> _queueItems = new();
         private ObservableCollection<ScheduleItemViewModel> _scheduleItems = new();
+        private List<QueueItemViewModel> _allQueueItems = new();
 
         public DoctorHomePage()
         {
             this.InitializeComponent();
+
             QueueListView.ItemsSource = _queueItems;
             ScheduleListView.ItemsSource = _scheduleItems;
 
-            // Load data khi page mở
             this.Loaded += async (s, e) => await LoadAllDataAsync();
         }
-
-        // ══════════════════════════════════════════
-        // DATA LOADING
-        // ══════════════════════════════════════════
 
         private async Task LoadAllDataAsync()
         {
             LoadWelcomeText();
-            LoadScheduleItems(); // mock data trước, sau thay bằng Supabase
+            LoadScheduleItems();
             await LoadQueueAsync();
             await LoadStatsAsync();
+            ShowAllQueue();
         }
 
         private void LoadWelcomeText()
         {
             var user = SessionStorage.CurrentUser;
             var hour = DateTime.Now.Hour;
-            var greeting = hour < 12 ? "Chào buổi sáng" :
-                           hour < 18 ? "Chào buổi chiều" : "Chào buổi tối";
 
-            TxtWelcome.Text = $"{greeting}, Bác sĩ {user?.FullName ?? ""}";
+            string greeting = hour < 12 ? "Chào buổi sáng"
+                            : hour < 18 ? "Chào buổi chiều"
+                            : "Chào buổi tối";
+
+            TxtWelcome.Text = $"{greeting}, Bác sĩ {user?.FullName ?? "Tâm"}";
         }
 
         private async Task LoadStatsAsync()
         {
-            // TODO: gọi SupabaseDbService lấy số liệu thực
-            // Tạm thời dùng mock
+            await Task.CompletedTask;
+
             TxtExamined.Text = "24";
             TxtEmergency.Text = "03";
             TxtAppointments.Text = "08";
@@ -87,11 +84,11 @@ namespace Healthcare.Client.UI.Doctor
 
         private async Task LoadQueueAsync()
         {
-            _queueItems.Clear();
+            await Task.CompletedTask;
 
-            // TODO: thay bằng SupabaseDbService.GetTodayQueueAsync(doctorId)
-            // Mock data theo đúng design
-            _queueItems.Add(new QueueItemViewModel
+            _allQueueItems.Clear();
+
+            _allQueueItems.Add(new QueueItemViewModel
             {
                 QueueNumber = "08",
                 PatientName = "Nguyễn Văn An",
@@ -106,7 +103,7 @@ namespace Healthcare.Client.UI.Doctor
                 AppointmentId = "apt-001"
             });
 
-            _queueItems.Add(new QueueItemViewModel
+            _allQueueItems.Add(new QueueItemViewModel
             {
                 QueueNumber = "09",
                 PatientName = "Lê Thị Bình",
@@ -121,7 +118,7 @@ namespace Healthcare.Client.UI.Doctor
                 AppointmentId = "apt-002"
             });
 
-            _queueItems.Add(new QueueItemViewModel
+            _allQueueItems.Add(new QueueItemViewModel
             {
                 QueueNumber = "10",
                 PatientName = "Trần Minh Quân",
@@ -136,7 +133,7 @@ namespace Healthcare.Client.UI.Doctor
                 AppointmentId = "apt-003"
             });
 
-            _queueItems.Add(new QueueItemViewModel
+            _allQueueItems.Add(new QueueItemViewModel
             {
                 QueueNumber = "11",
                 PatientName = "Phạm Hoàng Nam",
@@ -150,20 +147,21 @@ namespace Healthcare.Client.UI.Doctor
                 BadgeForeground = new SolidColorBrush(Color.FromArgb(255, 100, 116, 139)),
                 AppointmentId = "apt-004"
             });
+
+            UpdateQueueButtonText();
         }
 
         private void LoadScheduleItems()
         {
             _scheduleItems.Clear();
 
-            // TODO: thay bằng Supabase data
             _scheduleItems.Add(new ScheduleItemViewModel
             {
                 TimeRange = "08:00 - 09:00",
                 Title = "Giao ban khoa",
                 Description = "Phòng họp tầng 4 - Khu A",
                 DotColor = new SolidColorBrush(Color.FromArgb(255, 0, 89, 187)),
-                TimeColor = new SolidColorBrush(Color.FromArgb(255, 0, 89, 187)),
+                TimeColor = new SolidColorBrush(Color.FromArgb(255, 0, 89, 187))
             });
 
             _scheduleItems.Add(new ScheduleItemViewModel
@@ -172,7 +170,7 @@ namespace Healthcare.Client.UI.Doctor
                 Title = "Hội chẩn trực tuyến",
                 Description = "Bệnh nhân: Lê Văn Dũng (Ca khó)",
                 DotColor = new SolidColorBrush(Color.FromArgb(255, 99, 102, 241)),
-                TimeColor = new SolidColorBrush(Color.FromArgb(255, 99, 102, 241)),
+                TimeColor = new SolidColorBrush(Color.FromArgb(255, 99, 102, 241))
             });
 
             _scheduleItems.Add(new ScheduleItemViewModel
@@ -181,47 +179,126 @@ namespace Healthcare.Client.UI.Doctor
                 Title = "Khám chuyên sâu",
                 Description = "Danh sách đăng ký trước (05 ca)",
                 DotColor = new SolidColorBrush(Color.FromArgb(255, 203, 213, 225)),
-                TimeColor = new SolidColorBrush(Color.FromArgb(255, 148, 163, 184)),
+                TimeColor = new SolidColorBrush(Color.FromArgb(255, 148, 163, 184))
             });
         }
 
-        // ══════════════════════════════════════════
-        // EVENT HANDLERS
-        // ══════════════════════════════════════════
+        private void ShowAllQueue()
+        {
+            _queueItems.Clear();
 
-        // Click vào 1 bệnh nhân trong queue → navigate sang ExaminationPage
-        private void QueueItem_Click(object sender, ItemClickEventArgs e)
+            foreach (var item in _allQueueItems)
+                _queueItems.Add(item);
+
+            SetAllButtonActive();
+        }
+
+        private void ShowPriorityQueue()
+        {
+            _queueItems.Clear();
+
+            var priorityItems = _allQueueItems
+                .Where(x => x.StatusText == "ƯU TIÊN")
+                .ToList();
+
+            foreach (var item in priorityItems)
+                _queueItems.Add(item);
+
+            SetPriorityButtonActive();
+        }
+
+        private void UpdateQueueButtonText()
+        {
+            int total = _allQueueItems.Count;
+            int priority = _allQueueItems.Count(x => x.StatusText == "ƯU TIÊN");
+
+            BtnQueueAll.Content = $"Tất cả ({total})";
+            BtnQueuePriority.Content = $"Ưu tiên ({priority})";
+        }
+
+        private void SetAllButtonActive()
+        {
+            BtnQueueAll.Style = (Style)Application.Current.Resources["AccentButtonStyle"];
+            BtnQueuePriority.Style = (Style)Application.Current.Resources["DefaultButtonStyle"];
+        }
+
+        private void SetPriorityButtonActive()
+        {
+            BtnQueueAll.Style = (Style)Application.Current.Resources["DefaultButtonStyle"];
+            BtnQueuePriority.Style = (Style)Application.Current.Resources["AccentButtonStyle"];
+        }
+
+        private void BtnQueueAll_Click(object sender, RoutedEventArgs e)
+        {
+            ShowAllQueue();
+        }
+
+        private void BtnQueuePriority_Click(object sender, RoutedEventArgs e)
+        {
+            ShowPriorityQueue();
+        }
+
+        private async void QueueItem_Click(object sender, ItemClickEventArgs e)
         {
             if (e.ClickedItem is QueueItemViewModel item)
             {
-                // Lấy DoctorShell → navigate ContentFrame sang ExaminationPage
-                // và truyền appointmentId
-                var shell = this.Parent as Frame;
-                // TODO: Frame.Navigate(typeof(ExaminationPage), item.AppointmentId);
+                ContentDialog dialog = new ContentDialog
+                {
+                    Title = "Thông tin bệnh nhân",
+                    Content = $"Bệnh nhân: {item.PatientName}\nTriệu chứng: {item.Symptom}\nMã lịch hẹn: {item.AppointmentId}",
+                    CloseButtonText = "Đóng",
+                    PrimaryButtonText = "Sang khám",
+                    XamlRoot = this.XamlRoot
+                };
+
+                var result = await dialog.ShowAsync();
+
+                if (result == ContentDialogResult.Primary)
+                {
+                    if (this.Frame != null)
+                    {
+                        this.Frame.Navigate(typeof(ExaminationPage), item.AppointmentId);
+                    }
+                }
             }
         }
 
-        private void BtnViewAllQueue_Click(object sender, RoutedEventArgs e)
+        private async void BtnViewAllQueue_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: navigate sang trang Queue đầy đủ (nếu có)
+            ContentDialog dialog = new ContentDialog
+            {
+                Title = "Hàng chờ khám",
+                Content = $"Hiện có {_allQueueItems.Count} bệnh nhân trong danh sách chờ.",
+                CloseButtonText = "Đóng",
+                XamlRoot = this.XamlRoot
+            };
+
+            await dialog.ShowAsync();
         }
 
-        private void BtnAddSchedule_Click(object sender, RoutedEventArgs e)
+        private async void BtnAddSchedule_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: mở dialog thêm sự kiện
+            ContentDialog dialog = new ContentDialog
+            {
+                Title = "Thêm sự kiện",
+                Content = "Chức năng thêm lịch sẽ làm ở bước sau.",
+                CloseButtonText = "Đóng",
+                XamlRoot = this.XamlRoot
+            };
+
+            await dialog.ShowAsync();
         }
 
         private void BtnViewFullSchedule_Click(object sender, RoutedEventArgs e)
         {
-            // Navigate sang ManageSchedulePage
+            TriggerShellNavigation("ManageSchedulePage");
         }
 
         private void BtnViewLabResult_Click(object sender, RoutedEventArgs e)
         {
-            // Navigate sang PatientHistoryPage với patient ID liên quan
+            TriggerShellNavigation("PatientHistoryPage");
         }
 
-        // Quick Access shortcuts → đổi tab NavigationView ở Shell
         private void QuickAccess_ManageSchedule(object sender, RoutedEventArgs e)
         {
             TriggerShellNavigation("ManageSchedulePage");
@@ -242,13 +319,12 @@ namespace Healthcare.Client.UI.Doctor
             TriggerShellNavigation("RevenuePage");
         }
 
-        // Helper: tìm DoctorShell cha và trigger navigate
         private void TriggerShellNavigation(string pageTag)
         {
             try
             {
-                // Bubble up tìm DoctorShell
                 var parent = this.Parent;
+
                 while (parent != null && !(parent is DoctorShell))
                 {
                     parent = (parent as FrameworkElement)?.Parent;
@@ -265,7 +341,7 @@ namespace Healthcare.Client.UI.Doctor
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($" Navigation error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine("Navigation error: " + ex.Message);
             }
         }
     }

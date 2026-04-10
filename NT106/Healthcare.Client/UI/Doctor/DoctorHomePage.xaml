@@ -10,9 +10,6 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Padding="32,28,32,40" Spacing="24">
 
-            <!-- ══════════════════════════════════
-                 WELCOME HEADER
-            ══════════════════════════════════ -->
             <StackPanel Spacing="4">
                 <TextBlock x:Name="TxtWelcome"
                            Text="Chào buổi sáng, Bác sĩ Tâm"
@@ -24,21 +21,14 @@
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
             </StackPanel>
 
-            <!-- ══════════════════════════════════
-                 BODY: 2 cột (8/4)
-            ══════════════════════════════════ -->
             <Grid ColumnSpacing="24">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
-                    <!-- Left: stats + queue -->
                     <ColumnDefinition Width="1*"/>
-                    <!-- Right: schedule + reminder -->
                 </Grid.ColumnDefinitions>
 
-                <!-- ── LEFT COLUMN ── -->
                 <StackPanel Grid.Column="0" Spacing="20">
 
-                    <!-- STAT CARDS (3 cột ngang) -->
                     <Grid ColumnSpacing="16">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -46,7 +36,6 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Đã khám -->
                         <Border Grid.Column="0"
                                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -81,7 +70,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Cấp cứu -->
                         <Border Grid.Column="1"
                                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -116,7 +104,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Lịch hẹn -->
                         <Border Grid.Column="2"
                                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -152,7 +139,6 @@
                         </Border>
                     </Grid>
 
-                    <!-- QUICK ACCESS -->
                     <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                             BorderThickness="1"
@@ -174,7 +160,6 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Lịch trực -->
                                 <Button Grid.Column="0"
                                         HorizontalAlignment="Stretch"
                                         Style="{StaticResource DefaultButtonStyle}"
@@ -196,7 +181,6 @@
                                     </StackPanel>
                                 </Button>
 
-                                <!-- Khám từ xa -->
                                 <Button Grid.Column="1"
                                         HorizontalAlignment="Stretch"
                                         Style="{StaticResource DefaultButtonStyle}"
@@ -218,7 +202,6 @@
                                     </StackPanel>
                                 </Button>
 
-                                <!-- Tiền sử bệnh -->
                                 <Button Grid.Column="2"
                                         HorizontalAlignment="Stretch"
                                         Style="{StaticResource DefaultButtonStyle}"
@@ -240,7 +223,6 @@
                                     </StackPanel>
                                 </Button>
 
-                                <!-- Báo cáo -->
                                 <Button Grid.Column="3"
                                         HorizontalAlignment="Stretch"
                                         Style="{StaticResource DefaultButtonStyle}"
@@ -265,14 +247,12 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- PATIENT QUEUE -->
                     <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                             BorderThickness="1"
                             CornerRadius="12">
-                        <!-- Header -->
                         <StackPanel>
-                            <Grid Padding="20,16" >
+                            <Grid Padding="20,16">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
@@ -286,17 +266,18 @@
                                             Style="{StaticResource AccentButtonStyle}"
                                             CornerRadius="20"
                                             FontSize="11"
-                                            Padding="12,4"/>
+                                            Padding="12,4"
+                                            Click="BtnQueueAll_Click"/>
                                     <Button x:Name="BtnQueuePriority"
                                             Content="Ưu tiên (2)"
                                             Style="{StaticResource DefaultButtonStyle}"
                                             CornerRadius="20"
                                             FontSize="11"
-                                            Padding="12,4"/>
+                                            Padding="12,4"
+                                            Click="BtnQueuePriority_Click"/>
                                 </StackPanel>
                             </Grid>
 
-                            <!-- Queue List -->
                             <ListView x:Name="QueueListView"
                                       SelectionMode="None"
                                       IsItemClickEnabled="True"
@@ -320,7 +301,6 @@
                                                 <ColumnDefinition Width="32"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <!-- Số thứ tự -->
                                             <Border Grid.Column="0"
                                                     Width="40" Height="40"
                                                     CornerRadius="20"
@@ -333,7 +313,6 @@
                                                            VerticalAlignment="Center"/>
                                             </Border>
 
-                                            <!-- Tên + Triệu chứng -->
                                             <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
                                                 <TextBlock Text="{Binding PatientName}"
                                                            FontSize="13" FontWeight="SemiBold"/>
@@ -342,7 +321,6 @@
                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                             </StackPanel>
 
-                                            <!-- Giờ dự kiến -->
                                             <StackPanel Grid.Column="2"
                                                         VerticalAlignment="Center"
                                                         HorizontalAlignment="Right"
@@ -357,7 +335,6 @@
                                                            HorizontalAlignment="Right"/>
                                             </StackPanel>
 
-                                            <!-- Badge trạng thái -->
                                             <Border Grid.Column="3"
                                                     Background="{Binding BadgeBackground}"
                                                     CornerRadius="20"
@@ -369,7 +346,6 @@
                                                            Foreground="{Binding BadgeForeground}"/>
                                             </Border>
 
-                                            <!-- Arrow -->
                                             <FontIcon Grid.Column="4"
                                                       Glyph="&#xE76C;"
                                                       FontSize="14"
@@ -381,7 +357,6 @@
                                 </ListView.ItemTemplate>
                             </ListView>
 
-                            <!-- Xem thêm -->
                             <Button HorizontalAlignment="Stretch"
                                     Style="{StaticResource DefaultButtonStyle}"
                                     Padding="0,14"
@@ -397,10 +372,8 @@
 
                 </StackPanel>
 
-                <!-- ── RIGHT COLUMN ── -->
                 <StackPanel Grid.Column="1" Spacing="20">
 
-                    <!-- TODAY'S SCHEDULE -->
                     <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                             BorderThickness="1"
@@ -422,7 +395,6 @@
                                 </Button>
                             </Grid>
 
-                            <!-- Timeline items -->
                             <ListView x:Name="ScheduleListView"
                                       SelectionMode="None">
                                 <ListView.ItemContainerStyle>
@@ -446,7 +418,6 @@
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <!-- Dot indicator -->
                                             <Border Grid.Column="0"
                                                     Width="22" Height="22"
                                                     CornerRadius="11"
@@ -454,7 +425,6 @@
                                                     VerticalAlignment="Top"
                                                     Margin="0,2,0,0"/>
 
-                                            <!-- Content -->
                                             <StackPanel Grid.Column="1" Spacing="3">
                                                 <TextBlock Text="{Binding TimeRange}"
                                                            FontSize="10" FontWeight="Bold"
@@ -482,7 +452,6 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- CLINICAL REMINDER (màu xanh đậm như design) -->
                     <Border Background="#0059BB"
                             CornerRadius="12"
                             Padding="20">
@@ -507,7 +476,6 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- LOCATION INFO -->
                     <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                             BorderThickness="1"

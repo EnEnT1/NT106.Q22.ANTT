@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
@@ -18,14 +18,33 @@ using Windows.Foundation.Collections;
 
 namespace Healthcare.Client.UI.Doctor
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class ExaminationPage : Page
     {
+        private string _appointmentId;
+
         public ExaminationPage()
         {
-            InitializeComponent();
+            this.InitializeComponent();
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+
+            if (e.Parameter is string appointmentId)
+            {
+                _appointmentId = appointmentId;
+                LoadAppointmentData(_appointmentId);
+            }
+        }
+
+        private void LoadAppointmentData(string appointmentId)
+        {
+            // test tạm
+            System.Diagnostics.Debug.WriteLine("AppointmentId nhận được: " + appointmentId);
+
+            // TODO:
+            // gọi SupabaseDbService lấy dữ liệu ca khám theo appointmentId
         }
     }
 }
