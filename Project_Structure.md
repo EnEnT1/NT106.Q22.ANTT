@@ -44,8 +44,7 @@ NNT106.Solution // Thư mục gốc Solution
 │   ├── Program.cs                       // File khởi chạy Server, cài đặt Dependency Injection
 │   └── Healthcare.Server.csproj         
 │
-└── Healthcare.Client // Project 2: WinUI 3 / Windows App SDK
-    │
+└── Healthcare.Client // Project 2: 
     ├── APIClient                        // Giao tiếp nhánh 1: Chọc về Server nội bộ
     │   ├── AiClient.cs                  // Gói ảnh gửi lên Server phân tích
     │   ├── PaymentClient.cs             // Gửi request lấy URL thanh toán VNPay
