@@ -44,7 +44,7 @@ NNT106.Solution // Thư mục gốc Solution
 │   ├── Program.cs                       // File khởi chạy Server, cài đặt Dependency Injection
 │   └── Healthcare.Server.csproj         
 │
-└── Healthcare.Client // Project 2: 
+└── Healthcare.Client // Project 2
     ├── APIClient                        // Giao tiếp nhánh 1: Chọc về Server nội bộ
     │   ├── AiClient.cs                  // Gói ảnh gửi lên Server phân tích
     │   ├── PaymentClient.cs             // Gửi request lấy URL thanh toán VNPay
@@ -88,7 +88,7 @@ NNT106.Solution // Thư mục gốc Solution
     ├── Media                            // Xử lý âm thanh, hình ảnh cục bộ
     │   └── WebRtcPeerConnection.cs      // Thuật toán bắt Camera & Micro cho Video Call P2P
     │
-    ├── UI                               // Giao diện WinUI 3 XAML
+    ├── UI                              
     │   │ // Các trang giao diện (Pages)
     │   ├── Auth                     
     │   │    ├── LoginPage.xaml / .cs          // Trang Đăng nhập / Đăng ký
