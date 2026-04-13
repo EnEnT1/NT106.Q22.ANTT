@@ -3,12 +3,193 @@
     x:Class="Healthcare.Client.UI.Doctor.ExaminationPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Healthcare.Client.UI.Doctor"
+    xmlns:components="using:Healthcare.Client.UI.Components"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    Background="#F8F9FA">
 
+    <!-- 3-column layout: Patient Panel | Video | Chat -->
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="288"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="320"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ══════════════════════════════════════
+             COL 0 — PATIENT CONTEXT PANEL
+        ══════════════════════════════════════ -->
+        <Border Grid.Column="0"
+                Background="#F3F4F5"
+                BorderThickness="0,0,1,0"
+                BorderBrush="#E2E8F0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Patient Card -->
+                <Border Grid.Row="0"
+                        Background="White" CornerRadius="12"
+                        Margin="16,16,16,8" Padding="16">
+                    <StackPanel HorizontalAlignment="Center" Spacing="6">
+
+                        <!-- Avatar -->
+                        <Border x:Name="AvatarBorder"
+                                CornerRadius="60" Width="96" Height="96"
+                                BorderThickness="4" BorderBrush="White"
+                                HorizontalAlignment="Center"
+                                Background="#E2E8F0">
+                            <!--
+                            TODO — DB: Khi có AvatarUrl từ PatientProfile:
+                            <Border.Background>
+                                <ImageBrush x:Name="PatientAvatar" Stretch="UniformToFill"/>
+                            </Border.Background>
+                            (set ImageSource trong code-behind)
+                            -->
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE77B;"
+                                      FontSize="40" Foreground="#94A3B8"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+
+                        <!--
+                        TODO — DB: x:Bind ViewModel.PatientName / PatientMeta / Condition
+                        -->
+                        <TextBlock x:Name="TxtPatientName"
+                                   Text="Đang tải..."
+                                   FontSize="16" FontWeight="Bold"
+                                   Foreground="#1E293B"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="TxtPatientMeta"
+                                   Text="–"
+                                   FontSize="12" Foreground="#64748B"
+                                   HorizontalAlignment="Center"/>
+                        <Border x:Name="ConditionBadge"
+                                Background="#FEE2E2" CornerRadius="20"
+                                Padding="12,4" HorizontalAlignment="Center">
+                            <TextBlock x:Name="TxtCondition"
+                                       Text="–"
+                                       FontSize="11" FontWeight="Bold"
+                                       Foreground="#B91C1C"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Context Nav -->
+                <StackPanel Grid.Row="1" Spacing="2" Margin="16,4,16,0">
+                    <Button x:Name="BtnNavVideo"
+                            Click="BtnNav_Click" Tag="video"
+                            HorizontalAlignment="Stretch"
+                            Background="White" CornerRadius="8"
+                            BorderThickness="0" Padding="16,12">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE714;"
+                                      FontSize="18" Foreground="#0059BB"/>
+                            <TextBlock Text="Video Call" FontSize="13"
+                                       FontWeight="Bold" Foreground="#0059BB"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="BtnNavChat"
+                            Click="BtnNav_Click" Tag="chat"
+                            HorizontalAlignment="Stretch"
+                            Background="Transparent" CornerRadius="8"
+                            BorderThickness="0" Padding="16,12">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8F2;"
+                                      FontSize="18" Foreground="#64748B"/>
+                            <TextBlock Text="Chat" FontSize="13"
+                                       FontWeight="Normal" Foreground="#64748B"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="BtnNavNotes"
+                            Click="BtnNav_Click" Tag="notes"
+                            HorizontalAlignment="Stretch"
+                            Background="Transparent" CornerRadius="8"
+                            BorderThickness="0" Padding="16,12">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE70B;"
+                                      FontSize="18" Foreground="#64748B"/>
+                            <TextBlock Text="Medical Notes" FontSize="13"
+                                       FontWeight="Normal" Foreground="#64748B"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="BtnNavHistory"
+                            Click="BtnNav_Click" Tag="history"
+                            HorizontalAlignment="Stretch"
+                            Background="Transparent" CornerRadius="8"
+                            BorderThickness="0" Padding="16,12">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE81C;"
+                                      FontSize="18" Foreground="#64748B"/>
+                            <TextBlock Text="History" FontSize="13"
+                                       FontWeight="Normal" Foreground="#64748B"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- Footer -->
+                <StackPanel Grid.Row="2" Margin="16,8,16,24" Spacing="8">
+                    <Button x:Name="BtnFinish"
+                            Click="BtnFinish_Click"
+                            HorizontalAlignment="Stretch"
+                            Background="#B91C1C" Foreground="White"
+                            CornerRadius="10" Padding="0,14"
+                            FontSize="13" FontWeight="Bold" BorderThickness="0">
+                        <TextBlock Text="Kết thúc khám" HorizontalAlignment="Center"/>
+                    </Button>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="Trợ giúp"
+                                Background="Transparent" BorderThickness="0"
+                                FontSize="11" Foreground="#64748B"
+                                HorizontalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="Khẩn cấp"
+                                Click="BtnEmergency_Click"
+                                Background="Transparent" BorderThickness="0"
+                                FontSize="11" Foreground="#DC2626"
+                                HorizontalAlignment="Center"/>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ══════════════════════════════════════
+             COL 1 — VIDEO CALL COMPONENT
+        ══════════════════════════════════════ -->
+        <!-- COL 1 — VIDEO CALL COMPONENT -->
+        <Border Grid.Column="1" Margin="16">
+            <components:VideoCallControl
+                x:Name="VideoCall"
+                CallStarted="VideoCall_CallStarted"
+                CallEnded="VideoCall_CallEnded"
+                Visibility="Collapsed"/>
+        </Border>
+
+
+        <!-- ══════════════════════════════════════
+             COL 2 — CHAT COMPONENT
+        ══════════════════════════════════════ -->
+        <Border Grid.Column="2"
+                BorderThickness="1,0,0,0"
+                BorderBrush="#E2E8F0">
+            <components:ChatControl
+                x:Name="Chat"
+                Grid.Column="1"
+                Grid.ColumnSpan="2" 
+                StartCallRequested="Chat_StartCallRequested"
+                NotesSaved="Chat_NotesSaved"/>
+        </Border>
 
     </Grid>
 </Page>

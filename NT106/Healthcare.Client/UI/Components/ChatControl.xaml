@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Healthcare.Client.UI.Components.ChatControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="White">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Tab bar -->
+            <RowDefinition Height="*"/>
+            <!-- Chat panel -->
+            <RowDefinition Height="Auto"/>
+            <!-- Notes panel (collapsed by default) -->
+        </Grid.RowDefinitions>
+
+        <!-- ══════════════════════════════════════
+             TAB BAR
+        ══════════════════════════════════════ -->
+        <Border Grid.Row="0"
+                BorderThickness="0,0,0,1" BorderBrush="#E2E8F0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="TabChat" Grid.Column="0"
+                        Content="Live Chat"
+                        Click="Tab_Click" Tag="chat"
+                        HorizontalAlignment="Stretch" Padding="0,16"
+                        Background="Transparent"
+                        BorderThickness="0,0,0,2" BorderBrush="#0059BB"
+                        FontSize="13" FontWeight="Bold" Foreground="#0059BB"/>
+                <Button x:Name="TabNotes" Grid.Column="1"
+                        Content="Ghi chú"
+                        Click="Tab_Click" Tag="notes"
+                        HorizontalAlignment="Stretch" Padding="0,16"
+                        Background="Transparent"
+                        BorderThickness="0" BorderBrush="Transparent"
+                        FontSize="13" FontWeight="Normal" Foreground="#64748B"/>
+            </Grid>
+        </Border>
+
+        <!-- ══════════════════════════════════════
+             CHAT PANEL
+        ══════════════════════════════════════ -->
+        <Grid x:Name="PanelChat" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Start call button -->
+                <RowDefinition Height="*"/>
+                <!-- Messages -->
+                <RowDefinition Height="Auto"/>
+                <!-- Quick notes -->
+                <RowDefinition Height="Auto"/>
+                <!-- Input -->
+            </Grid.RowDefinitions>
+
+            <!-- Start Call Button -->
+            <Border Grid.Row="0" Padding="16,16,16,8">
+                <Button x:Name="BtnStartCall"
+                        Click="BtnStartCall_Click"
+                        HorizontalAlignment="Stretch"
+                        Background="#0059BB" Foreground="White"
+                        CornerRadius="10" Padding="0,14"
+                        FontSize="13" FontWeight="Bold" BorderThickness="0">
+                    <StackPanel Orientation="Horizontal" Spacing="8"
+                                HorizontalAlignment="Center">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE717;"
+                                  FontSize="15" Foreground="White"/>
+                        <TextBlock x:Name="TxtStartCallLabel"
+                                   Text="Bắt đầu cuộc gọi"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </Border>
+
+            <!-- Messages -->
+            <ScrollViewer x:Name="ChatScrollViewer"
+                          Grid.Row="1"
+                          VerticalScrollBarVisibility="Hidden"
+                          Padding="16,0,16,8">
+                <!--
+                TODO — Realtime:
+                Khi có DB thay StackPanel bằng ItemsRepeater:
+
+                <ItemsRepeater x:Name="MessageList"
+                               ItemsSource="{x:Bind _messages}">
+                  <ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="models:ChatMessage">
+                      ... DataTemplate dùng x:Bind để render bubble ...
+                    </DataTemplate>
+                  </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
+
+                SupabaseRealtimeService subscribe bảng chat_messages
+                filter: appointment_id=eq.{_appointmentId}
+                onInsert: DispatcherQueue.TryEnqueue(() => AppendMessage(msg))
+                -->
+                <StackPanel x:Name="MessageList" Spacing="12" Margin="0,8,0,0"/>
+            </ScrollViewer>
+
+            <!-- Quick Notes -->
+            <Border Grid.Row="2"
+                    Background="#F8FAFC"
+                    BorderThickness="0,1,0,1" BorderBrush="#F1F5F9"
+                    Padding="16,12">
+                <StackPanel Spacing="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   Text="GHI CHÚ NHANH"
+                                   FontSize="9" FontWeight="Bold"
+                                   Foreground="#64748B" CharacterSpacing="150"
+                                   VerticalAlignment="Center"/>
+                        <Button Grid.Column="1"
+                                x:Name="BtnAddNote"
+                                Click="BtnAddNote_Click"
+                                Background="Transparent" BorderThickness="0" Padding="4">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;"
+                                      FontSize="16" Foreground="#0059BB"/>
+                        </Button>
+                    </Grid>
+                    <!--
+                    TODO — DB: ItemsSource bind từ ViewModel.QuickNotes
+                    Lưu vào MedicalRecord.Notes khi Finish
+                    -->
+                    <StackPanel x:Name="QuickNotesList" Spacing="6"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Chat Input -->
+            <Border Grid.Row="3" Padding="16" Background="White">
+                <Grid>
+                    <TextBox x:Name="ChatInput"
+                             PlaceholderText="Gửi tin nhắn..."
+                             Background="#F3F4F5"
+                             BorderThickness="0" CornerRadius="20"
+                             Padding="16,10,48,10"
+                             FontSize="13"
+                             KeyDown="ChatInput_KeyDown"/>
+                    <Button x:Name="BtnSend"
+                            Click="BtnSend_Click"
+                            Width="36" Height="36"
+                            Background="Transparent" BorderThickness="0"
+                            Padding="0" Margin="0,0,8,0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE725;"
+                                  FontSize="16" Foreground="#0059BB"/>
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ══════════════════════════════════════
+             NOTES PANEL (collapsed by default)
+        ══════════════════════════════════════ -->
+        <ScrollViewer x:Name="PanelNotes"
+                      Grid.Row="1"
+                      Visibility="Collapsed"
+                      VerticalScrollBarVisibility="Auto"
+                      Padding="16">
+            <StackPanel Spacing="16">
+
+                <!-- Diagnosis -->
+                <TextBlock Text="Chẩn đoán"
+                           FontSize="13" FontWeight="Bold" Foreground="#1E293B"/>
+                <!--
+                TODO — DB: Text="{x:Bind ViewModel.DiagnosisText, Mode=TwoWay}"
+                Lưu vào MedicalRecord.Diagnosis
+                -->
+                <TextBox x:Name="DiagnosisBox"
+                         PlaceholderText="Nhập chẩn đoán..."
+                         AcceptsReturn="True" TextWrapping="Wrap"
+                         MinHeight="120"
+                         Background="#F8FAFC" BorderBrush="#E2E8F0"
+                         CornerRadius="8" Padding="12" FontSize="13"/>
+
+                <!-- Prescription -->
+                <TextBlock Text="Đơn thuốc"
+                           FontSize="13" FontWeight="Bold" Foreground="#1E293B"/>
+                <!--
+                TODO — DB: ItemsSource từ MasterMedicine
+                Khi bấm "Thêm thuốc" → ContentDialog search MasterMedicine
+                → thêm item vào PrescriptionList
+                → lưu vào MedicalRecord
+                -->
+                <StackPanel x:Name="PrescriptionList" Spacing="8"/>
+
+                <Button x:Name="BtnAddMedicine"
+                        Click="BtnAddMedicine_Click"
+                        HorizontalAlignment="Stretch"
+                        Background="#EFF6FF" BorderBrush="#BFDBFE"
+                        BorderThickness="1" CornerRadius="8"
+                        Padding="0,12" FontSize="13" FontWeight="SemiBold"
+                        Foreground="#0059BB">
+                    <StackPanel Orientation="Horizontal" Spacing="8"
+                                HorizontalAlignment="Center">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;"
+                                  FontSize="14" Foreground="#0059BB"/>
+                        <TextBlock Text="Thêm thuốc" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <Button x:Name="BtnSaveNotes"
+                        Click="BtnSaveNotes_Click"
+                        HorizontalAlignment="Stretch"
+                        Background="#0059BB" Foreground="White"
+                        BorderThickness="0" CornerRadius="8"
+                        Padding="0,12" FontSize="13" FontWeight="Bold">
+                    <TextBlock Text="Lưu ghi chú" HorizontalAlignment="Center"/>
+                </Button>
+            </StackPanel>
+        </ScrollViewer>
+
+    </Grid>
+</UserControl>
