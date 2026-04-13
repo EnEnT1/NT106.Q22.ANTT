@@ -1,4 +1,4 @@
-﻿using Supabase;
+using Supabase;
 using System;
 using System.Threading.Tasks;
 
@@ -6,15 +6,17 @@ namespace Healthcare.Server.SupabaseIntegration
 {
     public class SupabaseAdminHelper
     {
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
         public Supabase.Client AdminClient { get; private set; }
 
-        public SupabaseAdminHelper()
+        public SupabaseAdminHelper(Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
-            var url = Environment.GetEnvironmentVariable("SUPABASE_URL")
-                      ?? throw new Exception("Thiếu SUPABASE_URL trong .env");
+            _configuration = configuration;
+            var url = _configuration["Supabase:Url"]
+                      ?? throw new Exception("Thiếu Supabase:Url trong appsettings.json");
 
-            var serviceRoleKey = Environment.GetEnvironmentVariable("SUPABASE_SERVICE_ROLE_KEY")
-                                 ?? throw new Exception("Thiếu SUPABASE_SERVICE_ROLE_KEY trong .env");
+            var serviceRoleKey = _configuration["Supabase:ServiceRoleKey"]
+                                 ?? throw new Exception("Thiếu Supabase:ServiceRoleKey trong appsettings.json");
 
             var options = new SupabaseOptions { AutoConnectRealtime = false };
 

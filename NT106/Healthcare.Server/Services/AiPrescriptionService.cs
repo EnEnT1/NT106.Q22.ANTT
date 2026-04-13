@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,16 +11,18 @@ namespace Healthcare.Server.Services
 {
     public class AiPrescriptionService
     {
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
         private readonly string _apiKey;
         private readonly string _model;
         private readonly HttpClient _httpClient;
 
-        public AiPrescriptionService()
+        public AiPrescriptionService(Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
-            _apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY")
-                      ?? throw new Exception("Thiếu OPENAI_API_KEY trong file .env");
+            _configuration = configuration;
+            _apiKey = _configuration["OpenAI:ApiKey"]
+                      ?? throw new Exception("Thiếu OpenAI:ApiKey trong appsettings.json");
 
-            _model = Environment.GetEnvironmentVariable("OPENAI_MODEL")
+            _model = _configuration["OpenAI:Model"]
                      ?? "gpt-4o-mini";
 
             _httpClient = new HttpClient();

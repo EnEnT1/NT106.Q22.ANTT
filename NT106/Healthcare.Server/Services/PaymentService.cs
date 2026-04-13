@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -9,17 +9,19 @@ namespace Healthcare.Server.Services
 {
     public class PaymentService
     {
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
         private readonly string _vnpayTmnCode;
         private readonly string _vnpayHashSecret;
         private readonly string _vnpayUrl;
         private readonly string _vnpayReturnUrl;
 
-        public PaymentService()
+        public PaymentService(Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
-            _vnpayTmnCode = Environment.GetEnvironmentVariable("VNPAY_TMN_CODE") ?? "YOUR_TMN_CODE";
-            _vnpayHashSecret = Environment.GetEnvironmentVariable("VNPAY_HASH_SECRET") ?? "YOUR_SECRET";
-            _vnpayUrl = Environment.GetEnvironmentVariable("VNPAY_URL") ?? "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-            _vnpayReturnUrl = Environment.GetEnvironmentVariable("VNPAY_RETURN_URL") ?? "http://localhost:5246/api/payment/vnpay-return";
+            _configuration = configuration;
+            _vnpayTmnCode = _configuration["VnPay:TmnCode"] ?? "66G4ROY1";
+            _vnpayHashSecret = _configuration["VnPay:HashSecret"] ?? "71ZYZXHKPH9171NGNV7550Y22ADTXXOM";
+            _vnpayUrl = _configuration["VnPay:Url"] ?? "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+            _vnpayReturnUrl = _configuration["VnPay:ReturnUrl"] ?? "http://localhost:5246/api/payment/vnpay-return";
         }
 
         public string CreatePaymentUrl(string appointmentId, double amount, string ipAddress)

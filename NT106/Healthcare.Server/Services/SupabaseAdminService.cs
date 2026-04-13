@@ -1,4 +1,4 @@
-﻿using Healthcare.Server.SupabaseIntegration;
+using Healthcare.Server.SupabaseIntegration;
 using Microsoft.Extensions.Configuration;
 using Postgrest.Attributes;
 using Postgrest.Models;
@@ -21,8 +21,8 @@ namespace Healthcare.Server.Services
         public SupabaseAdminService(SupabaseAdminHelper adminHelper, IConfiguration config)
         {
             _adminHelper = adminHelper;
-            _url = config["SUPABASE_URL"];
-            _key = config["SUPABASE_SERVICE_ROLE_KEY"];
+            _url = config["Supabase:Url"];
+            _key = config["Supabase:ServiceRoleKey"];
         }
 
         public async Task<bool> DeleteUserCompletelyAsync(string id)

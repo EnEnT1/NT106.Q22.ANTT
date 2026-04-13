@@ -5,22 +5,21 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Healthcare.Server.Services;
-using DotNetEnv;
 using Supabase;
 var builder = WebApplication.CreateBuilder(args);
 
-DotNetEnv.Env.Load();
-builder.Configuration.AddEnvironmentVariables();
+// DotNetEnv.Env.Load(); // Đã chuyển sang appsettings.json
+// builder.Configuration.AddEnvironmentVariables();
 // 1. Khai báo các Controller API
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var supabaseUrl = Environment.GetEnvironmentVariable("SUPABASE_URL")
-                  ?? throw new InvalidOperationException("CRITICAL ERROR: Thiếu biến môi trường SUPABASE_URL!");
+var supabaseUrl = builder.Configuration["Supabase:Url"]
+                  ?? throw new InvalidOperationException("CRITICAL ERROR: Thiếu config Supabase:Url trong appsettings.json!");
 
-var supabaseKey = Environment.GetEnvironmentVariable("SUPABASE_SERVICE_ROLE_KEY")
-                  ?? throw new InvalidOperationException("CRITICAL ERROR: Thiếu biến môi trường SUPABASE_SERVICE_ROLE_KEY!");
+var supabaseKey = builder.Configuration["Supabase:ServiceRoleKey"]
+                  ?? throw new InvalidOperationException("CRITICAL ERROR: Thiếu config Supabase:ServiceRoleKey trong appsettings.json!");
 
 var options = new SupabaseOptions { AutoConnectRealtime = true };
 
