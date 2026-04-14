@@ -10,10 +10,6 @@ namespace Healthcare.Client.Models.Identity
         [Column("patient_id")]
         public string PatientId { get; set; }
 
-        [Column("date_of_birth")] public string DateOfBirth { get; set; }
-
-        [Column("gender")] public string Gender { get; set; }
-
         [Column("blood_type")]
         public string BloodType { get; set; }
 
