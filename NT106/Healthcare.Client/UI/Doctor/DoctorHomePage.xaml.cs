@@ -1,4 +1,4 @@
-﻿using Healthcare.Client.Helpers;
+using Healthcare.Client.Helpers;
 using Healthcare.Client.UI.Shell;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -302,11 +302,6 @@ namespace Healthcare.Client.UI.Doctor
         private void QuickAccess_ManageSchedule(object sender, RoutedEventArgs e)
         {
             TriggerShellNavigation("ManageSchedulePage");
-        }
-
-        private void QuickAccess_Examination(object sender, RoutedEventArgs e)
-        {
-            TriggerShellNavigation("ExaminationPage");
         }
 
         private void QuickAccess_PatientHistory(object sender, RoutedEventArgs e)

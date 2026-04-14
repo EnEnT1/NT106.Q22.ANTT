@@ -66,9 +66,17 @@ namespace Healthcare.Client.UI.Doctor
         {
             base.OnNavigatedTo(e);
 
-            // Nhận appointmentId từ DoctorHomePage (hàng chờ)
-            if (e.Parameter is string appointmentId)
-                _appointmentId = appointmentId;
+            // Nhận appointmentId hoặc patientId tùy route:
+            //   - Từ DoctorHomePage (hàng chờ)    → appointmentId
+            //   - Từ ManageSchedulePage (Gọi Video) → patientId
+            if (e.Parameter is string param)
+            {
+                // Heuristic đơn giản: nếu param chứa "apt-" thì là appointmentId
+                if (param.StartsWith("apt-", StringComparison.OrdinalIgnoreCase))
+                    _appointmentId = param;
+                else
+                    _patientId = param; // patientId đến từ ManageSchedulePage
+            }
 
             // TODO — Session: _currentUserId = SessionStorage.CurrentUser.Id;
             _currentUserId = "mock-doctor-id";
