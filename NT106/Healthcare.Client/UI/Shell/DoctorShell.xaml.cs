@@ -1,4 +1,4 @@
-﻿using Healthcare.Client.Helpers;
+using Healthcare.Client.Helpers;
 using Healthcare.Client.UI.Auth;
 using Healthcare.Client.UI.Doctor;
 using Microsoft.UI.Xaml;
@@ -17,7 +17,6 @@ namespace Healthcare.Client.UI.Shell
         {
             { "DoctorHomePage",      typeof(DoctorHomePage) },
             { "ManageSchedulePage",  typeof(ManageSchedulePage) },
-            { "ExaminationPage",     typeof(ExaminationPage) },
             { "PatientHistoryPage",  typeof(PatientHistoryPage) },
             { "RevenuePage",         typeof(RevenuePage) },
         };

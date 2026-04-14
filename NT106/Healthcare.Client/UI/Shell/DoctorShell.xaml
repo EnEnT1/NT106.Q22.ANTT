@@ -141,11 +141,6 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
-                <NavigationViewItem Tag="ExaminationPage" Content="Khám trực tuyến">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE714;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
 
                 <NavigationViewItem Tag="PatientHistoryPage" Content="Tiền sử bệnh">
                     <NavigationViewItem.Icon>
