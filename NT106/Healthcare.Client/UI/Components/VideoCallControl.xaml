@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <UserControl
     x:Class="Healthcare.Client.UI.Components.VideoCallControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -8,163 +7,206 @@
     mc:Ignorable="d">
 
     <Grid>
-        <!-- Container chính -->
         <Border CornerRadius="16" Background="Black">
             <Grid>
-                <!-- ── Waiting Placeholder ── -->
+                <!-- Placeholder chờ kết nối -->
                 <Border x:Name="WaitingPlaceholder" Background="#1E293B">
                     <StackPanel HorizontalAlignment="Center"
-                                VerticalAlignment="Center" Spacing="16">
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE77B;"
-                                  FontSize="80" Foreground="#334155"
+                                VerticalAlignment="Center"
+                                Spacing="16">
+                        <FontIcon FontFamily="Segoe MDL2 Assets"
+                                  Glyph="&#xE77B;"
+                                  FontSize="80"
+                                  Foreground="#334155"
                                   HorizontalAlignment="Center"/>
+
                         <TextBlock x:Name="TxtWaitingStatus"
                                    Text="Đang chờ kết nối bệnh nhân..."
-                                   FontSize="15" Foreground="#64748B"
+                                   FontSize="15"
+                                   Foreground="#64748B"
                                    HorizontalAlignment="Center"/>
+
                         <ProgressRing x:Name="ConnectingRing"
                                       IsActive="False"
-                                      Width="32" Height="32"
+                                      Width="32"
+                                      Height="32"
                                       Foreground="#0059BB"
                                       HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Border>
 
-                <!-- TODO — WebRTC: Remote video stream -->
-                <!-- <MediaPlayerElement x:Name="RemoteVideo" ... /> -->
+                <!-- TODO sau này: Remote video -->
+                <!-- <MediaPlayerElement x:Name="RemoteVideo"/> -->
 
-                <!-- Status Overlays -->
-                <StackPanel Orientation="Horizontal" Spacing="8"
-                            VerticalAlignment="Top" HorizontalAlignment="Left"
+                <!-- Badge góc trên -->
+                <StackPanel Orientation="Horizontal"
+                            Spacing="8"
+                            VerticalAlignment="Top"
+                            HorizontalAlignment="Left"
                             Margin="20,20,0,0">
-                    <!-- Live Badge -->
+
                     <Border x:Name="LiveBadge"
                             Visibility="Collapsed"
-                            Background="#1D4ED820" CornerRadius="8"
-                            BorderThickness="1" BorderBrush="#3B82F640"
+                            Background="#1D4ED820"
+                            CornerRadius="8"
+                            BorderThickness="1"
+                            BorderBrush="#3B82F640"
                             Padding="12,5">
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Ellipse Width="8" Height="8" Fill="#22C55E"
+                            <Ellipse Width="8"
+                                     Height="8"
+                                     Fill="#22C55E"
                                      VerticalAlignment="Center"/>
                             <TextBlock x:Name="TxtDuration"
                                        Text="LIVE 00:00"
-                                       FontSize="11" FontWeight="Bold"
+                                       FontSize="11"
+                                       FontWeight="Bold"
                                        Foreground="White"
                                        CharacterSpacing="100"/>
                         </StackPanel>
                     </Border>
 
-                    <!-- Quality Badge -->
                     <Border x:Name="QualityBadge"
                             Visibility="Collapsed"
-                            Background="#00000050" CornerRadius="8"
+                            Background="#00000050"
+                            CornerRadius="8"
                             Padding="10,5">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <FontIcon x:Name="IconQuality"
                                       FontFamily="Segoe MDL2 Assets"
                                       Glyph="&#xEC3F;"
-                                      FontSize="13" Foreground="White"/>
+                                      FontSize="13"
+                                      Foreground="White"/>
                             <TextBlock x:Name="TxtQuality"
                                        Text="HD Quality"
-                                       FontSize="10" FontWeight="Medium"
+                                       FontSize="10"
+                                       FontWeight="Medium"
                                        Foreground="White"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
 
-                <!-- Doctor PiP -->
+                <!-- PiP bác sĩ -->
                 <Border x:Name="PipContainer"
-                        Width="192" Height="108"
+                        Width="192"
+                        Height="108"
                         CornerRadius="12"
-                        BorderThickness="2" BorderBrush="#FFFFFF30"
+                        BorderThickness="2"
+                        BorderBrush="#FFFFFF30"
                         Background="#0F172A"
                         VerticalAlignment="Bottom"
                         HorizontalAlignment="Right"
                         Margin="0,0,20,90">
                     <Grid>
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE77B;"
-                                  FontSize="32" Foreground="#475569"
+                        <FontIcon FontFamily="Segoe MDL2 Assets"
+                                  Glyph="&#xE77B;"
+                                  FontSize="32"
+                                  Foreground="#475569"
                                   HorizontalAlignment="Center"
                                   VerticalAlignment="Center"/>
+
                         <Border VerticalAlignment="Bottom"
                                 HorizontalAlignment="Left"
                                 Background="#00000080"
                                 CornerRadius="0,0,0,10"
                                 Padding="8,3">
                             <TextBlock Text="Bác sĩ (Bạn)"
-                                       FontSize="9" FontWeight="Medium"
+                                       FontSize="9"
+                                       FontWeight="Medium"
                                        Foreground="White"/>
                         </Border>
                     </Grid>
                 </Border>
 
-                <!-- Call Controls -->
+                <!-- Nút điều khiển -->
                 <Border VerticalAlignment="Bottom"
                         HorizontalAlignment="Center"
                         Margin="0,0,0,24"
                         Background="#00000066"
                         CornerRadius="40"
-                        BorderThickness="1" BorderBrush="#FFFFFF1A"
+                        BorderThickness="1"
+                        BorderBrush="#FFFFFF1A"
                         Padding="24,12">
                     <StackPanel Orientation="Horizontal" Spacing="16">
-                        <!-- Mic -->
-                        <Button x:Name="BtnMic" Click="BtnMic_Click"
-                                Width="48" Height="48" Padding="0"
+
+                        <Button x:Name="BtnMic"
+                                Click="BtnMic_Click"
+                                Width="48"
+                                Height="48"
+                                Padding="0"
                                 Background="#00000066"
-                                CornerRadius="24" BorderThickness="0"
+                                CornerRadius="24"
+                                BorderThickness="0"
                                 ToolTipService.ToolTip="Tắt/bật micro">
                             <FontIcon x:Name="IconMic"
                                       FontFamily="Segoe MDL2 Assets"
                                       Glyph="&#xE720;"
-                                      FontSize="20" Foreground="White"/>
+                                      FontSize="20"
+                                      Foreground="White"/>
                         </Button>
 
-                        <!-- Speaker -->
-                        <Button x:Name="BtnSpeaker" Click="BtnSpeaker_Click"
-                                Width="48" Height="48" Padding="0"
+                        <Button x:Name="BtnSpeaker"
+                                Click="BtnSpeaker_Click"
+                                Width="48"
+                                Height="48"
+                                Padding="0"
                                 Background="#00000066"
-                                CornerRadius="24" BorderThickness="0"
+                                CornerRadius="24"
+                                BorderThickness="0"
                                 ToolTipService.ToolTip="Tắt/bật loa">
                             <FontIcon x:Name="IconSpeaker"
                                       FontFamily="Segoe MDL2 Assets"
                                       Glyph="&#xE767;"
-                                      FontSize="20" Foreground="White"/>
+                                      FontSize="20"
+                                      Foreground="White"/>
                         </Button>
 
-                        <!-- End Call -->
-                        <Button x:Name="BtnEndCall" Click="BtnEndCall_Click"
-                                Width="56" Height="56" Padding="0"
+                        <Button x:Name="BtnEndCall"
+                                Click="BtnEndCall_Click"
+                                Width="56"
+                                Height="56"
+                                Padding="0"
                                 Background="#DC2626"
-                                CornerRadius="28" BorderThickness="0"
+                                CornerRadius="28"
+                                BorderThickness="0"
                                 ToolTipService.ToolTip="Kết thúc cuộc gọi">
                             <FontIcon FontFamily="Segoe MDL2 Assets"
                                       Glyph="&#xE8D8;"
-                                      FontSize="24" Foreground="White"/>
+                                      FontSize="24"
+                                      Foreground="White"/>
                         </Button>
 
-                        <!-- Camera -->
-                        <Button x:Name="BtnCamera" Click="BtnCamera_Click"
-                                Width="48" Height="48" Padding="0"
+                        <Button x:Name="BtnCamera"
+                                Click="BtnCamera_Click"
+                                Width="48"
+                                Height="48"
+                                Padding="0"
                                 Background="#00000066"
-                                CornerRadius="24" BorderThickness="0"
+                                CornerRadius="24"
+                                BorderThickness="0"
                                 ToolTipService.ToolTip="Tắt/bật camera">
                             <FontIcon x:Name="IconCamera"
                                       FontFamily="Segoe MDL2 Assets"
                                       Glyph="&#xE714;"
-                                      FontSize="20" Foreground="White"/>
+                                      FontSize="20"
+                                      Foreground="White"/>
                         </Button>
 
-                        <!-- More -->
-                        <Button x:Name="BtnMore" Click="BtnMore_Click"
-                                Width="48" Height="48" Padding="0"
+                        <Button x:Name="BtnMore"
+                                Click="BtnMore_Click"
+                                Width="48"
+                                Height="48"
+                                Padding="0"
                                 Background="#00000066"
-                                CornerRadius="24" BorderThickness="0"
+                                CornerRadius="24"
+                                BorderThickness="0"
                                 ToolTipService.ToolTip="Tuỳ chọn khác">
                             <FontIcon x:Name="IconMore"
                                       FontFamily="Segoe MDL2 Assets"
                                       Glyph="&#xE712;"
-                                      FontSize="20" Foreground="White"/>
+                                      FontSize="20"
+                                      Foreground="White"/>
                         </Button>
                     </StackPanel>
                 </Border>
