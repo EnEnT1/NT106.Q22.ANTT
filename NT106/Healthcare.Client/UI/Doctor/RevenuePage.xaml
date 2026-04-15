@@ -109,6 +109,18 @@
                                       Width="180" CornerRadius="8" FontSize="13"
                                       SelectionChanged="DoctorFilter_SelectionChanged"/>
 
+                            <ComboBox x:Name="ServiceFilter"
+                                 PlaceholderText="Tất cả dịch vụ"
+                                 Width="180"
+                                 CornerRadius="8"
+                                 FontSize="13"
+                                 SelectionChanged="ServiceFilter_SelectionChanged">         
+                                <ComboBoxItem Content="Tất cả dịch vụ"/>
+                                <ComboBoxItem Content="Khám trực tuyến"/>
+                                <ComboBoxItem Content="Khám tại phòng mạch"/>
+                                <ComboBoxItem Content="Xét nghiệm"/>
+                                <ComboBoxItem Content="Đơn thuốc"/>
+                            </ComboBox>
                             <!-- Solid blue Export button matching screenshot -->
                             <Button x:Name="ExportButton" Click="ExportButton_Click"
                                     Background="#0059BB" BorderThickness="0"

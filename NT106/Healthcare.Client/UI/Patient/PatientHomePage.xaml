@@ -3,12 +3,217 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Grid Background="#F8F9FA">
-        <TextBlock Text="ĐÂY LÀ TRANG CHỦ BỆNH NHÂN (PATIENT HOMEPAGE)"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   FontSize="24" 
-                   FontWeight="Bold" 
-                   Foreground="#0059BB"/>
-    </Grid>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Background="#F8F9FA" Padding="24">
+            <StackPanel Spacing="20">
+
+                <!-- Header -->
+                <StackPanel Spacing="6">
+                    <TextBlock x:Name="GreetingText"
+                               Text="Chào buổi sáng"
+                               FontSize="34"
+                               FontWeight="Bold"
+                               Foreground="#1F1F1F"/>
+
+                    <TextBlock x:Name="SubGreetingText"
+                               Text="Chúc bạn có một ngày thật khỏe mạnh."
+                               FontSize="15"
+                               Foreground="#666666"/>
+                </StackPanel>
+
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0"
+                            Background="White"
+                            CornerRadius="16"
+                            Padding="20"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="LỊCH HẸN"
+                                       FontSize="13"
+                                       Foreground="#6B7280"/>
+                            <TextBlock x:Name="AppointmentCountText"
+                                       Text="0"
+                                       FontSize="34"
+                                       FontWeight="Bold"
+                                       Foreground="#111827"/>
+                            <TextBlock Text="Sắp tới"
+                                       FontSize="14"
+                                       Foreground="#2563EB"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1"
+                            Background="White"
+                            CornerRadius="16"
+                            Padding="20"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="BỆNH ÁN"
+                                       FontSize="13"
+                                       Foreground="#6B7280"/>
+                            <TextBlock x:Name="RecordCountText"
+                                       Text="0"
+                                       FontSize="34"
+                                       FontWeight="Bold"
+                                       Foreground="#111827"/>
+                            <TextBlock Text="Đã lưu"
+                                       FontSize="14"
+                                       Foreground="#10B981"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2"
+                            Background="White"
+                            CornerRadius="16"
+                            Padding="20"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="XÉT NGHIỆM"
+                                       FontSize="13"
+                                       Foreground="#6B7280"/>
+                            <TextBlock x:Name="LabCountText"
+                                       Text="0"
+                                       FontSize="34"
+                                       FontWeight="Bold"
+                                       Foreground="#111827"/>
+                            <TextBlock Text="Kết quả mới"
+                                       FontSize="14"
+                                       Foreground="#F59E0B"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Spacing="16">
+
+                        <Border Background="White"
+                                CornerRadius="16"
+                                Padding="20"
+                                BorderBrush="#E5E7EB"
+                                BorderThickness="1">
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="Truy cập nhanh"
+                                           FontSize="22"
+                                           FontWeight="SemiBold"
+                                           Foreground="#1F1F1F"/>
+
+                                <Grid ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button Grid.Column="0"
+                                            Content="Đặt lịch khám"
+                                            Height="90"
+                                            Click="BookAppointment_Click"/>
+
+                                    <Button Grid.Column="1"
+                                            Content="Hồ sơ của tôi"
+                                            Height="90"
+                                            Click="MyRecords_Click"/>
+
+                                    <Button Grid.Column="2"
+                                            Content="Chỉ số sức khỏe"
+                                            Height="90"
+                                            Click="HealthMetrics_Click"/>
+
+                                    <Button Grid.Column="3"
+                                            Content="Kết quả xét nghiệm"
+                                            Height="90"
+                                            Click="LabResults_Click"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="White"
+                                CornerRadius="16"
+                                Padding="20"
+                                BorderBrush="#E5E7EB"
+                                BorderThickness="1">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Lịch hẹn gần nhất"
+                                           FontSize="22"
+                                           FontWeight="SemiBold"
+                                           Foreground="#1F1F1F"/>
+
+                                <Border Background="#F9FAFB"
+                                        CornerRadius="12"
+                                        Padding="16">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock x:Name="LatestAppointmentTitleText"
+                                                   Text="Chưa có lịch hẹn"
+                                                   FontSize="18"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock x:Name="LatestAppointmentDateText"
+                                                   Text="Ngày khám: --/--/----"
+                                                   Foreground="#6B7280"/>
+                                        <TextBlock x:Name="LatestAppointmentDoctorText"
+                                                   Text="Bác sĩ: Chưa có dữ liệu"
+                                                   Foreground="#6B7280"/>
+                                        <TextBlock x:Name="LatestAppointmentStatusText"
+                                                   Text="Trạng thái: ---"
+                                                   Foreground="#2563EB"
+                                                   FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Spacing="16">
+
+                        <Border Background="White"
+                                CornerRadius="16"
+                                Padding="20"
+                                BorderBrush="#E5E7EB"
+                                BorderThickness="1">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Thông tin tài khoản"
+                                           FontSize="22"
+                                           FontWeight="SemiBold"
+                                           Foreground="#1F1F1F"/>
+
+                                <TextBlock x:Name="FullNameText" Text="Họ tên: " FontSize="15"/>
+                                <TextBlock x:Name="EmailText" Text="Email: " FontSize="15"/>
+                                <TextBlock x:Name="PhoneText" Text="Số điện thoại: " FontSize="15"/>
+                                <TextBlock x:Name="RoleText" Text="Vai trò: " FontSize="15"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="#0059BB"
+                                CornerRadius="16"
+                                Padding="20">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Nhắc nhở sức khỏe"
+                                           FontSize="20"
+                                           FontWeight="Bold"
+                                           Foreground="White"/>
+                                <TextBlock Text="Đừng quên theo dõi lịch khám và cập nhật chỉ số sức khỏe thường xuyên."
+                                           TextWrapping="Wrap"
+                                           Foreground="White"
+                                           FontSize="14"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
 </Page>
