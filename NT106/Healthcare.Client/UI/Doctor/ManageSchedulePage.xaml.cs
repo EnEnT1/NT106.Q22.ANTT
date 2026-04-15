@@ -203,12 +203,8 @@ namespace Healthcare.Client.UI.Doctor
 
         private void BtnVideoCall_Click(object sender, RoutedEventArgs e)
         {
-            // string patientId = (sender as Button)?.CommandParameter?.ToString();
-            // this.Frame.Navigate(typeof(Healthcare.Client.UI.Components.VideoCallWindow), new Healthcare.Client.UI.Components.VideoCallParams
-            // {
-            //     ReceiverId = patientId,
-            //     IsCaller = true
-            // });
+            string patientId = (sender as Button)?.CommandParameter?.ToString();
+            this.Frame.Navigate(typeof(ExaminationPage), patientId);
         }
        
         private void BtnExamine_Click(object sender, RoutedEventArgs e)

@@ -157,7 +157,6 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
                                 <Button Grid.Column="0"
@@ -186,27 +185,6 @@
                                         Style="{StaticResource DefaultButtonStyle}"
                                         CornerRadius="12"
                                         Padding="8,16"
-                                        Click="QuickAccess_Examination">
-                                    <StackPanel Spacing="10" HorizontalAlignment="Center">
-                                        <Border Width="52" Height="52" CornerRadius="12"
-                                                Background="#E0E7FF"
-                                                HorizontalAlignment="Center">
-                                            <FontIcon Glyph="&#xE714;" FontSize="26"
-                                                      Foreground="#4F46E5"
-                                                      HorizontalAlignment="Center"
-                                                      VerticalAlignment="Center"/>
-                                        </Border>
-                                        <TextBlock Text="Khám từ xa"
-                                                   FontSize="11" FontWeight="SemiBold"
-                                                   HorizontalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button>
-
-                                <Button Grid.Column="2"
-                                        HorizontalAlignment="Stretch"
-                                        Style="{StaticResource DefaultButtonStyle}"
-                                        CornerRadius="12"
-                                        Padding="8,16"
                                         Click="QuickAccess_PatientHistory">
                                     <StackPanel Spacing="10" HorizontalAlignment="Center">
                                         <Border Width="52" Height="52" CornerRadius="12"
@@ -223,7 +201,7 @@
                                     </StackPanel>
                                 </Button>
 
-                                <Button Grid.Column="3"
+                                <Button Grid.Column="2"
                                         HorizontalAlignment="Stretch"
                                         Style="{StaticResource DefaultButtonStyle}"
                                         CornerRadius="12"
