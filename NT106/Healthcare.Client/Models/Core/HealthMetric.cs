@@ -13,7 +13,7 @@ namespace Healthcare.Client.Models.Core
 
         [Column("metric_type")] public string MetricType { get; set; }
 
-        [Column("value")] public string Value { get; set; } 
+        [Column("value")] public double Value { get; set; } 
         [Column("unit")] public string Unit { get; set; }
 
         [Column("measured_at")] public DateTime MeasuredAt { get; set; }

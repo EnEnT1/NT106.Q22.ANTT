@@ -1,17 +1,24 @@
 using Postgrest.Attributes;
 using Postgrest.Models;
-using System.Collections.Generic; 
+using System.Collections.Generic;
 
 namespace Healthcare.Client.Models.Identity
 {
     [Table("patient_profiles")]
     public class PatientProfile : BaseModel
     {
+        [PrimaryKey("patient_id", false)]
         [Column("patient_id")]
-        public string PatientId { get; set; }
+        public string PatientId { get; set; } = string.Empty;
+
+        [Column("date_of_birth")]
+        public string DateOfBirth { get; set; } = string.Empty;
+
+        [Column("gender")]
+        public string Gender { get; set; } = string.Empty;
 
         [Column("blood_type")]
-        public string BloodType { get; set; }
+        public string BloodType { get; set; } = string.Empty;
 
         [Column("height_cm")]
         public float? HeightCm { get; set; }
@@ -20,9 +27,9 @@ namespace Healthcare.Client.Models.Identity
         public float? WeightKg { get; set; }
 
         [Column("allergies")]
-        public List<string> Allergies { get; set; }
+        public List<string> Allergies { get; set; } = new();
 
         [Column("chronic_diseases")]
-        public List<string> ChronicDiseases { get; set; }
+        public List<string> ChronicDiseases { get; set; } = new();
     }
 }

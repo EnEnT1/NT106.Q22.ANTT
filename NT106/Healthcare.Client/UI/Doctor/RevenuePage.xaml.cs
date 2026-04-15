@@ -1,13 +1,3 @@
-// ============================================================
-//  RevenuePage.xaml.cs
-//  Healthcare.Client — UI/Doctor/RevenuePage
-//
-//  Phiên bản UI-only: không kết nối database.
-//  Toàn bộ dữ liệu được tạo từ mock data nội bộ.
-//  Khi database sẵn sàng, thay GenerateMockTransactions()
-//  bằng query Supabase trong LoadDataAsync().
-// ============================================================
-
 using Microsoft.UI;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
@@ -15,50 +5,36 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
-
+using Healthcare.Client.Models.Core;
+using Healthcare.Client.Models.Identity;
+using Healthcare.Client.SupabaseIntegration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI;
-
+using Windows.Foundation;
 namespace Healthcare.Client.UI.Doctor
 {
     public sealed partial class RevenuePage : Page
     {
-        // ─────────────────────────────────────────────────────────
-        //  State
-        // ─────────────────────────────────────────────────────────
-
         private string _selectedPeriod = "month";   // "month" | "quarter" | "year"
-        private string? _selectedDoctorId = null;     // null = tất cả
-        private string? _selectedServiceType = null;   // null = tất cả
+        private string? _selectedDoctorId = null;   // null = tất cả
+        private string? _selectedServiceType = null;
 
         private int _currentPage = 0;
         private int _totalPages = 1;
         private const int PageSize = 10;
 
         private List<TransactionItem> _allTransactions = new();
-
         private List<MonthlyChartPoint> _chartData = new();
         private List<ServiceSegment> _donutData = new();
-
-        // Add this field to the RevenuePage class if missing:
-        private ComboBox ServiceFilter;
-
-        // ─────────────────────────────────────────────────────────
-        //  Constructor
-        // ─────────────────────────────────────────────────────────
 
         public RevenuePage()
         {
             this.InitializeComponent();
             this.Loaded += RevenuePage_Loaded;
         }
-
-        // ─────────────────────────────────────────────────────────
-        //  Navigation
-        // ─────────────────────────────────────────────────────────
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -75,21 +51,27 @@ namespace Healthcare.Client.UI.Doctor
             }
         }
 
-        // ─────────────────────────────────────────────────────────
-        //  DATA LOADING (mock)
-        // ─────────────────────────────────────────────────────────
-
         private async Task LoadDataAsync()
         {
             SetLoading(true);
+
             try
             {
+                if (ServiceFilter != null && ServiceFilter.SelectedIndex < 0)
+                {
+                    ServiceFilter.SelectedIndex = 0;
+                }
+
+                if (DoctorFilter.ItemsSource == null)
+                {
+                    await LoadDoctorFilterAsync();
+                }
+
                 var (fromDate, toDate) = GetDateRange(_selectedPeriod);
 
-                // Dùng mock data — thay bằng query DB khi sẵn sàng
-                _allTransactions = GenerateMockTransactions(fromDate, toDate);
+                _allTransactions = await LoadTransactionsFromDatabaseAsync(fromDate, toDate);
 
-                CalculateAndRenderKpis(fromDate, toDate);
+                await CalculateAndRenderKpis(fromDate, toDate);
 
                 _chartData = BuildChartData(fromDate, toDate);
                 _donutData = BuildDonutData();
@@ -100,7 +82,6 @@ namespace Healthcare.Client.UI.Doctor
                 RenderTransactionRows();
                 RenderBreakdownList();
 
-                // Charts vẽ sau 1 frame để Canvas có ActualWidth
                 await Task.Delay(50);
                 DrawBarChart();
                 DrawDonutChart();
@@ -115,11 +96,100 @@ namespace Healthcare.Client.UI.Doctor
             }
         }
 
-        // ─────────────────────────────────────────────────────────
-        //  KPI CALCULATION
-        // ─────────────────────────────────────────────────────────
+        private async void ServiceFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ServiceFilter.SelectedItem is ComboBoxItem item)
+            {
+                _selectedServiceType = item.Content?.ToString() switch
+                {
+                    "Khám trực tuyến" => "online",
+                    "Khám tại phòng mạch" => "clinic",
+                    "Xét nghiệm" => "lab",
+                    "Đơn thuốc" => "rx",
+                    _ => null
+                };
+            }
+            else
+            {
+                _selectedServiceType = null;
+            }
 
-        private void CalculateAndRenderKpis(DateTime fromDate, DateTime toDate)
+            _currentPage = 0;
+            await LoadDataAsync();
+        }
+
+        private async Task<List<TransactionItem>> LoadTransactionsFromDatabaseAsync(DateTime fromDate, DateTime toDate)
+        {
+            var result = new List<TransactionItem>();
+
+            try
+            {
+                var client = SupabaseManager.Instance.Client;
+
+                var transactionResponse = await client
+                    .From<Transaction>()
+                    .Get();
+
+                var transactions = transactionResponse.Models
+                    .Where(t => t.PaidAt.HasValue
+                             && t.PaidAt.Value >= fromDate
+                             && t.PaidAt.Value <= toDate)
+                    .ToList();
+
+                var appointmentResponse = await client
+                    .From<Appointment>()
+                    .Get();
+
+                var appointments = appointmentResponse.Models;
+
+                var userResponse = await client
+                    .From<User>()
+                    .Get();
+
+                var users = userResponse.Models;
+
+                foreach (var transaction in transactions)
+                {
+                    var appointment = appointments.FirstOrDefault(a => a.Id == transaction.AppointmentId);
+                    var patientUser = users.FirstOrDefault(u => u.Id == transaction.PatientId);
+
+                    result.Add(new TransactionItem
+                    {
+                        Id = transaction.Id,
+                        PatientName = patientUser?.FullName ?? "Bệnh nhân",
+                        ServiceType = InferServiceType(transaction, appointment),
+                        Status = transaction.Status,
+                        Amount = transaction.Amount,
+                        CreatedAt = transaction.PaidAt ?? appointment?.CreatedAt ?? DateTime.Now,
+                        DoctorId = appointment?.DoctorId
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorDialog("Lỗi tải dữ liệu doanh thu: " + ex.Message);
+            }
+
+            return result;
+        }
+
+        private string InferServiceType(Transaction transaction, Appointment? appointment)
+        {
+            var paymentMethod = transaction.PaymentMethod?.Trim().ToLower() ?? "";
+
+            if (paymentMethod.Contains("online"))
+                return "online";
+
+            if (paymentMethod.Contains("lab"))
+                return "lab";
+
+            if (paymentMethod.Contains("rx") || paymentMethod.Contains("pharmacy") || paymentMethod.Contains("medicine"))
+                return "rx";
+
+            return "clinic";
+        }
+
+        private async Task CalculateAndRenderKpis(DateTime fromDate, DateTime toDate)
         {
             var filtered = ApplyFilters(_allTransactions);
             var paid = filtered.Where(t => t.Status == "completed").ToList();
@@ -128,10 +198,9 @@ namespace Healthcare.Client.UI.Doctor
             var prevFrom = fromDate - span;
             var prevTo = fromDate.AddSeconds(-1);
 
-            var prevTransactions = GenerateMockTransactions(prevFrom, prevTo);
+            var prevTransactions = await LoadTransactionsFromDatabaseAsync(prevFrom, prevTo);
             var prevPaid = prevTransactions.Where(t => t.Status == "completed").ToList();
 
-            // --- Tổng doanh thu ---
             decimal totalRevenue = paid.Sum(t => t.Amount);
             decimal prevRevenue = prevPaid.Sum(t => t.Amount);
             double revenueGrowth = prevRevenue == 0 ? 0
@@ -140,7 +209,6 @@ namespace Healthcare.Client.UI.Doctor
             TxtTotalRevenue.Text = totalRevenue.ToString("N0");
             SetGrowthBadge(TxtTotalGrowth, Icon_TotalGrowth, Badge_TotalGrowth, revenueGrowth);
 
-            // --- Ca khám hoàn thành ---
             int completedVisits = paid.Count;
             int prevCompleted = prevPaid.Count;
             double visitsGrowth = prevCompleted == 0 ? 0
@@ -151,7 +219,6 @@ namespace Healthcare.Client.UI.Doctor
             TxtVisitsGrowth.Foreground = new SolidColorBrush(
                 visitsGrowth >= 0 ? HexToColor("#16A34A") : HexToColor("#DC2626"));
 
-            // --- DT trung bình / ca ---
             decimal avgRevenue = completedVisits == 0 ? 0 : totalRevenue / completedVisits;
             decimal prevAvg = prevCompleted == 0 ? 0 : prevRevenue / prevCompleted;
             double avgGrowth = prevAvg == 0 ? 0
@@ -160,16 +227,11 @@ namespace Healthcare.Client.UI.Doctor
             TxtAvgRevenue.Text = avgRevenue.ToString("N0");
             SetGrowthBadge(TxtAvgGrowth, Icon_AvgGrowth, Badge_AvgGrowth, avgGrowth);
 
-            // --- Tăng trưởng tháng ---
             TxtMonthlyGrowth.Text = FormatGrowth(revenueGrowth);
             GrowthProgressBar.Value = Math.Min(Math.Abs(revenueGrowth), 100);
             GrowthProgressBar.Foreground = new SolidColorBrush(
                 revenueGrowth >= 0 ? HexToColor("#10B981") : HexToColor("#EF4444"));
         }
-
-        // ─────────────────────────────────────────────────────────
-        //  CHART DATA BUILDERS
-        // ─────────────────────────────────────────────────────────
 
         private List<MonthlyChartPoint> BuildChartData(DateTime from, DateTime to)
         {
@@ -178,6 +240,7 @@ namespace Healthcare.Client.UI.Doctor
 
             var cursor = new DateTime(from.Year, from.Month, 1);
             var end = new DateTime(to.Year, to.Month, 1);
+
             while (cursor <= end)
             {
                 var month = cursor;
@@ -194,8 +257,10 @@ namespace Healthcare.Client.UI.Doctor
                         .Where(t => t.ServiceType == "online")
                         .Sum(t => t.Amount),
                 });
+
                 cursor = cursor.AddMonths(1);
             }
+
             return result;
         }
 
@@ -203,6 +268,7 @@ namespace Healthcare.Client.UI.Doctor
         {
             var paid = ApplyFilters(_allTransactions).Where(t => t.Status == "completed").ToList();
             decimal total = paid.Sum(t => t.Amount);
+
             if (total == 0) return new();
 
             var colors = new Dictionary<string, string>
@@ -212,6 +278,7 @@ namespace Healthcare.Client.UI.Doctor
                 ["lab"] = "#C084FC",
                 ["rx"] = "#FB923C",
             };
+
             var labels = new Dictionary<string, string>
             {
                 ["clinic"] = "Khám tại phòng mạch",
@@ -227,10 +294,6 @@ namespace Healthcare.Client.UI.Doctor
                 Share = (double)(paid.Where(t => t.ServiceType == key).Sum(t => t.Amount) / total),
             }).Where(s => s.Share > 0).ToList();
         }
-
-        // ─────────────────────────────────────────────────────────
-        //  RENDER: TRANSACTION ROWS
-        // ─────────────────────────────────────────────────────────
 
         private void RenderTransactionRows()
         {
@@ -254,21 +317,22 @@ namespace Healthcare.Client.UI.Doctor
             foreach (var tx in page)
                 TransactionRows.Children.Add(BuildTransactionRow(tx));
 
-            int shown = Math.Min(PageSize, filtered.Count - _currentPage * PageSize);
+            int shown = filtered.Count == 0 ? 0 : Math.Min(PageSize, filtered.Count - _currentPage * PageSize);
             TxtPaginationInfo.Text = $"Hiển thị {shown} trong số {filtered.Count} giao dịch";
 
             for (int i = 0; i < _totalPages; i++)
             {
                 int pageIndex = i;
                 bool isActive = (i == _currentPage);
+
                 var btn = new Border
                 {
                     Background = new SolidColorBrush(isActive ? HexToColor("#0059BB") : Colors.Transparent),
                     CornerRadius = new CornerRadius(6),
                     Width = 28,
-                    Height = 28,
-
+                    Height = 28
                 };
+
                 var lbl = new TextBlock
                 {
                     Text = (i + 1).ToString(),
@@ -276,10 +340,16 @@ namespace Healthcare.Client.UI.Doctor
                     FontWeight = isActive ? FontWeights.Bold : FontWeights.Normal,
                     Foreground = new SolidColorBrush(isActive ? Colors.White : HexToColor("#64748B")),
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
                 };
+
                 btn.Child = lbl;
-                btn.Tapped += (s, e) => { _currentPage = pageIndex; RenderTransactionRows(); };
+                btn.Tapped += (s, e) =>
+                {
+                    _currentPage = pageIndex;
+                    RenderTransactionRows();
+                };
+
                 PageButtons.Children.Add(btn);
             }
 
@@ -303,7 +373,6 @@ namespace Healthcare.Client.UI.Doctor
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.4, GridUnitType.Star) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.2, GridUnitType.Star) });
 
-            // Col 0 — Date
             var dateStack = new StackPanel();
             dateStack.Children.Add(new TextBlock
             {
@@ -320,7 +389,6 @@ namespace Healthcare.Client.UI.Doctor
             });
             Grid.SetColumn(dateStack, 0);
 
-            // Col 1 — Patient name
             var patientStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10 };
             var avatar = new Ellipse { Width = 32, Height = 32, Fill = new SolidColorBrush(HexToColor("#E2E8F0")) };
             patientStack.Children.Add(avatar);
@@ -334,7 +402,6 @@ namespace Healthcare.Client.UI.Doctor
             });
             Grid.SetColumn(patientStack, 1);
 
-            // Col 2 — Service badge
             var (badgeBg, badgeFg, badgeTxt) = GetServiceBadgeStyle(tx.ServiceType);
             var serviceBadge = new Border
             {
@@ -353,7 +420,6 @@ namespace Healthcare.Client.UI.Doctor
             };
             Grid.SetColumn(serviceBadge, 2);
 
-            // Col 3 — Amount
             var amountTxt = new TextBlock
             {
                 Text = tx.Amount.ToString("N0"),
@@ -365,7 +431,6 @@ namespace Healthcare.Client.UI.Doctor
             };
             Grid.SetColumn(amountTxt, 3);
 
-            // Col 4 — Status badge
             var (statusBg, statusDot, statusTxt) = GetStatusBadgeStyle(tx.Status);
             var statusContent = new StackPanel
             {
@@ -388,6 +453,7 @@ namespace Healthcare.Client.UI.Doctor
                 FontWeight = FontWeights.Bold,
                 Foreground = new SolidColorBrush(HexToColor(statusDot == "#16A34A" ? "#15803D" : "#C2410C"))
             });
+
             var statusBadge = new Border
             {
                 Background = new SolidColorBrush(HexToColor(statusBg)),
@@ -409,13 +475,10 @@ namespace Healthcare.Client.UI.Doctor
             return row;
         }
 
-        // ─────────────────────────────────────────────────────────
-        //  RENDER: BREAKDOWN LIST
-        // ─────────────────────────────────────────────────────────
-
         private void RenderBreakdownList()
         {
             BreakdownList.Children.Clear();
+
             foreach (var seg in _donutData)
             {
                 var row = new Grid();
@@ -453,10 +516,6 @@ namespace Healthcare.Client.UI.Doctor
                 BreakdownList.Children.Add(row);
             }
         }
-
-        // ─────────────────────────────────────────────────────────
-        //  DRAW: BAR CHART
-        // ─────────────────────────────────────────────────────────
 
         private void DrawBarChart()
         {
@@ -537,10 +596,6 @@ namespace Healthcare.Client.UI.Doctor
             if (_chartData.Count > 0) DrawBarChart();
         }
 
-        // ─────────────────────────────────────────────────────────
-        //  DRAW: DONUT CHART
-        // ─────────────────────────────────────────────────────────
-
         private void DrawDonutChart()
         {
             DonutChart.Children.Clear();
@@ -569,7 +624,8 @@ namespace Healthcare.Client.UI.Doctor
                 Width = 80,
                 TextAlignment = TextAlignment.Center
             };
-            Canvas.SetLeft(pct, cx - 40); Canvas.SetTop(pct, cy - 16);
+            Canvas.SetLeft(pct, cx - 40);
+            Canvas.SetTop(pct, cy - 16);
             DonutChart.Children.Add(pct);
 
             var sub = new TextBlock
@@ -582,7 +638,8 @@ namespace Healthcare.Client.UI.Doctor
                 Width = 80,
                 TextAlignment = TextAlignment.Center
             };
-            Canvas.SetLeft(sub, cx - 40); Canvas.SetTop(sub, cy + 4);
+            Canvas.SetLeft(sub, cx - 40);
+            Canvas.SetTop(sub, cy + 4);
             DonutChart.Children.Add(sub);
         }
 
@@ -603,54 +660,58 @@ namespace Healthcare.Client.UI.Doctor
 
             var fig = new PathFigure { StartPoint = outerStart, IsClosed = true };
             fig.Segments.Add(new ArcSegment
-            { Point = outerEnd, Size = new(outerR, outerR), IsLargeArc = isLarge, SweepDirection = SweepDirection.Clockwise });
+            {
+                Point = outerEnd,
+                Size = new Size(outerR, outerR),
+                IsLargeArc = isLarge,
+                SweepDirection = SweepDirection.Clockwise
+            });
             fig.Segments.Add(new LineSegment { Point = innerStart });
             fig.Segments.Add(new ArcSegment
-            { Point = innerEnd, Size = new(innerR, innerR), IsLargeArc = isLarge, SweepDirection = SweepDirection.Counterclockwise });
+            {
+                Point = innerEnd,
+                Size = new Size(innerR, innerR),
+                IsLargeArc = isLarge,
+                SweepDirection = SweepDirection.Counterclockwise
+            });
 
             var geo = new PathGeometry();
             geo.Figures.Add(fig);
-            return new Path { Data = geo, Fill = new SolidColorBrush(color) };
-        }
 
-        // ─────────────────────────────────────────────────────────
-        //  EVENT HANDLERS
-        // ─────────────────────────────────────────────────────────
+            return new Path
+            {
+                Data = geo,
+                Fill = new SolidColorBrush(color)
+            };
+        }
 
         private async void BtnPeriod_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn) return;
+
             _selectedPeriod = btn.Tag?.ToString() ?? "month";
             _currentPage = 0;
 
             foreach (var b in new[] { BtnThisMonth, BtnThisQuarter, BtnThisYear })
+            {
                 b.Style = b == btn
                     ? (Style)Resources["FilterActiveStyle"]
                     : (Style)Resources["FilterInactiveStyle"];
+            }
 
             await LoadDataAsync();
         }
 
         private async void DoctorFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _currentPage = 0;
-            await LoadDataAsync();
-        }
-
-        private async void ServiceFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (ServiceFilter.SelectedItem is ComboBoxItem item)
+            if (DoctorFilter.SelectedItem is DoctorFilterItem item)
             {
-                _selectedServiceType = item.Content?.ToString() switch
-                {
-                    "Khám trực tuyến" => "online",
-                    "Khám tại phòng mạch" => "clinic",
-                    "Xét nghiệm" => "lab",
-                    "Đơn thuốc" => "rx",
-                    _ => null
-                };
+                _selectedDoctorId = string.IsNullOrWhiteSpace(item.Id) ? null : item.Id;
             }
-            else _selectedServiceType = null;
+            else
+            {
+                _selectedDoctorId = null;
+            }
 
             _currentPage = 0;
             await LoadDataAsync();
@@ -658,9 +719,9 @@ namespace Healthcare.Client.UI.Doctor
 
         private async void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            await ShowInfoDialog("Xuất báo cáo",
-                "Tính năng xuất báo cáo đang được phát triển.\n" +
-                "Sẽ hỗ trợ xuất CSV và Excel trong phiên bản tiếp theo.");
+            await ShowInfoDialog(
+                "Xuất báo cáo",
+                "Tính năng xuất báo cáo đang được phát triển.\nSẽ hỗ trợ xuất CSV và Excel trong phiên bản tiếp theo.");
         }
 
         private void ViewAllTransactions_Click(object sender, RoutedEventArgs e)
@@ -670,49 +731,58 @@ namespace Healthcare.Client.UI.Doctor
 
         private void PrevPage_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentPage > 0) { _currentPage--; RenderTransactionRows(); }
+            if (_currentPage > 0)
+            {
+                _currentPage--;
+                RenderTransactionRows();
+            }
         }
 
         private void NextPage_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentPage < _totalPages - 1) { _currentPage++; RenderTransactionRows(); }
+            if (_currentPage < _totalPages - 1)
+            {
+                _currentPage++;
+                RenderTransactionRows();
+            }
         }
-
-        // ─────────────────────────────────────────────────────────
-        //  HELPERS — Filter / Date Range
-        // ─────────────────────────────────────────────────────────
 
         private List<TransactionItem> ApplyFilters(List<TransactionItem> source)
         {
             var q = source.AsEnumerable();
-            if (_selectedDoctorId != null) q = q.Where(t => t.DoctorId == _selectedDoctorId);
-            if (_selectedServiceType != null) q = q.Where(t => t.ServiceType == _selectedServiceType);
+
+            if (!string.IsNullOrWhiteSpace(_selectedDoctorId))
+                q = q.Where(t => t.DoctorId == _selectedDoctorId);
+
+            if (!string.IsNullOrWhiteSpace(_selectedServiceType))
+                q = q.Where(t => string.Equals(t.ServiceType, _selectedServiceType, StringComparison.OrdinalIgnoreCase));
+
             return q.ToList();
         }
 
         private static (DateTime from, DateTime to) GetDateRange(string period)
         {
             var now = DateTime.Now;
+
             return period switch
             {
                 "quarter" => (
                     new DateTime(now.Year, ((now.Month - 1) / 3) * 3 + 1, 1),
-                    new DateTime(now.Year, ((now.Month - 1) / 3) * 3 + 3, 1).AddMonths(1).AddSeconds(-1)),
+                    new DateTime(now.Year, ((now.Month - 1) / 3) * 3 + 3, 1).AddMonths(1).AddSeconds(-1)
+                ),
                 "year" => (
                     new DateTime(now.Year, 1, 1),
-                    new DateTime(now.Year, 12, 31, 23, 59, 59)),
+                    new DateTime(now.Year, 12, 31, 23, 59, 59)
+                ),
                 _ => (
                     new DateTime(now.Year, now.Month, 1),
-                    new DateTime(now.Year, now.Month, 1).AddMonths(1).AddSeconds(-1))
+                    new DateTime(now.Year, now.Month, 1).AddMonths(1).AddSeconds(-1)
+                )
             };
         }
 
         private static string BuildChartSubtitle(DateTime from, DateTime to)
             => $"Th {from.Month}/{from.Year} – Th {to.Month}/{to.Year}";
-
-        // ─────────────────────────────────────────────────────────
-        //  HELPERS — Badge / Style
-        // ─────────────────────────────────────────────────────────
 
         private static (string bg, string fg, string text) GetServiceBadgeStyle(string? type) => type switch
         {
@@ -734,8 +804,10 @@ namespace Healthcare.Client.UI.Doctor
         private void SetGrowthBadge(TextBlock txt, FontIcon icon, Border badge, double growth)
         {
             txt.Text = FormatGrowth(growth);
+
             bool positive = growth >= 0;
             var color = HexToColor(positive ? "#16A34A" : "#DC2626");
+
             txt.Foreground = new SolidColorBrush(color);
             icon.Foreground = new SolidColorBrush(color);
             icon.Glyph = positive ? "\uE96D" : "\uE96E";
@@ -744,10 +816,6 @@ namespace Healthcare.Client.UI.Doctor
 
         private static string FormatGrowth(double g)
             => g >= 0 ? $"+{g:F1}%" : $"{g:F1}%";
-
-        // ─────────────────────────────────────────────────────────
-        //  HELPERS — UI state
-        // ─────────────────────────────────────────────────────────
 
         private void SetLoading(bool isLoading)
         {
@@ -781,10 +849,6 @@ namespace Healthcare.Client.UI.Doctor
             await d.ShowAsync();
         }
 
-        // ─────────────────────────────────────────────────────────
-        //  HELPERS — Math / Color
-        // ─────────────────────────────────────────────────────────
-
         private static double DegToRad(double d) => d * Math.PI / 180.0;
 
         private static Windows.Foundation.Point Pt(double cx, double cy, double r, double rad)
@@ -793,29 +857,28 @@ namespace Healthcare.Client.UI.Doctor
         private static Color HexToColor(string hex)
         {
             hex = hex.TrimStart('#');
-            return Color.FromArgb(255,
+            return Color.FromArgb(
+                255,
                 Convert.ToByte(hex.Substring(0, 2), 16),
                 Convert.ToByte(hex.Substring(2, 2), 16),
-                Convert.ToByte(hex.Substring(4, 2), 16));
+                Convert.ToByte(hex.Substring(4, 2), 16)
+            );
         }
-
-        // ─────────────────────────────────────────────────────────
-        //  MOCK DATA — Xoá và thay bằng Supabase query khi có DB
-        // ─────────────────────────────────────────────────────────
 
         private static List<TransactionItem> GenerateMockTransactions(DateTime from, DateTime to)
         {
             var rnd = new Random(42);
             var types = new[] { "clinic", "online", "lab", "rx" };
             var statuses = new[] { "completed", "completed", "completed", "processing", "cancelled" };
-            var names = new[] { "Lê Thị Mai Anh", "Nguyễn Văn Bình", "Trần Hoàng Yến",
-                                   "Phạm Minh Đức",  "Võ Thị Lan",      "Đặng Minh Khoa" };
+            var names = new[] { "Lê Thị Mai Anh", "Nguyễn Văn Bình", "Trần Hoàng Yến", "Phạm Minh Đức", "Võ Thị Lan", "Đặng Minh Khoa" };
 
             var list = new List<TransactionItem>();
             var cursor = from;
+
             while (cursor <= to)
             {
                 int count = rnd.Next(1, 6);
+
                 for (int i = 0; i < count; i++)
                 {
                     list.Add(new TransactionItem
@@ -829,17 +892,62 @@ namespace Healthcare.Client.UI.Doctor
                         DoctorId = "mock-doctor-id",
                     });
                 }
+
                 cursor = cursor.AddDays(1);
             }
+
             return list.OrderByDescending(t => t.CreatedAt).ToList();
+        }
+
+        private async Task LoadDoctorFilterAsync()
+        {
+            try
+            {
+                var client = SupabaseManager.Instance.Client;
+
+                var doctorResponse = await client
+                    .From<DoctorProfile>()
+                    .Get();
+
+                var userResponse = await client
+                    .From<User>()
+                    .Get();
+
+                var doctors = doctorResponse.Models;
+                var users = userResponse.Models;
+
+                var doctorItems = new List<DoctorFilterItem>
+                {
+                    new DoctorFilterItem
+                    {
+                        Id = "",
+                        FullName = "Tất cả bác sĩ"
+                    }
+                };
+
+                foreach (var doctor in doctors)
+                {
+                    var user = users.FirstOrDefault(u => u.Id == doctor.DoctorId);
+
+                    doctorItems.Add(new DoctorFilterItem
+                    {
+                        Id = doctor.DoctorId,
+                        FullName = user?.FullName ?? "Bác sĩ"
+                    });
+                }
+
+                DoctorFilter.ItemsSource = doctorItems;
+                DoctorFilter.DisplayMemberPath = "FullName";
+                DoctorFilter.SelectedValuePath = "Id";
+                DoctorFilter.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorDialog("Không tải được danh sách bác sĩ: " + ex.Message);
+            }
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  LOCAL DTOs — dùng nội bộ trong trang này (không cần DB)
-    // ─────────────────────────────────────────────────────────────
-
-    /// <summary>Giao dịch dùng cho UI (mock).</summary>
     internal class TransactionItem
     {
         public string Id { get; set; } = "";
@@ -851,7 +959,6 @@ namespace Healthcare.Client.UI.Doctor
         public string? DoctorId { get; set; }
     }
 
-    /// <summary>Điểm dữ liệu cho 1 thanh bar chart.</summary>
     internal class MonthlyChartPoint
     {
         public string Label { get; set; } = "";
@@ -859,11 +966,16 @@ namespace Healthcare.Client.UI.Doctor
         public double OnlineAmount { get; set; }
     }
 
-    /// <summary>Một phân khúc trong donut chart.</summary>
     internal class ServiceSegment
     {
         public string Label { get; set; } = "";
         public string Color { get; set; } = "#CBD5E1";
-        public double Share { get; set; }  // 0.0 – 1.0
+        public double Share { get; set; }
+    }
+
+    internal class DoctorFilterItem
+    {
+        public string Id { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
     }
 }

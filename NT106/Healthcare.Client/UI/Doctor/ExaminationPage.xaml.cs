@@ -1,22 +1,6 @@
-// ============================================================
-//  ExaminationPage.xaml.cs
-//  Healthcare.Client — UI/Doctor/ExaminationPage
-//
-//  Vai trò: Layout shell + điều phối giữa các component.
-//  KHÔNG chứa logic chat, video, hay timer — tất cả nằm trong
-//  VideoCallControl và ChatControl.
-//
-//  Luồng chính:
-//    OnNavigatedTo(appointmentId)
-//      → LoadPatientInfoAsync()
-//      → VideoCall.InitializeAsync(appointmentId, patientId)
-//      → Chat.InitializeAsync(appointmentId, currentUserId, patientId)
-// ============================================================
-
+using Healthcare.Client.Helpers;
 using Healthcare.Client.Models.Core;
 using Healthcare.Client.Models.Identity;
-using Healthcare.Client.SupabaseIntegration;
-using Healthcare.Client.Helpers;
 using Healthcare.Client.UI.Components;
 
 using Microsoft.UI;
@@ -27,6 +11,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI;
 
@@ -34,53 +19,26 @@ namespace Healthcare.Client.UI.Doctor
 {
     public sealed partial class ExaminationPage : Page
     {
-        // ─────────────────────────────────────────────────────────
-        //  Dependencies
-        // ─────────────────────────────────────────────────────────
-
-        // TODO — DB: private readonly SupabaseDbService _db = SupabaseManager.Instance.Db;
-
-        // ─────────────────────────────────────────────────────────
-        //  State
-        // ─────────────────────────────────────────────────────────
-
         private string _appointmentId = string.Empty;
         private string _patientId = string.Empty;
         private string _currentUserId = string.Empty;
         private string _activeNav = "video";
-
-        // ─────────────────────────────────────────────────────────
-        //  Constructor
-        // ─────────────────────────────────────────────────────────
 
         public ExaminationPage()
         {
             this.InitializeComponent();
         }
 
-        // ─────────────────────────────────────────────────────────
-        //  NAVIGATION
-        // ─────────────────────────────────────────────────────────
-
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
-            // Nhận appointmentId hoặc patientId tùy route:
-            //   - Từ DoctorHomePage (hàng chờ)    → appointmentId
-            //   - Từ ManageSchedulePage (Gọi Video) → patientId
-            if (e.Parameter is string param)
-            {
-                // Heuristic đơn giản: nếu param chứa "apt-" thì là appointmentId
-                if (param.StartsWith("apt-", StringComparison.OrdinalIgnoreCase))
-                    _appointmentId = param;
-                else
-                    _patientId = param; // patientId đến từ ManageSchedulePage
-            }
+            if (e.Parameter is string appointmentId)
+                _appointmentId = appointmentId;
 
-            // TODO — Session: _currentUserId = SessionStorage.CurrentUser.Id;
-            _currentUserId = "mock-doctor-id";
+            _currentUserId = SessionStorage.CurrentUser?.Id ?? "mock-doctor-id";
 
+            UpdateNavStyles();
             await InitializePageAsync();
         }
 
@@ -91,83 +49,129 @@ namespace Healthcare.Client.UI.Doctor
             Chat.Cleanup();
         }
 
-        // ─────────────────────────────────────────────────────────
-        //  INIT
-        // ─────────────────────────────────────────────────────────
-
         private async Task InitializePageAsync()
         {
-            // 1. Load thông tin bệnh nhân → hiển thị sidebar trái
             await LoadPatientInfoAsync();
-
-            // 2. Khởi tạo VideoCallControl (chuẩn bị local camera)
             await VideoCall.InitializeAsync(_appointmentId, _patientId);
-
-            // 3. Khởi tạo ChatControl (load lịch sử + subscribe realtime)
             await Chat.InitializeAsync(_appointmentId, _currentUserId, _patientId);
         }
 
-        // ─────────────────────────────────────────────────────────
-        //  PATIENT INFO
-        // ─────────────────────────────────────────────────────────
-
         private async Task LoadPatientInfoAsync()
         {
-            // ══════════════════════════════════════════════════════
-            // TODO — DB: Query Appointment → PatientProfile
-            //
-            //   var appt = (await _db.GetAsync<Appointment>(q =>
-            //       q.Eq("id", _appointmentId))).FirstOrDefault();
-            //   if (appt == null) return;
-            //
-            //   _patientId = appt.PatientId;
-            //
-            //   var profile = (await _db.GetAsync<PatientProfile>(q =>
-            //       q.Eq("user_id", _patientId))).FirstOrDefault();
-            //   if (profile == null) return;
-            //
-            //   TxtPatientName.Text = profile.FullName;
-            //   TxtPatientMeta.Text = $"ID: #{profile.PatientCode}  •  {profile.Age} Tuổi";
-            //   TxtCondition.Text   = profile.PrimaryCondition ?? "–";
-            //
-            //   if (!string.IsNullOrEmpty(profile.AvatarUrl))
-            //   {
-            //       var brush = new ImageBrush();
-            //       brush.ImageSource = new BitmapImage(new Uri(profile.AvatarUrl));
-            //       AvatarBorder.Background = brush;
-            //   }
-            // ══════════════════════════════════════════════════════
+            try
+            {
+                var client = Healthcare.Client.SupabaseIntegration.SupabaseManager.Instance.Client;
 
-            // Mock — xoá khi có DB
-            await Task.Delay(0);
-            _patientId = "mock-patient-id";
-            TxtPatientName.Text = "Lê Văn Dũng";
-            TxtPatientMeta.Text = "ID: #MD-8829  •  45 Tuổi";
-            TxtCondition.Text = "Cao huyết áp";
+                var appointmentResponse = await client
+                    .From<Appointment>()
+                    .Get();
+
+                var appointment = appointmentResponse.Models
+                    .FirstOrDefault(a => a.Id == _appointmentId);
+
+                if (appointment == null)
+                {
+                    TxtPatientName.Text = "Không tìm thấy lịch hẹn";
+                    TxtPatientMeta.Text = "–";
+                    TxtCondition.Text = "–";
+                    return;
+                }
+
+                _patientId = appointment.PatientId;
+
+                var userResponse = await client
+                    .From<User>()
+                    .Get();
+
+                var patientUser = userResponse.Models
+                    .FirstOrDefault(u => u.Id == _patientId);
+
+                var patientProfileResponse = await client
+                    .From<PatientProfile>()
+                    .Get();
+
+                var patientProfile = patientProfileResponse.Models
+                    .FirstOrDefault(p => p.PatientId == _patientId);
+
+                TxtPatientName.Text = patientUser?.FullName ?? "Bệnh nhân";
+                TxtPatientMeta.Text = BuildPatientMeta(patientUser, patientProfile);
+                TxtCondition.Text = BuildCondition(patientProfile);
+            }
+            catch
+            {
+                TxtPatientName.Text = "Lê Văn Dũng";
+                TxtPatientMeta.Text = "ID: #MD-8829  •  45 Tuổi";
+                TxtCondition.Text = "Cao huyết áp";
+                _patientId = "mock-patient-id";
+            }
         }
 
-        // ─────────────────────────────────────────────────────────
-        //  LEFT NAV — context switching
-        // ─────────────────────────────────────────────────────────
+        private static string BuildPatientMeta(User? user, PatientProfile? profile)
+        {
+            if (user == null && profile == null)
+                return "–";
+
+            string idText = user != null ? $"ID: #{user.Id}" : "ID: –";
+
+            string ageText = "Tuổi: –";
+            if (profile != null && !string.IsNullOrWhiteSpace(profile.DateOfBirth))
+            {
+                if (DateTime.TryParse(profile.DateOfBirth, out var dob))
+                {
+                    var age = DateTime.Now.Year - dob.Year;
+                    if (dob > DateTime.Now.AddYears(-age)) age--;
+                    ageText = $"{age} tuổi";
+                }
+            }
+
+            return $"{idText}  •  {ageText}";
+        }
+
+        private static string BuildCondition(PatientProfile? profile)
+        {
+            if (profile == null) return "Chưa rõ";
+
+            if (profile.ChronicDiseases != null && profile.ChronicDiseases.Count > 0)
+                return string.Join(", ", profile.ChronicDiseases);
+
+            if (profile.Allergies != null && profile.Allergies.Count > 0)
+                return "Dị ứng: " + string.Join(", ", profile.Allergies);
+
+            return "Chưa rõ";
+        }
 
         private void BtnNav_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn) return;
+
             _activeNav = btn.Tag?.ToString() ?? "video";
             UpdateNavStyles();
 
-            // Khi click Chat/Notes từ sidebar → tự switch tab bên ChatControl
-            if (_activeNav == "chat") Chat.SwitchTab("chat");
-            if (_activeNav == "notes") Chat.SwitchTab("notes");
+            if (_activeNav == "video")
+            {
+                VideoCall.Visibility = Visibility.Visible;
+            }
+            else if (_activeNav == "chat")
+            {
+                Chat.SwitchTab("chat");
+            }
+            else if (_activeNav == "notes")
+            {
+                Chat.SwitchTab("notes");
+            }
+            else if (_activeNav == "history")
+            {
+                // TODO: sau này navigate sang PatientHistoryPage hoặc mở panel history
+            }
         }
 
         private void UpdateNavStyles()
         {
             var navItems = new[]
             {
-                (Btn: BtnNavVideo,   Tag: "video"),
-                (Btn: BtnNavChat,    Tag: "chat"),
-                (Btn: BtnNavNotes,   Tag: "notes"),
+                (Btn: BtnNavVideo, Tag: "video"),
+                (Btn: BtnNavChat, Tag: "chat"),
+                (Btn: BtnNavNotes, Tag: "notes"),
                 (Btn: BtnNavHistory, Tag: "history"),
             };
 
@@ -186,55 +190,45 @@ namespace Healthcare.Client.UI.Doctor
                                 active ? HexToColor("#0059BB") : HexToColor("#64748B"));
                             tb.FontWeight = active ? FontWeights.Bold : FontWeights.Normal;
                         }
+
                         if (child is FontIcon fi)
+                        {
                             fi.Foreground = new SolidColorBrush(
                                 active ? HexToColor("#0059BB") : HexToColor("#64748B"));
+                        }
                     }
                 }
             }
         }
 
-        // ─────────────────────────────────────────────────────────
-        //  VIDEO CALL EVENTS (từ VideoCallControl)
-        // ─────────────────────────────────────────────────────────
-
         private void VideoCall_CallStarted(object sender, EventArgs e)
         {
-            // Notify ChatControl để đổi trạng thái nút
             Chat.OnCallStarted();
+            _activeNav = "video";
+            UpdateNavStyles();
         }
 
         private void VideoCall_CallEnded(object sender, EventArgs e)
         {
             Chat.OnCallEnded();
             VideoCall.Visibility = Visibility.Collapsed;
-            Grid.SetColumn(Chat, 1);
-            Grid.SetColumnSpan(Chat, 2);
+            _activeNav = "chat";
+            UpdateNavStyles();
+            Chat.SwitchTab("chat");
         }
-
-        // ─────────────────────────────────────────────────────────
-        //  CHAT EVENTS (từ ChatControl)
-        // ─────────────────────────────────────────────────────────
 
         private async void Chat_StartCallRequested(object sender, EventArgs e)
         {
-            // ChatControl báo user bấm "Bắt đầu cuộc gọi"
-            // → ExaminationPage gọi VideoCall để start
             VideoCall.Visibility = Visibility.Visible;
-            Grid.SetColumn(Chat, 2);
-            Grid.SetColumnSpan(Chat, 1);
+            _activeNav = "video";
+            UpdateNavStyles();
             await VideoCall.StartCallAsync();
         }
 
         private void Chat_NotesSaved(object sender, MedicalNotesSavedEventArgs e)
         {
-            // Ghi chú đã lưu — có thể update UI sidebar nếu cần
-            // e.Diagnosis, e.QuickNotes
+            // Có thể dùng e.Diagnosis và e.QuickNotes để cập nhật UI sau này :v chỗ này cũng chưa ro
         }
-
-        // ─────────────────────────────────────────────────────────
-        //  FOOTER ACTIONS
-        // ─────────────────────────────────────────────────────────
 
         private async void BtnFinish_Click(object sender, RoutedEventArgs e)
         {
@@ -250,31 +244,16 @@ namespace Healthcare.Client.UI.Doctor
 
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)
             {
-                // Lấy notes từ ChatControl
                 var (diagnosis, quickNotes) = Chat.GetNotes();
 
-                // ══════════════════════════════════════════════════════
-                // TODO — DB: Lưu MedicalRecord + cập nhật Appointment
-                //
-                //   await _db.AddAsync(new MedicalRecord
-                //   {
-                //       AppointmentId = _appointmentId,
-                //       PatientId     = _patientId,
-                //       DoctorId      = _currentUserId,
-                //       Diagnosis     = diagnosis,
-                //       Notes         = string.Join("\n", quickNotes),
-                //       CreatedAt     = DateTime.UtcNow
-                //   });
-                //
-                //   await _db.UpdateAsync<Appointment>(
-                //       q => q.Eq("id", _appointmentId),
-                //       new { status = "completed" });
-                // ══════════════════════════════════════════════════════
+                // TODO:
+                // - lưu MedicalRecord thật
+                // - cập nhật Appointment status = completed
 
                 VideoCall.Cleanup();
                 Chat.Cleanup();
 
-                // TODO — Navigate: Frame.Navigate(typeof(DoctorHomePage));
+                // TODO: Frame.Navigate(typeof(DoctorHomePage));
             }
         }
 
@@ -288,17 +267,15 @@ namespace Healthcare.Client.UI.Doctor
                 XamlRoot = this.XamlRoot,
                 DefaultButton = ContentDialogButton.Close
             };
+
             await d.ShowAsync();
         }
-
-        // ─────────────────────────────────────────────────────────
-        //  UTILITY
-        // ─────────────────────────────────────────────────────────
 
         private static Color HexToColor(string hex)
         {
             hex = hex.TrimStart('#');
-            return Color.FromArgb(255,
+            return Color.FromArgb(
+                255,
                 Convert.ToByte(hex.Substring(0, 2), 16),
                 Convert.ToByte(hex.Substring(2, 2), 16),
                 Convert.ToByte(hex.Substring(4, 2), 16));
