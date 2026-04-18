@@ -1,4 +1,4 @@
-﻿using Healthcare.Client.UI.Shell;
+using Healthcare.Client.UI.Shell;
 using Microsoft.UI.Xaml;
 
 namespace Healthcare.Client
@@ -11,7 +11,6 @@ namespace Healthcare.Client
 
             // Ra lệnh cho khung chứa load giao diện trang Đăng nhập
             rootFrame.Navigate(typeof(UI.Auth.LoginPage));
-            rootFrame.Navigate(typeof(DoctorShell));
         }
     }
 }

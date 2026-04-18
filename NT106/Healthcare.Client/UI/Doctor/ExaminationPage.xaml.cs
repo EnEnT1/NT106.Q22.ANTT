@@ -100,7 +100,7 @@ namespace Healthcare.Client.UI.Doctor
             catch
             {
                 TxtPatientName.Text = "Lê Văn Dũng";
-                TxtPatientMeta.Text = "ID: #MD-8829  •  45 Tuổi";
+                TxtPatientMeta.Text = "ID: #MD8829  •  45 Tuổi";
                 TxtCondition.Text = "Cao huyết áp";
                 _patientId = "mock-patient-id";
             }
@@ -111,7 +111,7 @@ namespace Healthcare.Client.UI.Doctor
             if (user == null && profile == null)
                 return "–";
 
-            string idText = user != null ? $"ID: #{user.Id}" : "ID: –";
+            string idText = user != null ? $"ID: #{user.Id.Substring(0, Math.Min(user.Id.Length, 6)).ToUpper()}" : "ID: –";
 
             string ageText = "Tuổi: –";
             if (profile != null && !string.IsNullOrWhiteSpace(profile.DateOfBirth))

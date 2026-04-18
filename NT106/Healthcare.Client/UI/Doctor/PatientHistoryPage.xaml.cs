@@ -101,7 +101,7 @@ namespace Healthcare.Client.UI.Doctor
                 var latestRecord = records.FirstOrDefault();
 
                 TxtHeaderPatientName.Text = patient?.FullName ?? "Bệnh nhân";
-                TxtPatientCode.Text = patient != null ? $"#{patient.Id}" : "#N/A";
+                TxtPatientCode.Text = patient != null ? $"#{patient.Id.Substring(0, Math.Min(patient.Id.Length, 6)).ToUpper()}" : "#N/A";
                 TxtHeaderWeight.Text = profile?.WeightKg != null ? $"{profile.WeightKg:0.#}kg" : "N/A";
                 TxtPatientStatus.Text = (profile?.ChronicDiseases != null && profile.ChronicDiseases.Count > 0)
                     ? "Cần theo dõi"
@@ -253,7 +253,7 @@ namespace Healthcare.Client.UI.Doctor
 
             typeBlock.Text = "Lần khám";
             dateBlock.Text = record.CreatedAt.ToString("dd/MM/yyyy");
-            doctorBlock.Text = $"BS. {record.DoctorId}";
+            doctorBlock.Text = $"BS. {(record.DoctorId.Length > 6 ? record.DoctorId.Substring(0, 6).ToUpper() : record.DoctorId.ToUpper())}";
             summaryBlock.Text = string.IsNullOrWhiteSpace(record.Diagnosis)
                 ? "Không có tóm tắt"
                 : record.Diagnosis;

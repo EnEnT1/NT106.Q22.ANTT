@@ -9,9 +9,9 @@ namespace Healthcare.Client.Helpers
         {
             if (value is string id && !string.IsNullOrEmpty(id))
             {
-                if (id.Length <= 8) return id.ToUpper();
-                // Lấy 8 ký tự đầu của UUID
-                return id.Substring(0, 8).ToUpper() + "...";
+                if (id.Length <= 6) return id.ToUpper();
+                // Lấy 6 ký tự đầu của UUID
+                return id.Substring(0, 6).ToUpper();
             }
             return value;
         }

@@ -7,7 +7,7 @@ namespace Healthcare.Client.Models.Identity
     [Table("users")]
     public class User : BaseModel
     {
-        [PrimaryKey("id", false)] public string Id { get; set; }
+        [PrimaryKey("id", true)] public string Id { get; set; }
 
         [Column("role")] public string Role { get; set; }
 

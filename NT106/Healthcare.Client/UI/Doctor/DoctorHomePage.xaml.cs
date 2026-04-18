@@ -75,113 +75,155 @@ namespace Healthcare.Client.UI.Doctor
 
         private async Task LoadStatsAsync()
         {
-            await Task.CompletedTask;
+            try
+            {
+                var doctorId = SessionStorage.CurrentUser?.Id;
+                if (string.IsNullOrEmpty(doctorId)) return;
 
-            TxtExamined.Text = "24";
-            TxtEmergency.Text = "03";
-            TxtAppointments.Text = "08";
+                var client = SupabaseManager.Instance.Client;
+
+                // Tổng số ca đã khám (Status = 'Completed')
+                var examinedResponse = await client.From<Appointment>()
+                    .Where(x => x.DoctorId == doctorId && x.Status == "Completed")
+                    .Get();
+                TxtExamined.Text = examinedResponse.Models.Count.ToString("D2");
+
+                // Ca cấp cứu (Status = 'Emergency' hoặc logic khác, tạm thời giả định là các ca trong hôm nay có status Urgent)
+                // Vì model không có IsUrgent, tôi sẽ lọc theo Priority nếu có hoặc tính là 0 nếu không có data
+                TxtEmergency.Text = "00"; 
+
+                // Lịch hẹn hôm nay (Status = 'Confirmed' hoặc 'Pending' trong ngày hôm nay)
+                var today = DateTime.Today;
+                var appointmentsResponse = await client.From<Appointment>()
+                    .Where(x => x.DoctorId == doctorId && x.AppointmentDate >= today && x.AppointmentDate < today.AddDays(1))
+                    .Get();
+                
+                TxtAppointments.Text = appointmentsResponse.Models.Count.ToString("D2");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error loading stats: " + ex.Message);
+            }
         }
 
         private async Task LoadQueueAsync()
         {
-            await Task.CompletedTask;
-
-            _allQueueItems.Clear();
-
-            _allQueueItems.Add(new QueueItemViewModel
+            try
             {
-                QueueNumber = "08",
-                PatientName = "Nguyễn Văn An",
-                Symptom = "Đau thắt ngực • 45 tuổi",
-                TimeLabel = "Bắt đầu",
-                TimeValue = "09:15 AM",
-                StatusText = "ĐANG KHÁM",
-                NumberBackground = new SolidColorBrush(Color.FromArgb(255, 219, 234, 254)),
-                NumberForeground = new SolidColorBrush(Color.FromArgb(255, 37, 99, 235)),
-                BadgeBackground = new SolidColorBrush(Color.FromArgb(255, 219, 234, 254)),
-                BadgeForeground = new SolidColorBrush(Color.FromArgb(255, 29, 78, 216)),
-                AppointmentId = "apt-001"
-            });
+                var doctorId = SessionStorage.CurrentUser?.Id;
+                if (string.IsNullOrEmpty(doctorId)) return;
 
-            _allQueueItems.Add(new QueueItemViewModel
+                var client = SupabaseManager.Instance.Client;
+                var today = DateTime.Today;
+
+                // Lấy danh sách lịch hẹn trong ngày
+                var response = await client.From<Appointment>()
+                    .Where(x => x.DoctorId == doctorId && x.AppointmentDate >= today && x.AppointmentDate < today.AddDays(1))
+                    .Get();
+
+                var appointments = response.Models.OrderBy(x => x.StartTime).ToList();
+                
+                // Lấy thông tin bệnh nhân tương ứng
+                var patientIds = appointments.Select(a => a.PatientId).Distinct().ToList();
+                var patientsResponse = await client.From<User>()
+                    .Get(); // Postgrest filter IN is better if supported, but here we can filter locally or fetch all patients
+                
+                var patients = patientsResponse.Models.ToDictionary(u => u.Id, u => u.FullName);
+
+                _allQueueItems.Clear();
+
+                int queueCount = 1;
+                foreach (var appt in appointments)
+                {
+                    var patientName = patients.ContainsKey(appt.PatientId) ? patients[appt.PatientId] : "Bệnh nhân ẩn danh";
+                    
+                    var statusInfo = GetQueueStatusInfo(appt.Status);
+                    
+                    _allQueueItems.Add(new QueueItemViewModel
+                    {
+                        QueueNumber = queueCount.ToString("D2"),
+                        PatientName = patientName,
+                        Symptom = "Khám tổng quát", // Tạm thời để mặc định vì Model Appointment không có trường Lý do khám
+                        TimeLabel = appt.Status == "In Progress" ? "Bắt đầu" : "Dự kiến",
+                        TimeValue = appt.StartTime.ToString(@"hh\:mm"),
+                        StatusText = statusInfo.Text,
+                        NumberBackground = statusInfo.Bg,
+                        NumberForeground = statusInfo.Fg,
+                        BadgeBackground = statusInfo.Bg,
+                        BadgeForeground = statusInfo.Fg,
+                        AppointmentId = appt.Id
+                    });
+                    queueCount++;
+                }
+
+                UpdateQueueButtonText();
+            }
+            catch (Exception ex)
             {
-                QueueNumber = "09",
-                PatientName = "Lê Thị Bình",
-                Symptom = "Khó thở cấp • 68 tuổi",
-                TimeLabel = "Dự kiến",
-                TimeValue = "Ngay lập tức",
-                StatusText = "ƯU TIÊN",
-                NumberBackground = new SolidColorBrush(Color.FromArgb(255, 254, 226, 226)),
-                NumberForeground = new SolidColorBrush(Color.FromArgb(255, 220, 38, 38)),
-                BadgeBackground = new SolidColorBrush(Color.FromArgb(255, 254, 226, 226)),
-                BadgeForeground = new SolidColorBrush(Color.FromArgb(255, 153, 0, 10)),
-                AppointmentId = "apt-002"
-            });
-
-            _allQueueItems.Add(new QueueItemViewModel
-            {
-                QueueNumber = "10",
-                PatientName = "Trần Minh Quân",
-                Symptom = "Kiểm tra định kỳ • 32 tuổi",
-                TimeLabel = "Dự kiến",
-                TimeValue = "09:45 AM",
-                StatusText = "ĐANG ĐỢI",
-                NumberBackground = new SolidColorBrush(Color.FromArgb(255, 241, 245, 249)),
-                NumberForeground = new SolidColorBrush(Color.FromArgb(255, 100, 116, 139)),
-                BadgeBackground = new SolidColorBrush(Color.FromArgb(255, 241, 245, 249)),
-                BadgeForeground = new SolidColorBrush(Color.FromArgb(255, 100, 116, 139)),
-                AppointmentId = "apt-003"
-            });
-
-            _allQueueItems.Add(new QueueItemViewModel
-            {
-                QueueNumber = "11",
-                PatientName = "Phạm Hoàng Nam",
-                Symptom = "Tư vấn hậu phẫu • 29 tuổi",
-                TimeLabel = "Dự kiến",
-                TimeValue = "10:00 AM",
-                StatusText = "ĐANG ĐỢI",
-                NumberBackground = new SolidColorBrush(Color.FromArgb(255, 241, 245, 249)),
-                NumberForeground = new SolidColorBrush(Color.FromArgb(255, 100, 116, 139)),
-                BadgeBackground = new SolidColorBrush(Color.FromArgb(255, 241, 245, 249)),
-                BadgeForeground = new SolidColorBrush(Color.FromArgb(255, 100, 116, 139)),
-                AppointmentId = "apt-004"
-            });
-
-            UpdateQueueButtonText();
+                System.Diagnostics.Debug.WriteLine("Error loading queue: " + ex.Message);
+            }
         }
 
-        private void LoadScheduleItems()
+        private (string Text, Brush Bg, Brush Fg) GetQueueStatusInfo(string status)
         {
-            _scheduleItems.Clear();
-
-            _scheduleItems.Add(new ScheduleItemViewModel
+            return status switch
             {
-                TimeRange = "08:00 - 09:00",
-                Title = "Giao ban khoa",
-                Description = "Phòng họp tầng 4 - Khu A",
-                DotColor = new SolidColorBrush(Color.FromArgb(255, 0, 89, 187)),
-                TimeColor = new SolidColorBrush(Color.FromArgb(255, 0, 89, 187))
-            });
-
-            _scheduleItems.Add(new ScheduleItemViewModel
-            {
-                TimeRange = "10:30 - 11:30",
-                Title = "Hội chẩn trực tuyến",
-                Description = "Bệnh nhân: Lê Văn Dũng (Ca khó)",
-                DotColor = new SolidColorBrush(Color.FromArgb(255, 99, 102, 241)),
-                TimeColor = new SolidColorBrush(Color.FromArgb(255, 99, 102, 241))
-            });
-
-            _scheduleItems.Add(new ScheduleItemViewModel
-            {
-                TimeRange = "14:00 - 16:00",
-                Title = "Khám chuyên sâu",
-                Description = "Danh sách đăng ký trước (05 ca)",
-                DotColor = new SolidColorBrush(Color.FromArgb(255, 203, 213, 225)),
-                TimeColor = new SolidColorBrush(Color.FromArgb(255, 148, 163, 184))
-            });
+                "In Progress" => ("ĐANG KHÁM", new SolidColorBrush(Color.FromArgb(255, 219, 234, 254)), new SolidColorBrush(Color.FromArgb(255, 37, 99, 235))),
+                "Confirmed" => ("ĐANG ĐỢI", new SolidColorBrush(Color.FromArgb(255, 241, 245, 249)), new SolidColorBrush(Color.FromArgb(255, 100, 116, 139))),
+                "Pending" => ("CHỜ DUYỆT", new SolidColorBrush(Color.FromArgb(255, 254, 243, 199)), new SolidColorBrush(Color.FromArgb(255, 180, 83, 9))),
+                _ => ("HOÀN TẤT", new SolidColorBrush(Color.FromArgb(255, 220, 252, 231)), new SolidColorBrush(Color.FromArgb(255, 22, 163, 74)))
+            };
         }
+
+        private async void LoadScheduleItems()
+        {
+            try
+            {
+                var doctorId = SessionStorage.CurrentUser?.Id;
+                if (string.IsNullOrEmpty(doctorId)) return;
+
+                var client = SupabaseManager.Instance.Client;
+                var today = DateTime.Today;
+
+                _scheduleItems.Clear();
+
+                // Lấy lịch hẹn để làm lịch trình
+                var response = await client.From<Appointment>()
+                    .Where(x => x.DoctorId == doctorId && x.AppointmentDate >= today && x.AppointmentDate < today.AddDays(1))
+                    .Get();
+
+                var appointments = response.Models.OrderBy(x => x.StartTime).ToList();
+
+                foreach (var appt in appointments)
+                {
+                    _scheduleItems.Add(new ScheduleItemViewModel
+                    {
+                        TimeRange = $"{appt.StartTime:hh\\:mm} - {appt.StartTime.Add(TimeSpan.FromMinutes(30)):hh\\:mm}",
+                        Title = $"Hẹn khám: {appt.Id.Substring(0, Math.Min(appt.Id.Length, 6)).ToUpper()}",
+                        Description = $"Phòng khám: {appt.RoomCode ?? "A-101"}",
+                        DotColor = new SolidColorBrush(Color.FromArgb(255, 0, 89, 187)),
+                        TimeColor = new SolidColorBrush(Color.FromArgb(255, 0, 89, 187))
+                    });
+                }
+
+                if (_scheduleItems.Count == 0)
+                {
+                    _scheduleItems.Add(new ScheduleItemViewModel
+                    {
+                        TimeRange = "Cả ngày",
+                        Title = "Không có lịch trình",
+                        Description = "Bạn không có lịch hẹn nào trong hôm nay.",
+                        DotColor = new SolidColorBrush(Color.FromArgb(255, 148, 163, 184)),
+                        TimeColor = new SolidColorBrush(Color.FromArgb(255, 148, 163, 184))
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error loading schedule: " + ex.Message);
+            }
+        }
+
 
         private void ShowAllQueue()
         {
@@ -245,7 +287,7 @@ namespace Healthcare.Client.UI.Doctor
                 ContentDialog dialog = new ContentDialog
                 {
                     Title = "Thông tin bệnh nhân",
-                    Content = $"Bệnh nhân: {item.PatientName}\nTriệu chứng: {item.Symptom}\nMã lịch hẹn: {item.AppointmentId}",
+                    Content = $"Bệnh nhân: {item.PatientName}\nTriệu chứng: {item.Symptom}\nMã lịch hẹn: {(item.AppointmentId.Length > 6 ? item.AppointmentId.Substring(0, 6).ToUpper() : item.AppointmentId.ToUpper())}",
                     CloseButtonText = "Đóng",
                     PrimaryButtonText = "Sang khám",
                     XamlRoot = this.XamlRoot
