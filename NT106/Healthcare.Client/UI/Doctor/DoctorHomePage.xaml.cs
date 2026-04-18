@@ -9,6 +9,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI;
+using Healthcare.Client.SupabaseIntegration;
+using Healthcare.Client.Models.Core;
+using Healthcare.Client.Models.Identity;
 
 namespace Healthcare.Client.UI.Doctor
 {
