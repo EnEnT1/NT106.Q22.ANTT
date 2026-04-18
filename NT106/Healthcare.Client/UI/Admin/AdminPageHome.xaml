@@ -7,6 +7,114 @@
 
     <Page.Resources>
         <helpers:ShortIdConverter x:Key="ShortIdConverter"/>
+        
+        <!-- Template cho Người dùng (Bệnh nhân/Bác sĩ) -->
+        <DataTemplate x:Key="UserTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+                    <Border Width="36" Height="36" CornerRadius="8" Background="#EFF6FF">
+                        <FontIcon Glyph="&#xEFA9;" FontSize="16" Foreground="#2563EB"/>
+                    </Border>
+                    <TextBlock Text="{Binding Id, Converter={StaticResource ShortIdConverter}}"
+                               FontSize="13" FontWeight="SemiBold"
+                               Foreground="#2563EB" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding FullName}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
+                        <FontIcon Glyph="&#xE715;" FontSize="10" Foreground="#10B981" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Email}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding ExtraInfo}" FontSize="14" FontWeight="SemiBold" Foreground="#0369A1" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding Phone}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,4,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Padding="10,6" Background="#F1F5F9" CornerRadius="6">
+                        <TextBlock Text="{Binding CreatedAt}" FontSize="12" FontWeight="SemiBold" Foreground="#475569"/>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Template cho Lịch hẹn -->
+        <DataTemplate x:Key="AppointmentTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+                    <Border Width="36" Height="36" CornerRadius="8" Background="#F0FDF4">
+                        <FontIcon Glyph="&#xE787;" FontSize="16" Foreground="#16A34A"/>
+                    </Border>
+                    <TextBlock Text="{Binding Id, Converter={StaticResource ShortIdConverter}}"
+                               FontSize="13" FontWeight="SemiBold" Foreground="#16A34A" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding PatientName}" FontSize="14" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding DoctorName}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding AppointmentDate, ConverterParameter='d/M/yyyy'}" FontSize="14"/>
+                    <TextBlock Text="{Binding Status}" FontSize="12" FontWeight="SemiBold" Foreground="#2563EB" Margin="0,4,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="3" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding RoomCode}" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Template cho Giao dịch -->
+        <DataTemplate x:Key="TransactionTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+                    <Border Width="36" Height="36" CornerRadius="8" Background="#FFF7ED">
+                        <FontIcon Glyph="&#xE825;" FontSize="16" Foreground="#EA580C"/>
+                    </Border>
+                    <TextBlock Text="{Binding Id, Converter={StaticResource ShortIdConverter}}"
+                               FontSize="13" FontWeight="SemiBold" Foreground="#EA580C" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding PatientName}" FontSize="14" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding PaymentMethod}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Amount, ConverterParameter='C'}" FontSize="14" FontWeight="Bold" Foreground="#DC2626"/>
+                    <TextBlock Text="{Binding Status}" FontSize="12" FontWeight="SemiBold" Foreground="#10B981" Margin="0,4,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="3" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding PaidAt}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
     </Page.Resources>
 
     <Grid>
@@ -18,11 +126,18 @@
                         Background="Transparent">
 
             <NavigationView.PaneHeader>
-                <StackPanel Orientation="Horizontal" Padding="16,20,16,12" Spacing="12">
-                    <Border Width="32" Height="32" CornerRadius="8" Background="{ThemeResource AccentFillColorDefaultBrush}">
-                        <FontIcon Glyph="&#xE12A;" FontSize="16" Foreground="White" />
+                <StackPanel Orientation="Horizontal" Padding="20,24,16,16" Spacing="14">
+                    <Border Width="36" Height="36" CornerRadius="10">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#2563EB" Offset="0.0" />
+                                <GradientStop Color="#4F46E5" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <FontIcon Glyph="&#xEA18;" FontSize="18" Foreground="White" />
                     </Border>
-                    <TextBlock Text="Admin Panel" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+                    <TextBlock Text="Admin Portal" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" 
+                             Foreground="{ThemeResource TextFillColorPrimaryBrush}" CharacterSpacing="10"/>
                 </StackPanel>
             </NavigationView.PaneHeader>
 
@@ -74,6 +189,18 @@
                                 <TextBlock Text="Thêm mới" FontSize="13" FontWeight="SemiBold"/>
                             </StackPanel>
                         </Button>
+                        <Button x:Name="EditBtn"
+                                Style="{StaticResource DefaultButtonStyle}"
+                                Background="#F0F9FF"
+                                BorderBrush="#BAE6FD"
+                                CornerRadius="8"
+                                Padding="16,10"
+                                Click="EditBtn_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE70F;" FontSize="14" Foreground="#0284C7"/>
+                                <TextBlock Text="Sửa thông tin" FontSize="13" FontWeight="SemiBold" Foreground="#0284C7"/>
+                            </StackPanel>
+                        </Button>
                         <Button x:Name="DeleteBtn"
                                 Style="{StaticResource DefaultButtonStyle}"
                                 Background="#FEF2F2"
@@ -83,7 +210,7 @@
                                 Click="DeleteBtn_Click">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE74D;" FontSize="14" Foreground="#DC2626"/>
-                                <TextBlock Text="Xóa dòng" FontSize="13" FontWeight="SemiBold" Foreground="#DC2626"/>
+                                <TextBlock Text="Xóa dữ liệu" FontSize="13" FontWeight="SemiBold" Foreground="#DC2626"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -115,13 +242,13 @@
                                     <ColumnDefinition Width="2*"/>
                                     <ColumnDefinition Width="2*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="MÃ QUẢN LÝ" FontSize="11" FontWeight="Bold"
+                                <TextBlock x:Name="ColHeader0" Grid.Column="0" Text="MÃ QUẢN LÝ" FontSize="11" FontWeight="Bold"
                                            Foreground="#64748B" CharacterSpacing="50"/>
-                                <TextBlock Grid.Column="1" Text="HỌ TÊN / TRẠNG THÁI LIÊN LẠC" FontSize="11" FontWeight="Bold"
+                                <TextBlock x:Name="ColHeader1" Grid.Column="1" Text="HỌ TÊN / TRẠNG THÁI LIÊN LẠC" FontSize="11" FontWeight="Bold"
                                            Foreground="#64748B" CharacterSpacing="50"/>
-                                <TextBlock Grid.Column="2" Text="SĐT / NĂM SINH" FontSize="11" FontWeight="Bold"
+                                <TextBlock x:Name="ColHeader2" Grid.Column="2" Text="SĐT / NĂM SINH" FontSize="11" FontWeight="Bold"
                                            Foreground="#64748B" CharacterSpacing="50"/>
-                                <TextBlock Grid.Column="3" Text="NGÀY TẠO HỒ SƠ" FontSize="11" FontWeight="Bold"
+                                <TextBlock x:Name="ColHeader3" Grid.Column="3" Text="NGÀY TẠO HỒ SƠ" FontSize="11" FontWeight="Bold"
                                            Foreground="#64748B" CharacterSpacing="50"/>
                             </Grid>
                         </Border>
