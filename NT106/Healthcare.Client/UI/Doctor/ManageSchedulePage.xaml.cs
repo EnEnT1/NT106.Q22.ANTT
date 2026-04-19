@@ -27,6 +27,8 @@ namespace Healthcare.Client.UI.Doctor
         private List<User> _allPatients = new();
         private DateTime? _filteredDate = null;
         private DispatcherTimer _realtimeTimer;
+        private int _currentPage = 1;
+        private const int PageSize = 40;
 
         public ObservableCollection<AppointmentViewModel> SundayList { get; } = new();
         public ObservableCollection<AppointmentViewModel> MondayList { get; } = new();
@@ -202,13 +204,54 @@ namespace Healthcare.Client.UI.Doctor
                 query = query.Where(a => a.AppointmentDate.Date == _filteredDate.Value.Date);
             }
 
-            var sorted = query.OrderBy(a => a.AppointmentDate).ThenBy(a => a.StartTime).ToList();
-            foreach (var appt in sorted)
+            // SẮP XẾP: Cuộc hẹn GẦN NHẤT đến XA NHẤT (Giảm dần)
+            var fullList = query
+                .OrderByDescending(a => a.AppointmentDate)
+                .ThenByDescending(a => a.StartTime)
+                .ToList();
+
+            // LOGIC PHÂN TRANG
+            int totalItems = fullList.Count;
+            int totalPages = (int)Math.Ceiling((double)totalItems / PageSize);
+            if (totalPages == 0) totalPages = 1;
+
+            if (_currentPage > totalPages) _currentPage = totalPages;
+            if (_currentPage < 1) _currentPage = 1;
+
+            var paged = fullList
+                .Skip((_currentPage - 1) * PageSize)
+                .Take(PageSize)
+                .ToList();
+
+            foreach (var appt in paged)
             {
                 var patient = _allPatients.FirstOrDefault(u => u.Id == appt.PatientId);
                 var trans = _allTransactions.FirstOrDefault(t => t.AppointmentId == appt.Id);
                 AllAppointmentsListVM.Add(new AppointmentViewModel(appt, patient?.FullName ?? "Bệnh nhân (ẩn danh)", trans?.PaymentMethod));
             }
+
+            // Cập nhật UI phân trang
+            if (PageInfoText != null) 
+                PageInfoText.Text = $"Trang {_currentPage} / {totalPages}";
+            if (BtnPrevPage != null) 
+                BtnPrevPage.IsEnabled = _currentPage > 1;
+            if (BtnNextPage != null) 
+                BtnNextPage.IsEnabled = _currentPage < totalPages;
+        }
+
+        private void BtnPrevPage_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentPage > 1)
+            {
+                _currentPage--;
+                RefreshListView();
+            }
+        }
+
+        private void BtnNextPage_Click(object sender, RoutedEventArgs e)
+        {
+            _currentPage++;
+            RefreshListView();
         }
 
         private void RefreshWeekView()
@@ -235,6 +278,7 @@ namespace Healthcare.Client.UI.Doctor
             var weekAppts = _allAppointments
                 .Where(a => a.AppointmentDate.Date >= _currentWeekSunday.Date
                          && a.AppointmentDate.Date <= endOfWeek.Date)
+                .OrderBy(a => a.StartTime) // Đảm bảo sắp xếp theo giờ khám
                 .ToList();
 
             foreach (var appt in weekAppts)
@@ -326,6 +370,7 @@ namespace Healthcare.Client.UI.Doctor
                 // Sự kiện khi nhấn vào ô ngày
                 cell.Tapped += (s, e) => {
                     _filteredDate = cellDate;
+                    _currentPage = 1; // Reset trang khi chọn ngày mới
                     ListViewPanel.Visibility = Visibility.Visible;
                     WeekViewPanel.Visibility = Visibility.Collapsed;
                     MonthViewPanel.Visibility = Visibility.Collapsed;
@@ -414,6 +459,7 @@ namespace Healthcare.Client.UI.Doctor
         private void ListTab_Click(object sender, RoutedEventArgs e)
         {
             _filteredDate = null; // Bấm trực tiếp vào tab Danh sách thì xóa lọc
+            _currentPage = 1;     // Reset về trang đầu
             ListViewPanel.Visibility = Visibility.Visible;
             WeekViewPanel.Visibility = Visibility.Collapsed;
             MonthViewPanel.Visibility = Visibility.Collapsed;
@@ -532,7 +578,7 @@ namespace Healthcare.Client.UI.Doctor
             Id = model.Id;
             PatientId = model.PatientId;
             PatientName = name;
-            Time = model.StartTime.ToString(@"hh\:mm");
+            Time = $"{model.StartTime:hh\\:mm} - {model.EndTime:hh\\:mm}";
             BaseStatus = model.Status;
             DateFormatted = model.AppointmentDate.ToString("dd/MM/yyyy");
             TypeText = model.ExaminationType ?? "Offline";

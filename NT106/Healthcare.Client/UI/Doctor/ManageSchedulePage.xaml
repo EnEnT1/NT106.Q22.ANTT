@@ -775,6 +775,17 @@
                         </ListView.ItemTemplate>
                     </ListView>
                 </Border>
+
+                <!-- Pagination Controls -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20" Margin="0,24,0,0">
+                    <Button x:Name="BtnPrevPage" Click="BtnPrevPage_Click" Style="{StaticResource NavIconButtonStyle}">
+                        <FontIcon Glyph="&#xE76B;" FontSize="14"/>
+                    </Button>
+                    <TextBlock x:Name="PageInfoText" Text="Trang 1 / 1" VerticalAlignment="Center" FontWeight="Bold" Foreground="{StaticResource SecondaryBrush}"/>
+                    <Button x:Name="BtnNextPage" Click="BtnNextPage_Click" Style="{StaticResource NavIconButtonStyle}">
+                        <FontIcon Glyph="&#xE76C;" FontSize="14"/>
+                    </Button>
+                </StackPanel>
             </StackPanel>
         </StackPanel>
     </ScrollViewer>
