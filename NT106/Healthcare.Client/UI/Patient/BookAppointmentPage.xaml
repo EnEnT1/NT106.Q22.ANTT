@@ -1,0 +1,119 @@
+<Page
+    x:Class="Healthcare.Client.UI.Patient.BookAppointmentPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="#F8F9FA">
+
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="32" Padding="40" MaxWidth="800" HorizontalAlignment="Center">
+                
+                <!-- Title & Back -->
+                <StackPanel Spacing="12">
+                    <Button x:Name="BtnBack" Click="BtnBack_Click" Background="Transparent" Padding="0">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE72B;" FontSize="14" Foreground="#2563EB"/>
+                            <TextBlock Text="Quay lại" FontSize="14" Foreground="#2563EB" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                    <TextBlock Text="Đặt Lịch Khám Mới" FontSize="36" FontWeight="Bold" Foreground="#111827"/>
+                    <TextBlock Text="Vui lòng điền đầy đủ thông tin để hoàn tất việc đăng ký khám bệnh." 
+                               FontSize="16" Foreground="#6B7280"/>
+                </StackPanel>
+
+                <!-- Form Card -->
+                <Border Background="White" CornerRadius="16" Padding="32" BorderBrush="#E5E7EB" BorderThickness="1">
+                    <StackPanel Spacing="24">
+                        
+                        <!-- Doctor Selection -->
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Chọn Bác sĩ" FontSize="14" FontWeight="SemiBold" Foreground="#374151"/>
+                            <ComboBox x:Name="DoctorComboBox" HorizontalAlignment="Stretch" Padding="12" PlaceholderText="Chọn bác sĩ khám">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding FullName}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Date and Time -->
+                        <Grid ColumnSpacing="20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Ngày khám" FontSize="14" FontWeight="SemiBold" Foreground="#374151"/>
+                                <DatePicker x:Name="ApptDatePicker" HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+
+                            <StackPanel Spacing="8" Grid.Column="1">
+                                <TextBlock Text="Giờ khám" FontSize="14" FontWeight="SemiBold" Foreground="#374151"/>
+                                <TimePicker x:Name="ApptTimePicker" HorizontalAlignment="Stretch" ClockIdentifier="24HourClock"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Type of Appointment -->
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="Hình thức khám" FontSize="14" FontWeight="SemiBold" Foreground="#374151"/>
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <RadioButton x:Name="TypeOnline" Content="Trực tuyến (Online)" IsChecked="True" GroupName="Type"/>
+                                <RadioButton x:Name="TypeOffline" Content="Tại bệnh viện (Offline)" Grid.Column="1" GroupName="Type"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Payment Method -->
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="Phương thức thanh toán" FontSize="14" FontWeight="SemiBold" Foreground="#374151"/>
+                            <StackPanel Spacing="8">
+                                <RadioButton x:Name="PaymentOnline" Content="Chuyển khoản trực tuyến (Online)" IsChecked="True" GroupName="Payment"/>
+                                <RadioButton x:Name="PaymentManual" Content="Thanh toán tại quầy (Offline)" GroupName="Payment"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <Rectangle Height="1" Fill="#E5E7EB" Margin="0,8"/>
+
+                        <!-- Submit Button -->
+                        <Button x:Name="BtnConfirm" 
+                                Click="BtnConfirm_Click"
+                                Content="Xác nhận Đặt lịch" 
+                                HorizontalAlignment="Stretch" 
+                                Padding="20" 
+                                FontSize="16" 
+                                FontWeight="Bold"
+                                Background="#2563EB"
+                                Foreground="White"
+                                CornerRadius="8"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Information Note -->
+                <Border Background="#EFF6FF" CornerRadius="12" Padding="20">
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xE946;" FontSize="20" Foreground="#2563EB" VerticalAlignment="Top"/>
+                        <StackPanel Grid.Column="1" Spacing="4">
+                            <TextBlock Text="Lưu ý quan trọng" FontWeight="Bold" Foreground="#1E40AF"/>
+                            <TextBlock Text="Nếu chọn thanh toán chuyển khoản, bạn sẽ nhận được thông tin thanh toán sau khi bác sĩ xác nhận lịch hẹn. Đối với thanh toán tại quầy, vui lòng đến sớm 15 phút trước giờ khám." 
+                                       FontSize="13" Foreground="#1E40AF" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>
