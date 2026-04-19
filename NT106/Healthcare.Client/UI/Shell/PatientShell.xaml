@@ -5,8 +5,17 @@
     xmlns:local="using:Healthcare.Client.UI.Shell"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    mc:Ignorable="d">
+
+    <Page.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#f0f9ff" Offset="0"/>
+            <GradientStop Color="#e0e7ff" Offset="0.25"/>
+            <GradientStop Color="#faf5ff" Offset="0.50"/>
+            <GradientStop Color="#fdf4ff" Offset="0.75"/>
+            <GradientStop Color="#ffffff" Offset="1"/>
+        </LinearGradientBrush>
+    </Page.Background>
 
     <Page.Resources>
         <!-- Color Resources -->
@@ -142,9 +151,15 @@
         <!--                  SIDEBAR                  -->
         <!-- ══════════════════════════════════════════ -->
         <Border Grid.Column="0"
-                Background="White"
-                BorderBrush="{StaticResource BorderSubtleBrush}"
+                BorderBrush="#D0E4FF"
                 BorderThickness="0,0,1,0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#EEF6FF" Offset="0"/>
+                    <GradientStop Color="#E8EEFF" Offset="0.5"/>
+                    <GradientStop Color="#F0EEFF" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>  <!-- Logo -->
@@ -292,8 +307,8 @@
             <!--                 TOP BAR               -->
             <!-- ══════════════════════════════════════ -->
             <Border Grid.Row="0"
-                    Background="#BAFCFDFE"
-                    BorderBrush="{StaticResource BorderSubtleBrush}"
+                    Background="#EEF6FF"
+                    BorderBrush="#D0E4FF"
                     BorderThickness="0,0,0,1">
                 <Grid Margin="40,0">
                     <Grid.ColumnDefinitions>
