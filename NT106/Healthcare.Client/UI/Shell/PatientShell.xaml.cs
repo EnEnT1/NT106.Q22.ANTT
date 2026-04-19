@@ -1,67 +1,103 @@
-using Healthcare.Client.Helpers;
-using Healthcare.Client.UI.Auth;
-using Healthcare.Client.UI.Patient;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using Healthcare.Client.UI.Patient;
+using Healthcare.Client.UI.Auth;
+using Healthcare.Client.Helpers;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Healthcare.Client.UI.Shell
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// Shell page chứa SideBar và TopBar.
+    /// PatientHomePage được load vào ContentFrame.
     /// </summary>
     public sealed partial class PatientShell : Page
     {
-        private readonly Dictionary<string, Type> _pages = new()
-        {
-            { "PatientHomePage", typeof(PatientHomePage) },
-            { "BookAppointmentPage", typeof(BookAppointmentPage) },
-        };
+        // Danh sách tất cả nav buttons để reset active state
+        private List<Button> _navButtons;
 
         public PatientShell()
         {
-            InitializeComponent();
-            LoadPatientInfo();
-            TxtDate.Text = DateTime.Now.ToString("dddd, dd MMMM", new System.Globalization.CultureInfo("vi-VN"));
-        }
+            this.InitializeComponent();
+            UpdateDateDisplay();
 
-        private void LoadPatientInfo()
-        {
-            var user = SessionStorage.CurrentUser;
-            if (user == null) return;
-            TxtPatientName.Text = user.FullName ?? "Bệnh nhân";
-            PatientAvatar.DisplayName = user.FullName ?? "B";
-        }
-
-        private void NavView_Loaded(object sender, RoutedEventArgs e)
-        {
-            NavView.SelectedItem = NavView.MenuItems[0];
-            ContentFrame.Navigate(typeof(PatientHomePage));
-        }
-
-        private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
-        {
-            if (args.SelectedItem is NavigationViewItem item && item.Tag is string tag && _pages.TryGetValue(tag, out var pageType))
+            // Khởi tạo danh sách nav buttons
+            _navButtons = new List<Button>
             {
-                ContentFrame.Navigate(pageType);
-            }
+                NavHome, NavAppointment, NavRecords,
+                NavPayment, NavHealthMetrics, NavOnline
+            };
+
+            // Navigate tới trang chủ khi load
+            ContentFrame.Navigate(typeof(PatientHomePage), this);
+            SetActiveButton(NavHome);
         }
 
-        private async void NavLogout_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+        // ──────────────────────────────────────────────
+        // Sidebar Navigation Handlers
+        // ──────────────────────────────────────────────
+
+        private void NavHome_Click(object sender, RoutedEventArgs e)
+        {
+            NavigateTo(typeof(PatientHomePage));
+            SetActiveButton(NavHome);
+        }
+
+        private void NavAppointment_Click(object sender, RoutedEventArgs e)
+        {
+            NavigateTo(typeof(BookAppointmentPage));
+            SetActiveButton(NavAppointment);
+        }
+
+        private void NavRecords_Click(object sender, RoutedEventArgs e)
+        {
+            NavigateTo(typeof(MyRecordsPage));
+            SetActiveButton(NavRecords);
+        }
+
+        private void NavPayment_Click(object sender, RoutedEventArgs e)
+        {
+            NavigateTo(typeof(PaymentCheckoutPage));
+            SetActiveButton(NavPayment);
+        }
+
+        private void NavHealthMetrics_Click(object sender, RoutedEventArgs e)
+        {
+            NavigateTo(typeof(HealthMetricsPage));
+            SetActiveButton(NavHealthMetrics);
+        }
+
+        private void NavOnline_Click(object sender, RoutedEventArgs e)
+        {
+            NavigateTo(typeof(LabResultsPage));
+            SetActiveButton(NavOnline);
+        }
+
+        // ──────────────────────────────────────────────
+        // Public: Được gọi từ PatientHomePage (Quick Access)
+        // ──────────────────────────────────────────────
+
+        public void NavigateToPage(Type pageType)
+        {
+            NavigateTo(pageType);
+
+            // Cập nhật active state tương ứng trang
+            if (pageType == typeof(PatientHomePage))       SetActiveButton(NavHome);
+            else if (pageType == typeof(BookAppointmentPage)) SetActiveButton(NavAppointment);
+            else if (pageType == typeof(MyRecordsPage))    SetActiveButton(NavRecords);
+            else if (pageType == typeof(PaymentCheckoutPage)) SetActiveButton(NavPayment);
+            else if (pageType == typeof(HealthMetricsPage)) SetActiveButton(NavHealthMetrics);
+            else if (pageType == typeof(LabResultsPage))   SetActiveButton(NavOnline);
+        }
+
+        // ──────────────────────────────────────────────
+        // Helpers
+        // ──────────────────────────────────────────────
+        // Đăng xuất
+        // ──────────────────────────────────────────────
+        private async void LogoutBtn_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new ContentDialog
             {
@@ -69,14 +105,49 @@ namespace Healthcare.Client.UI.Shell
                 Content = "Bạn có chắc muốn đăng xuất không?",
                 PrimaryButtonText = "Đăng xuất",
                 CloseButtonText = "Hủy",
+                DefaultButton = ContentDialogButton.Close,
                 XamlRoot = this.XamlRoot
             };
 
-            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
             {
                 SessionStorage.ClearSession();
-                Frame.Navigate(typeof(Healthcare.Client.UI.Auth.LoginPage));
+                Frame.Navigate(typeof(LoginPage));
             }
+        }
+
+        // ──────────────────────────────────────────────
+
+        private void NavigateTo(Type pageType)
+        {
+            if (ContentFrame.CurrentSourcePageType != pageType)
+                ContentFrame.Navigate(pageType, this); // truyền shell để trang con có thể gọi lại
+        }
+
+        /// <summary>
+        /// Đặt button active, reset tất cả các button còn lại về inactive.
+        /// </summary>
+        private void SetActiveButton(Button activeButton)
+        {
+            var activeStyle   = (Style)Resources["NavItemActiveStyle"];
+            var inactiveStyle = (Style)Resources["NavItemButtonStyle"];
+
+            foreach (var btn in _navButtons)
+            {
+                btn.Style = (btn == activeButton) ? activeStyle : inactiveStyle;
+            }
+        }
+
+        /// <summary>
+        /// Cập nhật hiển thị ngày hiện tại trên TopBar.
+        /// </summary>
+        private void UpdateDateDisplay()
+        {
+            var now = DateTime.Now;
+            string[] dayNames = { "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy" };
+            string dayName = dayNames[(int)now.DayOfWeek];
+            DateTextBlock.Text = $"{dayName}, {now:dd/MM/yyyy}";
         }
     }
 }

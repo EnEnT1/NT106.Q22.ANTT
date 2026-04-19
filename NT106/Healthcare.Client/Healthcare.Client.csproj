@@ -39,11 +39,39 @@
     <None Remove="UI\Doctor\ManageSchedulePage.xaml" />
     <None Remove="UI\Doctor\PatientHistoryPage.xaml" />
     <None Remove="UI\Doctor\RevenuePage.xaml" />
+    <None Remove="UI\Patient\HealthMetricsPage.xaml" />
+    <None Remove="UI\Patient\LabResultsPage.xaml" />
+    <None Remove="UI\Patient\MyRecordsPage.xaml" />
+    <None Remove="UI\Patient\PaymentCheckoutPage.xaml" />
     <None Remove="UI\Shell\DoctorShell.xaml" />
   </ItemGroup>
 
   <ItemGroup>
     <Page Remove="UI\App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Patient\LabResultsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Patient\HealthMetricsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Patient\MyRecordsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Patient\PaymentCheckoutPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>
