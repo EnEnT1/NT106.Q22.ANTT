@@ -19,6 +19,7 @@ namespace Healthcare.Client.Models.Core
 
         [Column("status")] public string Status { get; set; }
 
+        [Column("examination_type")] public string ExaminationType { get; set; }
         [Column("room_code")] public string RoomCode { get; set; }
 
         [Column("created_at")] public DateTime CreatedAt { get; set; }

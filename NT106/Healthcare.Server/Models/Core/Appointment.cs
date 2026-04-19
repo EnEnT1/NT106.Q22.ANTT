@@ -14,6 +14,7 @@ namespace Healthcare.Server.Models.Core
         [Column("appointment_date")] public DateTime AppointmentDate { get; set; } = DateTime.UtcNow;
         [Column("start_time")] public string StartTime { get; set; } 
         [Column("status")] public string Status { get; set; } = string.Empty;
+        [Column("examination_type")] public string ExaminationType { get; set; } = string.Empty;
         [Column("room_code")] public string RoomCode { get; set; } = string.Empty;
         [Column("created_at")] public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
