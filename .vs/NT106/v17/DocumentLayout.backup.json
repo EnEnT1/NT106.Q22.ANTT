@@ -72,7 +72,7 @@
               "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Patient\\PatientHomePage.xaml.cs",
               "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Patient\\PatientHomePage.xaml.cs",
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Patient\\PatientHomePage.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADgAAAA+AAAAAAAAAA==",
+              "ViewState": "AgIAABQAAAAAAAAAAAAAwDgAAAA+AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-19T14:06:02.031Z",
               "EditorCaption": ""
@@ -87,8 +87,7 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Patient\\LabResultsPage.xaml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-04-19T14:00:52.741Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-19T14:00:52.741Z"
             },
             {
               "$type": "Document",
@@ -100,8 +99,7 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Patient\\HealthMetricsPage.xaml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-04-19T14:00:37.893Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-19T14:00:37.893Z"
             },
             {
               "$type": "Document",
@@ -113,8 +111,7 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Patient\\MyRecordsPage.xaml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-04-19T14:00:16.684Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-19T14:00:16.684Z"
             },
             {
               "$type": "Document",
@@ -126,8 +123,7 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Patient\\PaymentCheckoutPage.xaml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-04-19T13:59:53.32Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-19T13:59:53.32Z"
             },
             {
               "$type": "Document",
@@ -139,8 +135,7 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Shell\\PatientShell.xaml.cs",
               "ViewState": "AgIAAA8AAAAAAAAAAAAxwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-19T13:54:17.152Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-19T13:54:17.152Z"
             },
             {
               "$type": "Document",
@@ -152,8 +147,7 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Shell\\DoctorShell.xaml.cs",
               "ViewState": "AgIAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-19T13:54:14.5Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-19T13:54:14.5Z"
             },
             {
               "$type": "Document",
@@ -165,8 +159,7 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Shell\\DoctorShell.xaml",
               "ViewState": "AgIAAJ8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-04-19T13:54:04.548Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-19T13:54:04.548Z"
             },
             {
               "$type": "Document",
@@ -178,8 +171,7 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Auth\\LoginPage.xaml.cs",
               "ViewState": "AgIAAE8AAAAAAAAAAAAcwF0AAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-19T13:52:47.842Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-19T13:52:47.842Z"
             },
             {
               "$type": "Document",
@@ -191,8 +183,7 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Patient\\PatientHomePage.xaml",
               "ViewState": "AgIAABICAAAAAAAAAAAAACYCAABEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-04-19T13:42:48.298Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-19T13:42:48.298Z"
             },
             {
               "$type": "Document",
@@ -204,8 +195,7 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Shell\\PatientShell.xaml",
               "ViewState": "AgIAAO8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-04-19T13:42:33.218Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-19T13:42:33.218Z"
             },
             {
               "$type": "Document",
