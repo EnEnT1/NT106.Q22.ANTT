@@ -34,63 +34,15 @@
                                FontSize="12"
                                Foreground="#64748B"/>
                 </StackPanel>
-
-                <Button x:Name="BtnStartCall"
-                        Grid.Column="1"
-                        Click="BtnStartCall_Click"
-                        Background="#0059BB"
-                        Foreground="White"
-                        BorderThickness="0"
-                        CornerRadius="10"
-                        Padding="14,10">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon FontFamily="Segoe MDL2 Assets"
-                                  Glyph="&#xE717;"
-                                  FontSize="14"
-                                  Foreground="White"/>
-                        <TextBlock x:Name="TxtStartCallLabel"
-                                   Text="Bắt đầu cuộc gọi"
-                                   FontSize="13"
-                                   FontWeight="SemiBold"
-                                   Foreground="White"/>
-                    </StackPanel>
-                </Button>
             </Grid>
         </Border>
 
-        <Border Grid.Row="1"
-                Background="White"
-                BorderBrush="#E5E7EB"
-                BorderThickness="0,0,0,1"
-                Padding="16,0,16,0">
-            <StackPanel Orientation="Horizontal" Spacing="20">
-                <Button x:Name="TabChat"
-                        Tag="chat"
-                        Click="Tab_Click"
-                        Background="Transparent"
-                        BorderThickness="0,0,0,2"
-                        BorderBrush="#0059BB"
-                        Padding="4,12">
-                    <TextBlock Text="Chat"
-                               FontSize="13"
-                               FontWeight="Bold"
-                               Foreground="#0059BB"/>
-                </Button>
-
-                <Button x:Name="TabNotes"
-                        Tag="notes"
-                        Click="Tab_Click"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        BorderBrush="Transparent"
-                        Padding="4,12">
-                    <TextBlock Text="Ghi chú"
-                               FontSize="13"
-                               FontWeight="Normal"
-                               Foreground="#64748B"/>
-                </Button>
+            <StackPanel Orientation="Horizontal" Padding="16,8">
+                <TextBlock Text="Cửa sổ Chat"
+                           FontSize="13"
+                           FontWeight="Bold"
+                           Foreground="#0059BB"/>
             </StackPanel>
-        </Border>
 
         <Grid Grid.Row="2">
             <Grid x:Name="PanelChat" Visibility="Visible">
@@ -148,133 +100,6 @@
                 </Border>
             </Grid>
 
-            <ScrollViewer x:Name="PanelNotes"
-                          Visibility="Collapsed"
-                          VerticalScrollBarVisibility="Auto">
-                <StackPanel Padding="16" Spacing="16">
-
-                    <Border Background="#F8FAFC"
-                            CornerRadius="12"
-                            Padding="16"
-                            BorderBrush="#E5E7EB"
-                            BorderThickness="1">
-                        <StackPanel Spacing="10">
-                            <TextBlock Text="Chẩn đoán"
-                                       FontSize="16"
-                                       FontWeight="Bold"
-                                       Foreground="#1E293B"/>
-
-                            <TextBox x:Name="DiagnosisBox"
-                                     PlaceholderText="Nhập chẩn đoán..."
-                                     AcceptsReturn="True"
-                                     TextWrapping="Wrap"
-                                     MinHeight="100"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Background="#F8FAFC"
-                            CornerRadius="12"
-                            Padding="16"
-                            BorderBrush="#E5E7EB"
-                            BorderThickness="1">
-                        <StackPanel Spacing="12">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="Ghi chú nhanh"
-                                           FontSize="16"
-                                           FontWeight="Bold"
-                                           Foreground="#1E293B"/>
-
-                                <Button Grid.Column="1"
-                                        Click="BtnAddNote_Click"
-                                        Background="#EAF2FF"
-                                        Foreground="#0059BB"
-                                        BorderThickness="0"
-                                        CornerRadius="8"
-                                        Padding="10,6">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <FontIcon FontFamily="Segoe MDL2 Assets"
-                                                  Glyph="&#xE710;"
-                                                  FontSize="12"
-                                                  Foreground="#0059BB"/>
-                                        <TextBlock Text="Thêm"
-                                                   FontSize="12"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="#0059BB"/>
-                                    </StackPanel>
-                                </Button>
-                            </Grid>
-
-                            <StackPanel x:Name="QuickNotesList" Spacing="8"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Background="#F8FAFC"
-                            CornerRadius="12"
-                            Padding="16"
-                            BorderBrush="#E5E7EB"
-                            BorderThickness="1">
-                        <StackPanel Spacing="12">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="Đơn thuốc"
-                                           FontSize="16"
-                                           FontWeight="Bold"
-                                           Foreground="#1E293B"/>
-
-                                <Button Grid.Column="1"
-                                        Click="BtnAddMedicine_Click"
-                                        Background="#EAF2FF"
-                                        Foreground="#0059BB"
-                                        BorderThickness="0"
-                                        CornerRadius="8"
-                                        Padding="10,6">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <FontIcon FontFamily="Segoe MDL2 Assets"
-                                                  Glyph="&#xE710;"
-                                                  FontSize="12"
-                                                  Foreground="#0059BB"/>
-                                        <TextBlock Text="Thêm thuốc"
-                                                   FontSize="12"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="#0059BB"/>
-                                    </StackPanel>
-                                </Button>
-                            </Grid>
-
-                            <StackPanel x:Name="PrescriptionList" Spacing="8"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Button Click="BtnSaveNotes_Click"
-                            Background="#16A34A"
-                            Foreground="White"
-                            BorderThickness="0"
-                            CornerRadius="10"
-                            Padding="14,12"
-                            HorizontalAlignment="Left">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon FontFamily="Segoe MDL2 Assets"
-                                      Glyph="&#xE74E;"
-                                      FontSize="13"
-                                      Foreground="White"/>
-                            <TextBlock Text="Lưu ghi chú khám"
-                                       FontSize="13"
-                                       FontWeight="SemiBold"
-                                       Foreground="White"/>
-                        </StackPanel>
-                    </Button>
-
-                </StackPanel>
-            </ScrollViewer>
         </Grid>
 
         <Border Grid.Row="3"
