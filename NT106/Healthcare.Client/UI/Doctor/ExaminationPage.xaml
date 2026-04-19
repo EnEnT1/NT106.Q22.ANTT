@@ -6,281 +6,140 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="#F8F9FA">
+    Background="#F0F2F5">
+
+    <Page.Resources>
+        <ThemeShadow x:Name="SharedShadow"/>
+    </Page.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="288"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="320"/>
+            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- COL 0 — PATIENT CONTEXT PANEL -->
-        <Border Grid.Column="0"
-                Background="#F3F4F5"
-                BorderThickness="0,0,1,0"
-                BorderBrush="#E2E8F0">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <Border Grid.Row="0"
-                        Background="White"
-                        CornerRadius="12"
-                        Margin="16,16,16,8"
-                        Padding="16">
-                    <StackPanel HorizontalAlignment="Center" Spacing="6">
-                        <Border x:Name="AvatarBorder"
-                                CornerRadius="60"
-                                Width="96"
-                                Height="96"
-                                BorderThickness="4"
-                                BorderBrush="White"
-                                HorizontalAlignment="Center"
-                                Background="#E2E8F0">
-                            <FontIcon FontFamily="Segoe MDL2 Assets"
-                                      Glyph="&#xE77B;"
-                                      FontSize="40"
-                                      Foreground="#94A3B8"
-                                      HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"/>
-                        </Border>
-
-                        <TextBlock x:Name="TxtPatientName"
-                                   Text="Đang tải..."
-                                   FontSize="16"
-                                   FontWeight="Bold"
-                                   Foreground="#1E293B"
-                                   HorizontalAlignment="Center"/>
-
-                        <TextBlock x:Name="TxtPatientMeta"
-                                   Text="–"
-                                   FontSize="12"
-                                   Foreground="#64748B"
-                                   HorizontalAlignment="Center"/>
-
-                        <Border x:Name="ConditionBadge"
-                                Background="#FEE2E2"
-                                CornerRadius="20"
-                                Padding="12,4"
-                                HorizontalAlignment="Center">
-                            <TextBlock x:Name="TxtCondition"
-                                       Text="–"
-                                       FontSize="11"
-                                       FontWeight="Bold"
-                                       Foreground="#B91C1C"/>
-                        </Border>
-                    </StackPanel>
-                </Border>
-
-                <StackPanel Grid.Row="1" Spacing="2" Margin="16,4,16,0">
-                    <Button x:Name="BtnNavVideo"
-                            Click="BtnNav_Click"
-                            Tag="video"
-                            HorizontalAlignment="Stretch"
-                            Background="White"
-                            CornerRadius="8"
-                            BorderThickness="0"
-                            Padding="16,12">
-                        <StackPanel Orientation="Horizontal" Spacing="12">
-                            <FontIcon FontFamily="Segoe MDL2 Assets"
-                                      Glyph="&#xE714;"
-                                      FontSize="18"
-                                      Foreground="#0059BB"/>
-                            <TextBlock Text="Video Call"
-                                       FontSize="13"
-                                       FontWeight="Bold"
-                                       Foreground="#0059BB"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-
-                    <Button x:Name="BtnNavChat"
-                            Click="BtnNav_Click"
-                            Tag="chat"
-                            HorizontalAlignment="Stretch"
-                            Background="Transparent"
-                            CornerRadius="8"
-                            BorderThickness="0"
-                            Padding="16,12">
-                        <StackPanel Orientation="Horizontal" Spacing="12">
-                            <FontIcon FontFamily="Segoe MDL2 Assets"
-                                      Glyph="&#xE8F2;"
-                                      FontSize="18"
-                                      Foreground="#64748B"/>
-                            <TextBlock Text="Chat"
-                                       FontSize="13"
-                                       FontWeight="Normal"
-                                       Foreground="#64748B"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-
-                    <Button x:Name="BtnNavNotes"
-                            Click="BtnNav_Click"
-                            Tag="notes"
-                            HorizontalAlignment="Stretch"
-                            Background="Transparent"
-                            CornerRadius="8"
-                            BorderThickness="0"
-                            Padding="16,12">
-                        <StackPanel Orientation="Horizontal" Spacing="12">
-                            <FontIcon FontFamily="Segoe MDL2 Assets"
-                                      Glyph="&#xE70B;"
-                                      FontSize="18"
-                                      Foreground="#64748B"/>
-                            <TextBlock Text="Medical Notes"
-                                       FontSize="13"
-                                       FontWeight="Normal"
-                                       Foreground="#64748B"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-
-                    <Button x:Name="BtnNavHistory"
-                            Click="BtnNav_Click"
-                            Tag="history"
-                            HorizontalAlignment="Stretch"
-                            Background="Transparent"
-                            CornerRadius="8"
-                            BorderThickness="0"
-                            Padding="16,12">
-                        <StackPanel Orientation="Horizontal" Spacing="12">
-                            <FontIcon FontFamily="Segoe MDL2 Assets"
-                                      Glyph="&#xE81C;"
-                                      FontSize="18"
-                                      Foreground="#64748B"/>
-                            <TextBlock Text="History"
-                                       FontSize="13"
-                                       FontWeight="Normal"
-                                       Foreground="#64748B"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-
-                <StackPanel Grid.Row="2" Margin="16,8,16,24" Spacing="8">
-                    <Button x:Name="BtnFinish"
-                            Click="BtnFinish_Click"
-                            HorizontalAlignment="Stretch"
-                            Background="#B91C1C"
-                            Foreground="White"
-                            CornerRadius="10"
-                            Padding="0,14"
-                            FontSize="13"
-                            FontWeight="Bold"
-                            BorderThickness="0">
-                        <TextBlock Text="Kết thúc khám" HorizontalAlignment="Center"/>
-                    </Button>
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Button Grid.Column="0"
-                                Content="Trợ giúp"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                FontSize="11"
-                                Foreground="#64748B"
-                                HorizontalAlignment="Center"/>
-
-                        <Button Grid.Column="1"
-                                Content="Khẩn cấp"
-                                Click="BtnEmergency_Click"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                FontSize="11"
-                                Foreground="#DC2626"
-                                HorizontalAlignment="Center"/>
-                    </Grid>
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        <!-- COL 1 — VIDEO -->
-        <Border Grid.Column="1" Margin="16">
+        <!-- LEFT SIDE: DOMINANT VIDEO AREA -->
+        <Border Grid.Column="0" Margin="20" CornerRadius="20" Background="Black" Shadow="{StaticResource SharedShadow}">
             <components:VideoCallControl x:Name="VideoCall"
                                          CallStarted="VideoCall_CallStarted"
                                          CallEnded="VideoCall_CallEnded"
                                          Visibility="Visible"/>
         </Border>
 
-        <!-- COL 2 — TOOLS (CHAT / NOTES) -->
-        <Grid Grid.Column="2" BorderThickness="1,0,0,0" BorderBrush="#E2E8F0">
-            <!-- CHAT PANEL -->
-            <Border x:Name="ChatHost" Visibility="Collapsed">
-                <components:ChatControl x:Name="Chat"
-                                        StartCallRequested="Chat_StartCallRequested"
-                                        NotesSaved="Chat_NotesSaved"/>
+        <!-- RIGHT SIDE: INFORMATION & TOOLS PANEL (Stacked UI) -->
+        <Grid Grid.Column="1" Margin="0,20,20,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Navigation Tabs -->
+            <Border Grid.Row="0" Background="White" CornerRadius="16" Padding="8" Margin="0,0,0,16" Shadow="{StaticResource SharedShadow}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Click="BtnNav_Click" Tag="info" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Stretch" Padding="0,10">
+                        <FontIcon x:Name="IconInfo" Glyph="&#xE77B;" FontSize="20" Foreground="#0284C7"/>
+                    </Button>
+                    <Button Grid.Column="1" Click="BtnNav_Click" Tag="chat" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Stretch" Padding="0,10">
+                        <FontIcon x:Name="IconChat" Glyph="&#xE8F2;" FontSize="20" Foreground="#64748B"/>
+                    </Button>
+                    <Button Grid.Column="2" Click="BtnNav_Click" Tag="notes" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Stretch" Padding="0,10">
+                        <FontIcon x:Name="IconNotes" Glyph="&#xE70B;" FontSize="20" Foreground="#64748B"/>
+                    </Button>
+                    <Button Grid.Column="3" Click="BtnNav_Click" Tag="prescription" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Stretch" Padding="0,10">
+                        <FontIcon x:Name="IconPrescription" Glyph="&#xE950;" FontSize="20" Foreground="#64748B"/>
+                    </Button>
+                </Grid>
             </Border>
 
-            <!-- NOTES PANEL (Relocated from ChatControl) -->
-            <ScrollViewer x:Name="NotesHost" Visibility="Visible" VerticalScrollBarVisibility="Auto" Background="White">
-                <StackPanel Padding="16" Spacing="16">
-                    <TextBlock Text="Ghi chú &amp; Hồ sơ" FontSize="20" FontWeight="Bold" Foreground="#1E293B"/>
+            <!-- Panels -->
+            <Grid Grid.Row="1">
+                <!-- Info Panel -->
+                <Border x:Name="InfoPanel" Visibility="Visible" Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource SharedShadow}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="24">
+                            <TextBlock Text="Thông tin bệnh nhân" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
+                            
+                            <StackPanel HorizontalAlignment="Center" Spacing="12">
+                                <PersonPicture x:Name="PatientAvatar" Width="120" Height="120" Background="#F1F5F9"/>
+                                <TextBlock x:Name="TxtPatientName" Text="Đang tải..." FontSize="22" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <Border Background="#EEF2FF" CornerRadius="20" Padding="14,6" HorizontalAlignment="Center">
+                                    <TextBlock x:Name="TxtCondition" Text="Duy trì ổn định" FontSize="12" FontWeight="Bold" Foreground="#4F46E5"/>
+                                </Border>
+                            </StackPanel>
 
-                    <!-- Chẩn đoán -->
-                    <Border Background="#F8FAFC" CornerRadius="12" Padding="16" BorderBrush="#E5E7EB" BorderThickness="1">
-                        <StackPanel Spacing="10">
-                            <TextBlock Text="Chẩn đoán" FontSize="16" FontWeight="Bold" Foreground="#1E293B"/>
-                            <TextBox x:Name="DiagnosisBox" PlaceholderText="Nhập chẩn đoán..." AcceptsReturn="True" TextWrapping="Wrap" MinHeight="100"/>
+                            <StackPanel Spacing="16">
+                                <Grid>
+                                    <TextBlock Text="Tuổi / Giới tính" Foreground="#64748B" FontSize="14"/>
+                                    <TextBlock x:Name="TxtPatientMeta" Text="--" FontWeight="SemiBold" HorizontalAlignment="Right" FontSize="14"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="Cân nặng / Chiều cao" Foreground="#64748B" FontSize="14"/>
+                                    <TextBlock Text="65kg / 170cm" FontWeight="SemiBold" HorizontalAlignment="Right" FontSize="14"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="Nhóm máu" Foreground="#64748B" FontSize="14"/>
+                                    <TextBlock Text="O+" FontWeight="Bold" Foreground="#DC2626" HorizontalAlignment="Right" FontSize="14"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <Button x:Name="BtnFinish" Click="BtnFinish_Click" HorizontalAlignment="Stretch" Margin="0,12,0,0" Padding="0,14" Background="#EF4444" Foreground="White" CornerRadius="12" BorderThickness="0" FontWeight="Bold">
+                                <TextBlock Text="Kết thúc phiên khám"/>
+                            </Button>
                         </StackPanel>
-                    </Border>
+                    </ScrollViewer>
+                </Border>
 
-                    <!-- Ghi chú nhanh -->
-                    <Border Background="#F8FAFC" CornerRadius="12" Padding="16" BorderBrush="#E5E7EB" BorderThickness="1">
-                        <StackPanel Spacing="12">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Ghi chú nhanh" FontSize="16" FontWeight="Bold" Foreground="#1E293B"/>
-                                <Button Grid.Column="1" Click="BtnAddNote_Click" Background="#EAF2FF" Foreground="#0059BB" BorderThickness="0" CornerRadius="8" Padding="10,6">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;" FontSize="12" Foreground="#0059BB"/>
-                                        <TextBlock Text="Thêm" FontSize="12" FontWeight="SemiBold" Foreground="#0059BB"/>
-                                    </StackPanel>
-                                </Button>
-                            </Grid>
-                            <StackPanel x:Name="QuickNotesList" Spacing="8"/>
+                <!-- Chat Panel -->
+                <Border x:Name="ChatPanel" Visibility="Collapsed" Background="White" CornerRadius="20" Shadow="{StaticResource SharedShadow}">
+                    <components:ChatControl x:Name="Chat"/>
+                </Border>
+
+                <!-- Notes Panel -->
+                <Border x:Name="NotesPanel" Visibility="Collapsed" Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource SharedShadow}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="20">
+                            <TextBlock Text="Ghi chú &amp; Chẩn đoán" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
+                            
+                            <TextBox x:Name="DiagnosisBox" Header="Chẩn đoán xác định" PlaceholderText="Nhập chẩn đoán hoặc mã bệnh..." AcceptsReturn="True" TextWrapping="Wrap" MinHeight="100"/>
+                            
+                            <StackPanel Spacing="12">
+                                <Grid>
+                                    <TextBlock Text="Ghi chú nhanh" FontWeight="Bold" VerticalAlignment="Center"/>
+                                    <Button Click="BtnAddNote_Click" HorizontalAlignment="Right" Content="Thêm ghi chú" FontSize="12" Padding="12,6" Background="#F0F9FF" Foreground="#0284C7" BorderThickness="0" CornerRadius="8"/>
+                                </Grid>
+                                <StackPanel x:Name="QuickNotesList" Spacing="8"/>
+                            </StackPanel>
+
+                            <Button Click="BtnSaveNotes_Click" Background="#16A34A" Foreground="White" CornerRadius="12" Padding="16" HorizontalAlignment="Stretch" Margin="0,12,0,0" BorderThickness="0" FontWeight="SemiBold">
+                                <TextBlock Text="Lưu hồ sơ khám"/>
+                            </Button>
                         </StackPanel>
-                    </Border>
+                    </ScrollViewer>
+                </Border>
 
-                    <!-- Đơn thuốc -->
-                    <Border Background="#F8FAFC" CornerRadius="12" Padding="16" BorderBrush="#E5E7EB" BorderThickness="1">
-                        <StackPanel Spacing="12">
+                <!-- Prescription Panel -->
+                <Border x:Name="PrescriptionPanel" Visibility="Collapsed" Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource SharedShadow}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="20">
                             <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Đơn thuốc" FontSize="16" FontWeight="Bold" Foreground="#1E293B"/>
-                                <Button Grid.Column="1" Click="BtnAddMedicine_Click" Background="#EAF2FF" Foreground="#0059BB" BorderThickness="0" CornerRadius="8" Padding="10,6">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;" FontSize="12" Foreground="#0059BB"/>
-                                        <TextBlock Text="Thêm thuốc" FontSize="12" FontWeight="SemiBold" Foreground="#0059BB"/>
-                                    </StackPanel>
-                                </Button>
+                                <TextBlock Text="Đơn thuốc" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
+                                <Button Click="BtnAddMedicine_Click" HorizontalAlignment="Right" Content="Thêm thuốc" Padding="12,6" Background="#F0FDF4" Foreground="#16A34A" BorderThickness="0" CornerRadius="8"/>
                             </Grid>
                             <StackPanel x:Name="PrescriptionList" Spacing="8"/>
+                            
+                            <TextBlock Text="Ghi chú đơn thuốc" FontSize="14" FontWeight="Bold" Margin="0,12,0,0"/>
+                            <TextBox PlaceholderText="Dặn dò bệnh nhân về liều dùng..." AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80"/>
                         </StackPanel>
-                    </Border>
-
-                    <Button Click="BtnSaveNotes_Click" Background="#16A34A" Foreground="White" BorderThickness="0" CornerRadius="10" Padding="14,12" HorizontalAlignment="Stretch">
-                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74E;" FontSize="13" Foreground="White"/>
-                            <TextBlock Text="Lưu ghi chú khám" FontSize="13" FontWeight="SemiBold" Foreground="White"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-            </ScrollViewer>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
         </Grid>
     </Grid>
 </Page>

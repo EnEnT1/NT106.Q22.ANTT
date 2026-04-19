@@ -145,97 +145,70 @@ namespace Healthcare.Client.UI.Doctor
         {
             if (sender is not Button btn) return;
 
-            _activeNav = btn.Tag?.ToString() ?? "video";
+            string oldNav = _activeNav;
+            _activeNav = btn.Tag?.ToString() ?? "info";
+            
+            if (oldNav == _activeNav) return;
+
             UpdateNavStyles();
 
-            // GIỮ VIDEO LUÔN HIỆN DIỆN (Nếu cần ưu tiên diện tích thì mới ẩn, 
-            // nhưng ở đây người dùng muốn hiện cùng lúc nên ta để Visible)
-            VideoCall.Visibility = Visibility.Visible;
+            // All panels initially collapsed
+            InfoPanel.Visibility = Visibility.Collapsed;
+            ChatPanel.Visibility = Visibility.Collapsed;
+            NotesPanel.Visibility = Visibility.Collapsed;
+            PrescriptionPanel.Visibility = Visibility.Collapsed;
 
-            if (_activeNav == "video")
+            // Activate panel based on tag
+            switch (_activeNav)
             {
-                // Khi ở tab Video, ta có thể chọn hiện Chat hoặc Notes mặc định bên cạnh.
-                // Ở đây ta chọn hiện Chat bên phải.
-                ChatHost.Visibility = Visibility.Visible;
-                NotesHost.Visibility = Visibility.Collapsed;
-            }
-            else if (_activeNav == "chat")
-            {
-                ChatHost.Visibility = Visibility.Visible;
-                NotesHost.Visibility = Visibility.Collapsed;
-            }
-            else if (_activeNav == "notes")
-            {
-                ChatHost.Visibility = Visibility.Collapsed;
-                NotesHost.Visibility = Visibility.Visible;
-                RenderQuickNotes(); 
-            }
-            else if (_activeNav == "history")
-            {
-                // Tương lai: Hiện lịch sử bệnh án ở cột 2
+                case "info":
+                    InfoPanel.Visibility = Visibility.Visible;
+                    break;
+                case "chat":
+                    ChatPanel.Visibility = Visibility.Visible;
+                    break;
+                case "notes":
+                    NotesPanel.Visibility = Visibility.Visible;
+                    RenderQuickNotes();
+                    break;
+                case "prescription":
+                    PrescriptionPanel.Visibility = Visibility.Visible;
+                    break;
             }
         }
 
         private void UpdateNavStyles()
         {
-            var navItems = new[]
+            // Reset all icons to default color
+            IconInfo.Foreground = new SolidColorBrush(HexToColor("#64748B"));
+            IconChat.Foreground = new SolidColorBrush(HexToColor("#64748B"));
+            IconNotes.Foreground = new SolidColorBrush(HexToColor("#64748B"));
+            IconPrescription.Foreground = new SolidColorBrush(HexToColor("#64748B"));
+
+            // Set active icon color
+            var activeBrush = new SolidColorBrush(HexToColor("#0284C7"));
+            switch (_activeNav)
             {
-                (Btn: BtnNavVideo, Tag: "video"),
-                (Btn: BtnNavChat, Tag: "chat"),
-                (Btn: BtnNavNotes, Tag: "notes"),
-                (Btn: BtnNavHistory, Tag: "history"),
-            };
-
-            foreach (var (btn, tag) in navItems)
-            {
-                bool active = tag == _activeNav;
-                btn.Background = new SolidColorBrush(active ? Colors.White : Colors.Transparent);
-
-                if (btn.Content is StackPanel sp)
-                {
-                    foreach (var child in sp.Children)
-                    {
-                        if (child is TextBlock tb)
-                        {
-                            tb.Foreground = new SolidColorBrush(
-                                active ? HexToColor("#0059BB") : HexToColor("#64748B"));
-                            tb.FontWeight = active ? FontWeights.Bold : FontWeights.Normal;
-                        }
-
-                        if (child is FontIcon fi)
-                        {
-                            fi.Foreground = new SolidColorBrush(
-                                active ? HexToColor("#0059BB") : HexToColor("#64748B"));
-                        }
-                    }
-                }
+                case "info": IconInfo.Foreground = activeBrush; break;
+                case "chat": IconChat.Foreground = activeBrush; break;
+                case "notes": IconNotes.Foreground = activeBrush; break;
+                case "prescription": IconPrescription.Foreground = activeBrush; break;
             }
         }
 
         private void VideoCall_CallStarted(object sender, EventArgs e)
         {
-            Chat.OnCallStarted();
-            _activeNav = "video";
+            _activeNav = "info";
             UpdateNavStyles();
         }
 
         private void VideoCall_CallEnded(object sender, EventArgs e)
         {
-            Chat.OnCallEnded();
-            VideoCall.Visibility = Visibility.Collapsed;
-            _activeNav = "chat";
-            UpdateNavStyles();
-            ChatHost.Visibility = Visibility.Visible;
-            NotesHost.Visibility = Visibility.Collapsed;
+            // In the new layout, we might not want to hide the whole VideoCall control, 
+            // but just show that it ended. Or we can hide it.
+            // Keeping it visible as a black screen with status message for now.
         }
 
-        private async void Chat_StartCallRequested(object sender, EventArgs e)
-        {
-            VideoCall.Visibility = Visibility.Visible;
-            _activeNav = "video";
-            UpdateNavStyles();
-            await VideoCall.StartCallAsync();
-        }
 
         private async void Chat_NotesSaved(object sender, MedicalNotesSavedEventArgs e)
         {

@@ -216,8 +216,8 @@
                         <Border Background="White" CornerRadius="16" Padding="32" BorderBrush="#F1F5F9" BorderThickness="1">
                             <StackPanel Spacing="24">
                                 <Grid Height="120" Width="120" HorizontalAlignment="Center">
-                                    <Border x:Name="AvatarPlaceholder" CornerRadius="60" Background="#94A3B8">
-                                        <TextBlock x:Name="AvatarInitials" Text="BA" FontSize="40" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" CharacterSpacing="50"/>
+                                    <Border x:Name="AvatarPlaceholder" CornerRadius="60" Background="#F1F5F9">
+                                        <TextBlock x:Name="AvatarInitials" Text="BA" FontSize="40" FontWeight="Bold" Foreground="#64748B" HorizontalAlignment="Center" VerticalAlignment="Center" CharacterSpacing="50"/>
                                     </Border>
                                     <Ellipse x:Name="AvatarContainer" Visibility="Collapsed">
                                         <Ellipse.Fill>
