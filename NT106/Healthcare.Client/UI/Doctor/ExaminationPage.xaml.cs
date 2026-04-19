@@ -23,6 +23,7 @@ namespace Healthcare.Client.UI.Doctor
         private string _patientId = string.Empty;
         private string _currentUserId = string.Empty;
         private string _activeNav = "video";
+        private readonly System.Collections.Generic.List<string> _quickNotes = new();
 
         public ExaminationPage()
         {
@@ -147,21 +148,31 @@ namespace Healthcare.Client.UI.Doctor
             _activeNav = btn.Tag?.ToString() ?? "video";
             UpdateNavStyles();
 
+            // GIỮ VIDEO LUÔN HIỆN DIỆN (Nếu cần ưu tiên diện tích thì mới ẩn, 
+            // nhưng ở đây người dùng muốn hiện cùng lúc nên ta để Visible)
+            VideoCall.Visibility = Visibility.Visible;
+
             if (_activeNav == "video")
             {
-                VideoCall.Visibility = Visibility.Visible;
+                // Khi ở tab Video, ta có thể chọn hiện Chat hoặc Notes mặc định bên cạnh.
+                // Ở đây ta chọn hiện Chat bên phải.
+                ChatHost.Visibility = Visibility.Visible;
+                NotesHost.Visibility = Visibility.Collapsed;
             }
             else if (_activeNav == "chat")
             {
-                Chat.SwitchTab("chat");
+                ChatHost.Visibility = Visibility.Visible;
+                NotesHost.Visibility = Visibility.Collapsed;
             }
             else if (_activeNav == "notes")
             {
-                Chat.SwitchTab("notes");
+                ChatHost.Visibility = Visibility.Collapsed;
+                NotesHost.Visibility = Visibility.Visible;
+                RenderQuickNotes(); 
             }
             else if (_activeNav == "history")
             {
-                // TODO: sau này navigate sang PatientHistoryPage hoặc mở panel history
+                // Tương lai: Hiện lịch sử bệnh án ở cột 2
             }
         }
 
@@ -214,7 +225,8 @@ namespace Healthcare.Client.UI.Doctor
             VideoCall.Visibility = Visibility.Collapsed;
             _activeNav = "chat";
             UpdateNavStyles();
-            Chat.SwitchTab("chat");
+            ChatHost.Visibility = Visibility.Visible;
+            NotesHost.Visibility = Visibility.Collapsed;
         }
 
         private async void Chat_StartCallRequested(object sender, EventArgs e)
@@ -227,11 +239,64 @@ namespace Healthcare.Client.UI.Doctor
 
         private async void Chat_NotesSaved(object sender, MedicalNotesSavedEventArgs e)
         {
-            // Hiển thị thông báo lưu thành công trên App (như một Notification nhỏ hoặc cập nhật Status)
-            System.Diagnostics.Debug.WriteLine($"Notes saved: {e.Diagnosis}");
-            
-            // Bạn có thể hiển thị một thông báo nhẹ nhàng ở góc màn hình hoặc trong Chat
-            // Ở đây tôi ví dụ hiển thị một ContentDialog nhỏ (tùy chọn) hoặc đơn giản là cập nhật UI nếu cần
+            // Logic này có thể bỏ qua hoặc cập nhật nếu cần đồng bộ thông tin khác
+        }
+
+        private async void BtnAddNote_Click(object sender, RoutedEventArgs e)
+        {
+            var input = new TextBox { PlaceholderText = "Nhập ghi chú nhanh...", Width = 260, TextWrapping = TextWrapping.Wrap };
+            var dialog = new ContentDialog { Title = "Thêm ghi chú nhanh", Content = input, PrimaryButtonText = "Thêm", CloseButtonText = "Huỷ", DefaultButton = ContentDialogButton.Primary, XamlRoot = this.XamlRoot };
+
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(input.Text))
+            {
+                _quickNotes.Add(input.Text.Trim());
+                RenderQuickNotes();
+            }
+        }
+
+        private void RenderQuickNotes()
+        {
+            QuickNotesList.Children.Clear();
+            if (_quickNotes.Count == 0)
+            {
+                QuickNotesList.Children.Add(new TextBlock { Text = "Chưa có ghi chú nhanh", FontSize = 12, Foreground = new SolidColorBrush(HexToColor("#94A3B8")) });
+                return;
+            }
+            foreach (var note in _quickNotes)
+            {
+                var row = new Border { Background = new SolidColorBrush(Colors.White), CornerRadius = new CornerRadius(8), BorderBrush = new SolidColorBrush(HexToColor("#F1F5F9")), BorderThickness = new Thickness(1, 1, 1, 1), Padding = new Thickness(10, 8, 10, 8) };
+                var sp = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+                sp.Children.Add(new FontIcon { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\uE73E", FontSize = 12, Foreground = new SolidColorBrush(HexToColor("#0059BB")), VerticalAlignment = VerticalAlignment.Center });
+                sp.Children.Add(new TextBlock { Text = note, FontSize = 12, TextWrapping = TextWrapping.Wrap, Foreground = new SolidColorBrush(HexToColor("#1E293B")), VerticalAlignment = VerticalAlignment.Center });
+                row.Child = sp;
+                QuickNotesList.Children.Add(row);
+            }
+        }
+
+        private void BtnAddMedicine_Click(object sender, RoutedEventArgs e) { /* Picker DB Logic logic here */ }
+
+        private async void BtnSaveNotes_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var client = Healthcare.Client.SupabaseIntegration.SupabaseManager.Instance.Client;
+                var record = new MedicalRecord {
+                    Id = Guid.NewGuid().ToString(),
+                    AppointmentId = _appointmentId,
+                    DoctorId = _currentUserId,
+                    PatientId = _patientId,
+                    Diagnosis = DiagnosisBox.Text ?? string.Empty,
+                    PrescriptionImageUrl = string.Empty,
+                    AiMedicines = string.Join(" | ", _quickNotes),
+                    CreatedAt = DateTime.Now
+                };
+                await client.From<MedicalRecord>().Insert(record);
+                await new ContentDialog { Title = "Đã lưu", Content = "Ghi chú khám bệnh đã được lưu.", CloseButtonText = "Đóng", XamlRoot = this.XamlRoot }.ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                await new ContentDialog { Title = "Lỗi", Content = "Không lưu được ghi chú: " + ex.Message, CloseButtonText = "Đóng", XamlRoot = this.XamlRoot }.ShowAsync();
+            }
         }
 
         private async void BtnFinish_Click(object sender, RoutedEventArgs e)
@@ -251,16 +316,16 @@ namespace Healthcare.Client.UI.Doctor
                 try
                 {
                     var client = Healthcare.Client.SupabaseIntegration.SupabaseManager.Instance.Client;
-                    var (diagnosis, quickNotes) = Chat.GetNotes();
-
-                    // 1. Tạo hoặc cập nhật MedicalRecord
+                    
+                    // 1. Lưu hồ sơ bệnh án
                     var medicalRecord = new MedicalRecord
                     {
+                        Id = Guid.NewGuid().ToString(),
                         AppointmentId = _appointmentId,
                         PatientId = _patientId,
                         DoctorId = _currentUserId,
-                        Diagnosis = diagnosis,
-                        AiMedicines = string.Join(", ", quickNotes), // Chuyển List<string> sang string
+                        Diagnosis = DiagnosisBox.Text ?? string.Empty,
+                        AiMedicines = string.Join(" | ", _quickNotes),
                         CreatedAt = DateTime.Now
                     };
 
