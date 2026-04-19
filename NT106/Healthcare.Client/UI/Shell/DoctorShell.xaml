@@ -112,7 +112,8 @@
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <PersonPicture x:Name="DoctorAvatar"
                                        Width="40" Height="40"
-                                       DisplayName="Dr. Minh Tâm"/>
+                                       DisplayName="Dr. Minh Tâm"
+                                       Background="#F1F5F9"/>
                         <StackPanel VerticalAlignment="Center" Spacing="2">
                             <TextBlock x:Name="TxtDoctorName"
                                        Text="Dr. Minh Tâm"

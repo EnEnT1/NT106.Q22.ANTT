@@ -67,7 +67,7 @@
             <NavigationView.PaneHeader>
                 <Border Padding="12,12,12,20" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Margin="0,0,0,8">
                     <StackPanel Orientation="Horizontal" Spacing="12">
-                        <PersonPicture x:Name="PatientAvatar" Width="40" Height="40"/>
+                        <PersonPicture x:Name="PatientAvatar" Width="40" Height="40" Background="#F1F5F9"/>
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock x:Name="TxtPatientName" Text="Bệnh nhân" FontSize="14" FontWeight="SemiBold"/>
                             <TextBlock Text="Thành viên hạng Vàng" FontSize="10" Foreground="#64748B"/>
