@@ -1,0 +1,363 @@
+<Page
+    x:Class="Healthcare.Client.UI.Doctor.AppointmentDetailPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:components="using:Healthcare.Client.UI.Components"
+    mc:Ignorable="d"
+    Background="#F8FAFC">
+
+    <Page.Resources>
+        <ThemeShadow x:Name="SharedShadow"/>
+    </Page.Resources>
+
+    <Grid x:Name="RootGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="MainColumn" Width="*"/>
+            <ColumnDefinition x:Name="ChatColumn" Width="0"/>
+        </Grid.ColumnDefinitions>
+
+        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="24" Padding="24" HorizontalAlignment="Stretch">
+                
+                <!-- Breadcrumb & Back -->
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <Button Click="BtnBack_Click" Background="Transparent" Padding="4" CornerRadius="20" VerticalAlignment="Center" Margin="-8,0,4,0">
+                        <FontIcon Glyph="&#xE72B;" FontSize="20" Foreground="#64748B" FontFamily="Segoe MDL2 Assets"/>
+                    </Button>
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <TextBlock Text="Lịch trực" Foreground="#64748B" FontSize="12" Tapped="Breadcrumb_Tapped"/>
+                        <FontIcon Glyph="&#xE72A;" FontSize="10" Foreground="#94A3B8"/>
+                        <TextBlock Text="Chi tiết cuộc khám" Foreground="#0284C7" FontSize="12" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Header Section -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Spacing="4">
+                        <TextBlock x:Name="ApptIdText" FontSize="11" Foreground="#475569" FontWeight="Bold" CharacterSpacing="50"/>
+                        <StackPanel Orientation="Horizontal" Spacing="0">
+                            <TextBlock x:Name="PatientNameTitleText" FontSize="32" FontWeight="Bold" Foreground="#0369A1" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock x:Name="PatientEmailText" FontSize="16" Foreground="#64748B"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                        <Button x:Name="BtnTopApprove" Content="Duyệt lịch" Click="BtnApprove_Click" Padding="20,8" Background="#0284C7" Foreground="White" FontWeight="SemiBold" CornerRadius="8" Visibility="Collapsed"/>
+                        <Button x:Name="BtnTopCancel" Content="Hủy lịch" Click="BtnCancel_Click" Padding="20,8" Background="White" BorderBrush="#EF4444" BorderThickness="1" Foreground="#EF4444" FontWeight="SemiBold" CornerRadius="8"/>
+                        <Button x:Name="BtnTopVideoCall" Content="Vào phòng khám" Click="BtnVideoCall_Click" Padding="20,8" Background="#0284C7" Foreground="White" FontWeight="SemiBold" CornerRadius="8" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Main Layout -->
+                <Grid ColumnSpacing="24">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="6.5*"/>
+                        <ColumnDefinition Width="3.5*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left Column -->
+                    <StackPanel Spacing="24">
+                        
+                        <!-- Appointment Info Card -->
+                        <Border Background="White" CornerRadius="16" Padding="28" BorderBrush="#F1F5F9" BorderThickness="1">
+                            <StackPanel Spacing="24">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Border Background="#F0F9FF" CornerRadius="6" Padding="6">
+                                        <FontIcon Glyph="&#xE787;" FontSize="16" Foreground="#0284C7"/>
+                                    </Border>
+                                    <TextBlock Text="Thông tin lịch hẹn" FontWeight="Bold" FontSize="16" Foreground="#1E293B" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Spacing="20">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <FontIcon Glyph="&#xE787;" FontSize="16" Foreground="#94A3B8" Margin="0,4,16,0" VerticalAlignment="Top"/>
+                                        <StackPanel Grid.Column="1" Spacing="2">
+                                            <TextBlock Text="THỜI GIAN DỰ KIẾN" FontSize="10" Foreground="#64748B" FontWeight="Bold"/>
+                                            <TextBlock x:Name="DateText" FontSize="15" FontWeight="Bold" Foreground="#1E293B"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <TextBlock x:Name="TimeText" FontSize="12" Foreground="#64748B"/>
+                                                <TextBlock Text="-" FontSize="12" Foreground="#64748B"/>
+                                                <TextBlock x:Name="EndTimeText" FontSize="12" Foreground="#64748B"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <FontIcon Glyph="&#xE8A3;" FontSize="16" Foreground="#94A3B8" Margin="0,0,16,0" VerticalAlignment="Center"/>
+                                        <StackPanel Grid.Column="1" Spacing="2">
+                                            <TextBlock Text="PHÒNG / MÃ PHÒNG KHÁM" FontSize="10" Foreground="#64748B" FontWeight="Bold"/>
+                                            <TextBlock x:Name="RoomCodeText" FontSize="15" FontWeight="Bold" Foreground="#0284C7"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <FontIcon Glyph="&#xE70F;" FontSize="16" Foreground="#94A3B8" Margin="0,0,16,0" VerticalAlignment="Center"/>
+                                        <StackPanel Grid.Column="1" Spacing="2">
+                                            <TextBlock Text="HÌNH THỨC KHÁM" FontSize="10" Foreground="#64748B" FontWeight="Bold"/>
+                                            <Border x:Name="TypeBadge" HorizontalAlignment="Left" CornerRadius="12" Padding="12,4">
+                                                <TextBlock x:Name="TypeText" FontSize="10" FontWeight="Bold" Foreground="White" CharacterSpacing="50"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Clinical Notes Card -->
+                        <Border Background="White" CornerRadius="16" Padding="32" BorderBrush="#F1F5F9" BorderThickness="1">
+                            <StackPanel Spacing="24">
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <Border Background="#F0F9FF" CornerRadius="6" Padding="6">
+                                            <FontIcon Glyph="&#xE8C4;" FontSize="16" Foreground="#0284C7"/>
+                                        </Border>
+                                        <TextBlock Text="Ghi chú lâm sàng" FontWeight="Bold" FontSize="20" Foreground="#1E293B" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    
+                                    <Button HorizontalAlignment="Right" Click="BtnExamine_Click" Background="Transparent" Padding="8,4">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <FontIcon Glyph="&#xE70F;" FontSize="12" Foreground="#0284C7"/>
+                                            <TextBlock Text="Chỉnh sửa" FontSize="13" Foreground="#0284C7" FontWeight="Bold"/>
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+
+                                <!-- Note Body -->
+                                <Border Background="#F8FAFC" CornerRadius="12" Padding="24" BorderThickness="4,0,0,0" BorderBrush="#3B82F6">
+                                    <StackPanel Spacing="12">
+                                        <Grid>
+                                            <TextBlock Text="ĐÁNH GIÁ Y KHOA" FontSize="11" Foreground="#475569" FontWeight="Bold"/>
+                                            <TextBlock x:Name="NoteDateText" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Right"/>
+                                        </Grid>
+                                        <TextBlock x:Name="DiagnosisText" Text="Bác sĩ chưa có ghi chú cho cuộc khám này." TextWrapping="Wrap" FontSize="14" FontStyle="Italic" Foreground="#475569" LineHeight="24"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Tags -->
+                                <Grid ColumnSpacing="16">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <Border Background="#F8FAFC" CornerRadius="8" Padding="12,8" BorderBrush="#E2E8F0" BorderThickness="1">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <FontIcon Glyph="&#xE950;" FontSize="14" Foreground="#0284C7"/>
+                                            <StackPanel Spacing="2">
+                                                <TextBlock Text="ĐƠN THUỐC ĐÃ KÊ" FontSize="9" Foreground="#64748B" FontWeight="Bold"/>
+                                                <TextBlock x:Name="MedicineText" Text="Chưa có" FontSize="13" Foreground="#1E293B" FontWeight="SemiBold"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="1" Background="#F8FAFC" CornerRadius="8" Padding="12,8" BorderBrush="#E2E8F0" BorderThickness="1">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <FontIcon Glyph="&#xE787;" FontSize="14" Foreground="#0284C7"/>
+                                            <StackPanel Spacing="2">
+                                                <TextBlock Text="YÊU CẦU TÁI KHÁM" FontSize="9" Foreground="#64748B" FontWeight="Bold"/>
+                                                <TextBlock Text="Theo chỉ định" FontSize="13" Foreground="#1E293B" FontWeight="SemiBold"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Interactive Section (Chat/Call) -->
+                        <Border Background="White" CornerRadius="16" Padding="28" BorderBrush="#F1F5F9" BorderThickness="1">
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="Tương tác" FontWeight="Bold" FontSize="16" Foreground="#1E293B"/>
+                                <Grid ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Click="BtnChat_Click" HorizontalAlignment="Stretch" Padding="12" Background="#F0F9FF" BorderBrush="#BAE6FD" BorderThickness="1" CornerRadius="8">
+                                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                            <FontIcon Glyph="&#xE8BD;" FontSize="16" Foreground="#0284C7" FontFamily="Segoe MDL2 Assets"/>
+                                            <TextBlock Text="Nhắn tin" FontWeight="SemiBold" Foreground="#0284C7"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button x:Name="BtnCallAction" Grid.Column="1" Click="BtnVideoCall_Click" HorizontalAlignment="Stretch" Padding="12" Background="#F0FDF4" BorderBrush="#BBF7D0" BorderThickness="1" CornerRadius="8">
+                                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                            <FontIcon Glyph="&#xE717;" FontSize="16" Foreground="#16A34A" FontFamily="Segoe MDL2 Assets"/>
+                                            <TextBlock x:Name="CallBtnLabel" Text="Gọi Video" FontWeight="SemiBold" Foreground="#16A34A"/>
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+
+                    <!-- Right Column -->
+                    <StackPanel Grid.Column="1" Spacing="24">
+                        
+                        <!-- Profile Card -->
+                        <Border Background="White" CornerRadius="16" Padding="32" BorderBrush="#F1F5F9" BorderThickness="1">
+                            <StackPanel Spacing="24">
+                                <Grid Height="120" Width="120" HorizontalAlignment="Center">
+                                    <Border x:Name="AvatarPlaceholder" CornerRadius="60" Background="#94A3B8">
+                                        <TextBlock x:Name="AvatarInitials" Text="BA" FontSize="40" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" CharacterSpacing="50"/>
+                                    </Border>
+                                    <Ellipse x:Name="AvatarContainer" Visibility="Collapsed">
+                                        <Ellipse.Fill>
+                                            <ImageBrush x:Name="PatientAvatarBrush" Stretch="UniformToFill"/>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                    <Border Width="28" Height="28" CornerRadius="14" Background="#0284C7" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,8" BorderBrush="White" BorderThickness="3">
+                                        <FontIcon Glyph="&#xE73E;" FontSize="10" Foreground="White"/>
+                                    </Border>
+                                </Grid>
+
+                                <StackPanel Spacing="8" HorizontalAlignment="Center">
+                                    <Border x:Name="StatusBadge" CornerRadius="12" Padding="16,4" Background="#94A3B8" HorizontalAlignment="Center">
+                                        <TextBlock x:Name="StatusText" Text="..." FontSize="10" FontWeight="Bold" Foreground="White"/>
+                                    </Border>
+                                    <TextBlock x:Name="ProfileNameText" FontSize="20" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center" TextAlignment="Center"/>
+                                </StackPanel>
+
+                                <Rectangle Height="1" Fill="#F1F5F9" Margin="0,8"/>
+
+                                <StackPanel Spacing="16">
+                                    <Grid>
+                                        <TextBlock Text="Giới tính" Foreground="#64748B" FontSize="13"/>
+                                        <TextBlock x:Name="GenderText" Text="--" Foreground="#1E293B" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <Grid>
+                                        <TextBlock Text="Tuổi" Foreground="#64748B" FontSize="13"/>
+                                        <TextBlock x:Name="AgeText" Text="--" Foreground="#1E293B" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <Grid>
+                                        <TextBlock Text="Nhóm máu" Foreground="#64748B" FontSize="13"/>
+                                        <TextBlock x:Name="BloodTypeText" Text="--" Foreground="#B91C1C" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <Grid>
+                                        <TextBlock Text="Lần khám cuối" Foreground="#64748B" FontSize="13"/>
+                                        <TextBlock x:Name="LastVisitText" Text="Chưa có" Foreground="#1E293B" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                </StackPanel>
+
+                                <Button Click="BtnHistory_Click" HorizontalAlignment="Stretch" Padding="12" Background="Transparent" BorderBrush="#E2E8F0" BorderThickness="1" Foreground="#334155" CornerRadius="8">
+                                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                        <FontIcon Glyph="&#xE81C;" FontSize="14" FontFamily="Segoe MDL2 Assets"/>
+                                        <TextBlock Text="Xem bệnh sử chi tiết" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Timeline Card -->
+                        <Border Background="White" CornerRadius="16" Padding="28" BorderBrush="#F1F5F9" BorderThickness="1">
+                            <StackPanel Spacing="24">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Border Background="#F1F5F9" CornerRadius="6" Padding="6">
+                                        <FontIcon Glyph="&#xE81C;" FontSize="16" Foreground="#475569"/>
+                                    </Border>
+                                    <TextBlock Text="Lịch trình lịch hẹn" FontWeight="Bold" FontSize="16" Foreground="#1E293B" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <!-- Timeline Items -->
+                                <StackPanel Spacing="0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Width="24" HorizontalAlignment="Center" Margin="0,4,16,0">
+                                            <Ellipse Width="24" Height="24" Fill="#0284C7"/>
+                                            <FontIcon Glyph="&#xE73E;" FontSize="10" Foreground="White" Margin="0,-17,0,0"/>
+                                            <Rectangle Width="2" Height="38" Fill="#E2E8F0" Margin="0,4,0,0"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="4">
+                                            <TextBlock Text="Đã đăng ký" FontSize="13" FontWeight="Bold" Foreground="#1E293B"/>
+                                            <TextBlock x:Name="TimelineBookedTime" Text="--" FontSize="11" Foreground="#64748B"/>
+                                            <TextBlock Text="Bởi hệ thống đặt lịch" FontSize="11" FontStyle="Italic" Foreground="#94A3B8"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid Margin="0,16,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Width="24" HorizontalAlignment="Center" Margin="0,4,16,0">
+                                            <Ellipse Width="24" Height="24" Fill="#F1F5F9"/>
+                                            <FontIcon Glyph="&#xE814;" FontSize="10" Foreground="#64748B" Margin="0,-17,0,0"/>
+                                            <Rectangle Width="2" Height="38" Fill="#E2E8F0" Margin="0,4,0,0"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="4">
+                                            <TextBlock Text="Gửi nhắc nhở" FontSize="13" FontWeight="Bold" Foreground="#1E293B"/>
+                                            <TextBlock Text="Tự động" FontSize="11" Foreground="#64748B"/>
+                                            <TextBlock Text="Email &amp; Thông báo ứng dụng" FontSize="11" FontStyle="Italic" Foreground="#94A3B8"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid Margin="0,16,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Width="24" HorizontalAlignment="Center" Margin="0,4,16,0">
+                                            <Ellipse x:Name="TimelineEndIconBg" Width="24" Height="24" Fill="#94A3B8"/>
+                                            <FontIcon x:Name="TimelineEndIcon" Glyph="&#xE814;" FontSize="10" Foreground="White" Margin="0,-17,0,0"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="4">
+                                            <TextBlock x:Name="TimelineEndTitle" Text="..." FontSize="13" FontWeight="Bold" Foreground="#475569"/>
+                                            <TextBlock x:Name="TimelineEndTime" Text="--" FontSize="11" Foreground="#64748B"/>
+                                            <Border x:Name="TimelineEndReason" Background="#FEF2F2" CornerRadius="6" Padding="12,8" Margin="0,4,0,0" Visibility="Collapsed">
+                                                <TextBlock x:Name="TimelineEndReasonText" Text="--" FontSize="11" FontStyle="Italic" Foreground="#9F1239" TextWrapping="Wrap"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+
+                    </StackPanel>
+                </Grid>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Right Side Chat Panel -->
+        <Border Grid.Column="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1,0,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Chat Header with Close Button -->
+                <Grid Background="#F8FAFC" Padding="16,12" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
+                    <TextBlock Text="Tin nhắn" FontWeight="Bold" VerticalAlignment="Center" Foreground="#1E293B"/>
+                    <Button HorizontalAlignment="Right" Click="BtnCloseChat_Click" Background="Transparent" Padding="4" CornerRadius="4">
+                        <FontIcon Glyph="&#xE8BB;" FontSize="14" Foreground="#64748B" FontFamily="Segoe MDL2 Assets"/>
+                    </Button>
+                </Grid>
+
+                <components:ChatControl x:Name="ChatPane" Grid.Row="1" Visibility="Collapsed"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

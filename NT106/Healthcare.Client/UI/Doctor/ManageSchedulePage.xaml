@@ -34,7 +34,8 @@
                 CornerRadius="12" 
                 Padding="14" 
                 Margin="0,0,0,10" 
-                Background="{x:Bind BgBrush}">
+                Background="{x:Bind BgBrush}"
+                Tapped="AppointmentCard_Tapped">
                 <Border.BorderThickness>1</Border.BorderThickness>
                 <Border.BorderBrush>
                     <SolidColorBrush Color="{x:Bind BorderColorCode}"/>
@@ -65,76 +66,34 @@
                             Foreground="{x:Bind TagBgBrush}"/>
                     </Grid>
 
-                    <TextBlock 
-                        Text="{x:Bind Time}" 
-                        FontSize="14" 
-                        FontWeight="Bold"/>
-                    <TextBlock 
-                        Text="{x:Bind PatientName}" 
-                        FontSize="12" 
-                        Foreground="{StaticResource SecondaryBrush}" 
-                        FontWeight="SemiBold"/>
-
-                    <StackPanel Spacing="4" Margin="0,6,0,0">
-                        <Grid ColumnSpacing="4" Visibility="{x:Bind IsPending}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Button 
-                                Grid.Column="0" 
-                                Content="Duyệt" 
-                                Background="#2E7D32" 
-                                Foreground="White" 
-                                HorizontalAlignment="Stretch" 
-                                CornerRadius="6" 
-                                FontSize="11" 
-                                FontWeight="Bold" 
-                                Padding="0,6" 
-                                CommandParameter="{x:Bind Id}" 
-                                Click="BtnApprove_Click"/>
-                            <Button 
-                                Grid.Column="1" 
-                                Content="Hủy" 
-                                Background="#BA1A1A" 
-                                Foreground="White" 
-                                HorizontalAlignment="Stretch" 
-                                CornerRadius="6" 
-                                FontSize="11" 
-                                FontWeight="Bold" 
-                                Padding="0,6" 
-                                CommandParameter="{x:Bind Id}" 
-                                Click="BtnCancel_Click"/>
-                        </Grid>
-
-                        <Button 
-                            Content=" Gọi Video" 
-                            FontFamily="Segoe MDL2 Assets" 
-                            Background="{StaticResource PrimaryBrush}" 
-                            Foreground="White" 
-                            HorizontalAlignment="Stretch" 
-                            CornerRadius="6" 
-                            FontSize="11" 
-                            FontWeight="Bold" 
-                            Padding="0,6" 
-                            Visibility="{x:Bind IsConfirmed}" 
-                            CommandParameter="{x:Bind PatientId}" 
-                            Click="BtnVideoCall_Click"/>
-                        <Button 
-                            Content="📝 Nhập bệnh án" 
-                            Background="White" 
-                            Foreground="{StaticResource PrimaryBrush}" 
-                            BorderBrush="{StaticResource PrimaryBrush}" 
-                            BorderThickness="1" 
-                            HorizontalAlignment="Stretch" 
-                            CornerRadius="6" 
-                            FontSize="11" 
-                            FontWeight="Bold" 
-                            Padding="0,6" 
-                            Visibility="{x:Bind IsConfirmed}" 
-                            CommandParameter="{x:Bind Id}" 
-                            Click="BtnExamine_Click"/>
+                    <StackPanel Spacing="2">
+                        <TextBlock 
+                            Text="{x:Bind Time}" 
+                            FontSize="14" 
+                            FontWeight="Bold"/>
+                        <TextBlock 
+                            Text="{x:Bind PatientName}" 
+                            FontSize="12" 
+                            Foreground="{StaticResource SecondaryBrush}" 
+                            FontWeight="SemiBold"/>
                     </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,2,0,0">
+                        <Border Background="{x:Bind TypeBgBrush}" 
+                                CornerRadius="4" 
+                                Padding="4,1">
+                            <TextBlock Text="{x:Bind TypeText}" FontSize="9" Foreground="White" FontWeight="Bold"/>
+                        </Border>
+                        <Border Background="#F1F5F9" 
+                                CornerRadius="4" 
+                                Padding="4,1"
+                                BorderBrush="#E2E8F0"
+                                BorderThickness="1">
+                            <TextBlock Text="{x:Bind PaymentText}" FontSize="9" Foreground="#475569" FontWeight="SemiBold"/>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Actions removed - handle in Detail page -->
                 </StackPanel>
             </Border>
         </DataTemplate>
@@ -367,22 +326,38 @@
                 HorizontalAlignment="Left">
                 <StackPanel Orientation="Horizontal" Spacing="2">
                     <Button 
+                        x:Name="ListTabButton" 
+                        Click="ListTab_Click" 
+                        Style="{StaticResource TabButtonStyle}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon 
+                                x:Name="ListTabIcon"
+                                Glyph="&#xE8FD;" 
+                                FontSize="14" 
+                                Foreground="{StaticResource SecondaryBrush}"/>
+                            <TextBlock 
+                                x:Name="ListTabLabel"
+                                Text="Dạng danh sách" 
+                                Foreground="{StaticResource SecondaryBrush}" 
+                                FontWeight="SemiBold" 
+                                FontSize="13"/>
+                        </StackPanel>
+                    </Button>
+                    <Button 
                         x:Name="WeekTabButton" 
                         Click="WeekTab_Click" 
-                        Style="{StaticResource TabButtonStyle}">
-                        <Button.RenderTransform>
-                            <CompositeTransform x:Name="WeekTabTransform"/>
-                        </Button.RenderTransform>
+                        Style="{StaticResource TabButtonStyle}"
+                        Background="{StaticResource PrimaryBrush}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <FontIcon 
                                 x:Name="WeekTabIcon"
                                 Glyph="&#xE8BF;" 
                                 FontSize="14" 
-                                Foreground="{StaticResource PrimaryBrush}"/>
+                                Foreground="White"/>
                             <TextBlock 
                                 x:Name="WeekTabLabel"
                                 Text="Xem theo tuần" 
-                                Foreground="{StaticResource PrimaryBrush}" 
+                                Foreground="White" 
                                 FontWeight="Bold" 
                                 FontSize="13"/>
                         </StackPanel>
@@ -391,9 +366,6 @@
                         x:Name="MonthTabButton" 
                         Click="MonthTab_Click" 
                         Style="{StaticResource TabButtonStyle}">
-                        <Button.RenderTransform>
-                            <CompositeTransform x:Name="MonthTabTransform"/>
-                        </Button.RenderTransform>
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <FontIcon 
                                 x:Name="MonthTabIcon"
@@ -738,6 +710,70 @@
                             <RowDefinition Height="100"/>
                         </Grid.RowDefinitions>
                     </Grid>
+                </Border>
+            </StackPanel>
+            
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- LIST VIEW PANEL                                         -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <StackPanel x:Name="ListViewPanel" Visibility="Collapsed">
+                <Border Background="White" CornerRadius="16" BorderBrush="#E5E7EB" BorderThickness="1" Padding="8">
+                    <ListView x:Name="AllAppointmentsListView"
+                              ItemsSource="{x:Bind AllAppointmentsListVM}"
+                              SelectionMode="None">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Padding" Value="16,12"/>
+                                <Setter Property="BorderBrush" Value="#F3F4F6"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.Header>
+                            <Grid Padding="16,4,16,12" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="100"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="THỜI GIAN" FontSize="10" FontWeight="Bold" Foreground="#6B7280" CharacterSpacing="50"/>
+                                <TextBlock Grid.Column="1" Text="BỆNH NHÂN" FontSize="10" FontWeight="Bold" Foreground="#6B7280" CharacterSpacing="50"/>
+                                <TextBlock Grid.Column="2" Text="HÌNH THỨC" FontSize="10" FontWeight="Bold" Foreground="#6B7280" CharacterSpacing="50"/>
+                                <TextBlock Grid.Column="3" Text="THANH TOÁN" FontSize="10" FontWeight="Bold" Foreground="#6B7280" CharacterSpacing="50"/>
+                                <TextBlock Grid.Column="4" Text="TRẠNG THÁI" FontSize="10" FontWeight="Bold" Foreground="#6B7280" CharacterSpacing="50"/>
+                            </Grid>
+                        </ListView.Header>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="local:AppointmentViewModel">
+                                <Grid Tapped="AppointmentCard_Tapped" Background="Transparent">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="140"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="120"/>
+                                        <ColumnDefinition Width="120"/>
+                                        <ColumnDefinition Width="100"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="{x:Bind Time}" FontWeight="Bold" FontSize="15" Foreground="#111827"/>
+                                        <TextBlock Text="{x:Bind DateFormatted}" FontSize="12" Foreground="#6B7280"/>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Column="1" Text="{x:Bind PatientName}" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14" Foreground="#111827"/>
+
+                                    <Border Grid.Column="2" Background="{x:Bind TypeBgBrush}" CornerRadius="6" Padding="8,3" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                        <TextBlock Text="{x:Bind TypeText}" FontSize="10" Foreground="White" FontWeight="Bold"/>
+                                    </Border>
+
+                                    <TextBlock Grid.Column="3" Text="{x:Bind PaymentText}" VerticalAlignment="Center" FontSize="13" Foreground="#4B5563"/>
+
+                                    <TextBlock Grid.Column="4" Text="{x:Bind StatusText}" VerticalAlignment="Center" Foreground="{x:Bind TagBgBrush}" FontSize="12" FontWeight="Bold"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
                 </Border>
             </StackPanel>
         </StackPanel>

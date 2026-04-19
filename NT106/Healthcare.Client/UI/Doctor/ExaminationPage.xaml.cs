@@ -225,9 +225,13 @@ namespace Healthcare.Client.UI.Doctor
             await VideoCall.StartCallAsync();
         }
 
-        private void Chat_NotesSaved(object sender, MedicalNotesSavedEventArgs e)
+        private async void Chat_NotesSaved(object sender, MedicalNotesSavedEventArgs e)
         {
-            // Có thể dùng e.Diagnosis và e.QuickNotes để cập nhật UI sau này :v chỗ này cũng chưa ro
+            // Hiển thị thông báo lưu thành công trên App (như một Notification nhỏ hoặc cập nhật Status)
+            System.Diagnostics.Debug.WriteLine($"Notes saved: {e.Diagnosis}");
+            
+            // Bạn có thể hiển thị một thông báo nhẹ nhàng ở góc màn hình hoặc trong Chat
+            // Ở đây tôi ví dụ hiển thị một ContentDialog nhỏ (tùy chọn) hoặc đơn giản là cập nhật UI nếu cần
         }
 
         private async void BtnFinish_Click(object sender, RoutedEventArgs e)
@@ -244,16 +248,46 @@ namespace Healthcare.Client.UI.Doctor
 
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)
             {
-                var (diagnosis, quickNotes) = Chat.GetNotes();
+                try
+                {
+                    var client = Healthcare.Client.SupabaseIntegration.SupabaseManager.Instance.Client;
+                    var (diagnosis, quickNotes) = Chat.GetNotes();
 
-                // TODO:
-                // - lưu MedicalRecord thật
-                // - cập nhật Appointment status = completed
+                    // 1. Tạo hoặc cập nhật MedicalRecord
+                    var medicalRecord = new MedicalRecord
+                    {
+                        AppointmentId = _appointmentId,
+                        PatientId = _patientId,
+                        DoctorId = _currentUserId,
+                        Diagnosis = diagnosis,
+                        AiMedicines = string.Join(", ", quickNotes), // Chuyển List<string> sang string
+                        CreatedAt = DateTime.Now
+                    };
 
-                VideoCall.Cleanup();
-                Chat.Cleanup();
+                    await client.From<MedicalRecord>().Insert(medicalRecord);
 
-                // TODO: Frame.Navigate(typeof(DoctorHomePage));
+                    // 2. Cập nhật Appointment status = Completed
+                    await client.From<Appointment>()
+                        .Where(x => x.Id == _appointmentId)
+                        .Set(x => x.Status, "Completed")
+                        .Update();
+
+                    VideoCall.Cleanup();
+                    Chat.Cleanup();
+
+                    // Quay về trang chủ bác sĩ
+                    Frame.Navigate(typeof(ManageSchedulePage)); 
+                }
+                catch (Exception ex)
+                {
+                    await new ContentDialog
+                    {
+                        Title = "Lỗi lưu dữ liệu",
+                        Content = $"Không thể lưu kết quả khám: {ex.Message}",
+                        CloseButtonText = "Đóng",
+                        XamlRoot = this.XamlRoot
+                    }.ShowAsync();
+                }
             }
         }
 

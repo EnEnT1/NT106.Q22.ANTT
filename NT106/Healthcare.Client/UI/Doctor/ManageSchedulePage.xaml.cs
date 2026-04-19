@@ -1,3 +1,4 @@
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -22,6 +23,9 @@ namespace Healthcare.Client.UI.Doctor
         private DateTime _currentWeekSunday;
         private DateTime _currentMonthDate;
         private List<Appointment> _allAppointments = new();
+        private List<Transaction> _allTransactions = new();
+        private List<User> _allPatients = new();
+        private DateTime? _filteredDate = null;
         private DispatcherTimer _realtimeTimer;
 
         public ObservableCollection<AppointmentViewModel> SundayList { get; } = new();
@@ -31,6 +35,7 @@ namespace Healthcare.Client.UI.Doctor
         public ObservableCollection<AppointmentViewModel> ThursdayList { get; } = new();
         public ObservableCollection<AppointmentViewModel> FridayList { get; } = new();
         public ObservableCollection<AppointmentViewModel> SaturdayList { get; } = new();
+        public ObservableCollection<AppointmentViewModel> AllAppointmentsListVM { get; } = new();
 
         public ManageSchedulePage()
         {
@@ -156,8 +161,24 @@ namespace Healthcare.Client.UI.Doctor
 
                 _allAppointments = response.Models ?? new List<Appointment>();
 
+                // Fetch Patients (Users) - Sử dụng Filter thay vì Where để tránh lỗi scope
+                var pIds = _allAppointments.Select(a => a.PatientId).Distinct().ToList();
+                if (pIds.Any())
+                {
+                    var uRes = await _supabase.From<User>()
+                        .Filter("id", Postgrest.Constants.Operator.In, pIds)
+                        .Get();
+                    _allPatients = uRes.Models ?? new List<User>();
+                }
+
+                var transResponse = await _supabase
+                    .From<Transaction>()
+                    .Get();
+                _allTransactions = transResponse.Models ?? new List<Transaction>();
+
                 RefreshWeekView();
                 RefreshMonthView();
+                RefreshListView();
             }
             catch (Exception ex)
             {
@@ -168,6 +189,25 @@ namespace Healthcare.Client.UI.Doctor
                     CloseButtonText = "Đóng",
                     XamlRoot = this.XamlRoot
                 }.ShowAsync();
+            }
+        }
+
+        private void RefreshListView()
+        {
+            AllAppointmentsListVM.Clear();
+            var query = _allAppointments.AsEnumerable();
+            
+            if (_filteredDate.HasValue)
+            {
+                query = query.Where(a => a.AppointmentDate.Date == _filteredDate.Value.Date);
+            }
+
+            var sorted = query.OrderBy(a => a.AppointmentDate).ThenBy(a => a.StartTime).ToList();
+            foreach (var appt in sorted)
+            {
+                var patient = _allPatients.FirstOrDefault(u => u.Id == appt.PatientId);
+                var trans = _allTransactions.FirstOrDefault(t => t.AppointmentId == appt.Id);
+                AllAppointmentsListVM.Add(new AppointmentViewModel(appt, patient?.FullName ?? "Bệnh nhân (ẩn danh)", trans?.PaymentMethod));
             }
         }
 
@@ -199,7 +239,9 @@ namespace Healthcare.Client.UI.Doctor
 
             foreach (var appt in weekAppts)
             {
-                var vm = new AppointmentViewModel(appt, "Bệnh nhân (ẩn danh)");
+                var patient = _allPatients.FirstOrDefault(u => u.Id == appt.PatientId);
+                var trans = _allTransactions.FirstOrDefault(t => t.AppointmentId == appt.Id);
+                var vm = new AppointmentViewModel(appt, patient?.FullName ?? "Bệnh nhân (ẩn danh)", trans?.PaymentMethod);
                 int dow = (int)appt.AppointmentDate.DayOfWeek;
 
                 if (dow == 0) SundayList.Add(vm);
@@ -280,6 +322,17 @@ namespace Healthcare.Client.UI.Doctor
                 }
 
                 cell.Child = sp;
+                
+                // Sự kiện khi nhấn vào ô ngày
+                cell.Tapped += (s, e) => {
+                    _filteredDate = cellDate;
+                    ListViewPanel.Visibility = Visibility.Visible;
+                    WeekViewPanel.Visibility = Visibility.Collapsed;
+                    MonthViewPanel.Visibility = Visibility.Collapsed;
+                    RefreshListView();
+                    UpdateTabStyles(ListTabButton);
+                };
+
                 Grid.SetRow(cell, row);
                 Grid.SetColumn(cell, col);
                 MonthCalendarGrid.Children.Add(cell);
@@ -344,42 +397,64 @@ namespace Healthcare.Client.UI.Doctor
             this.Frame.Navigate(typeof(ExaminationPage), apptId);
         }
 
+        private void AppointmentCard_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            var vm = (sender as FrameworkElement)?.DataContext as AppointmentViewModel;
+            if (vm != null)
+            {
+                this.Frame.Navigate(typeof(AppointmentDetailPage), vm.Id);
+            }
+        }
+
         private void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
             _ = LoadDataFromSupabase();
         }
 
+        private void ListTab_Click(object sender, RoutedEventArgs e)
+        {
+            _filteredDate = null; // Bấm trực tiếp vào tab Danh sách thì xóa lọc
+            ListViewPanel.Visibility = Visibility.Visible;
+            WeekViewPanel.Visibility = Visibility.Collapsed;
+            MonthViewPanel.Visibility = Visibility.Collapsed;
+            RefreshListView();
+
+            UpdateTabStyles(ListTabButton);
+        }
+
         private void WeekTab_Click(object sender, RoutedEventArgs e)
         {
+            ListViewPanel.Visibility = Visibility.Collapsed;
             WeekViewPanel.Visibility = Visibility.Visible;
             MonthViewPanel.Visibility = Visibility.Collapsed;
 
-            WeekTabButton.Background = new SolidColorBrush(Color.FromArgb(255, 0, 89, 187));
-            WeekTabIcon.Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
-            WeekTabLabel.Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
-            WeekTabLabel.FontWeight = Microsoft.UI.Text.FontWeights.Bold;
-
-            MonthTabButton.Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
-            MonthTabIcon.Foreground = new SolidColorBrush(Color.FromArgb(255, 70, 96, 127));
-            MonthTabLabel.Foreground = new SolidColorBrush(Color.FromArgb(255, 70, 96, 127));
-            MonthTabLabel.FontWeight = Microsoft.UI.Text.FontWeights.SemiBold;
+            UpdateTabStyles(WeekTabButton);
         }
 
         private void MonthTab_Click(object sender, RoutedEventArgs e)
         {
+            ListViewPanel.Visibility = Visibility.Collapsed;
             WeekViewPanel.Visibility = Visibility.Collapsed;
             MonthViewPanel.Visibility = Visibility.Visible;
             RefreshMonthView();
 
-            MonthTabButton.Background = new SolidColorBrush(Color.FromArgb(255, 0, 89, 187));
-            MonthTabIcon.Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
-            MonthTabLabel.Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
-            MonthTabLabel.FontWeight = Microsoft.UI.Text.FontWeights.Bold;
+            UpdateTabStyles(MonthTabButton);
+        }
 
-            WeekTabButton.Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
-            WeekTabIcon.Foreground = new SolidColorBrush(Color.FromArgb(255, 70, 96, 127));
-            WeekTabLabel.Foreground = new SolidColorBrush(Color.FromArgb(255, 70, 96, 127));
-            WeekTabLabel.FontWeight = Microsoft.UI.Text.FontWeights.SemiBold;
+        private void UpdateTabStyles(Button activeBtn)
+        {
+            var buttons = new[] { ListTabButton, WeekTabButton, MonthTabButton };
+            var icons = new[] { ListTabIcon, WeekTabIcon, MonthTabIcon };
+            var labels = new[] { ListTabLabel, WeekTabLabel, MonthTabLabel };
+
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                bool isActive = buttons[i] == activeBtn;
+                buttons[i].Background = new SolidColorBrush(isActive ? Color.FromArgb(255, 0, 89, 187) : Colors.Transparent);
+                icons[i].Foreground = new SolidColorBrush(isActive ? Colors.White : Color.FromArgb(255, 70, 96, 127));
+                labels[i].Foreground = new SolidColorBrush(isActive ? Colors.White : Color.FromArgb(255, 70, 96, 127));
+                labels[i].FontWeight = isActive ? Microsoft.UI.Text.FontWeights.Bold : Microsoft.UI.Text.FontWeights.SemiBold;
+            }
         }
 
         private void PrevWeek_Click(object sender, RoutedEventArgs e)
@@ -417,6 +492,7 @@ namespace Healthcare.Client.UI.Doctor
 
         public Visibility IsPending => BaseStatus == "Pending" ? Visibility.Visible : Visibility.Collapsed;
         public Visibility IsConfirmed => BaseStatus == "Confirmed" ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility IsOnlineCallVisible => (BaseStatus == "Confirmed" && TypeText == "Online") ? Visibility.Visible : Visibility.Collapsed;
 
         public SolidColorBrush BgBrush => new SolidColorBrush(
             BaseStatus == "Pending"
@@ -428,19 +504,39 @@ namespace Healthcare.Client.UI.Doctor
             : Color.FromArgb(255, 191, 217, 253);
 
         public SolidColorBrush TagBgBrush => new SolidColorBrush(
-            BaseStatus == "Pending"
-                ? Color.FromArgb(255, 255, 179, 0)
-                : Color.FromArgb(255, 0, 89, 187));
+            BaseStatus switch
+            {
+                "Pending" => Color.FromArgb(255, 255, 179, 0),    // Cam - Chờ duyệt
+                "Confirmed" => Color.FromArgb(255, 0, 89, 187),  // Lam - Sẵn sàng
+                "Completed" => Color.FromArgb(255, 5, 150, 105), // Xanh lá - Hoàn thành
+                "Cancelled" => Color.FromArgb(255, 220, 38, 38), // Đỏ - Đã hủy
+                _ => Color.FromArgb(255, 100, 116, 139)          // Xám - Khác
+            });
 
-        public string StatusText => BaseStatus == "Pending" ? "Chờ duyệt" : "Sẵn sàng";
+        public string StatusText => BaseStatus switch
+        {
+            "Pending" => "Chờ duyệt",
+            "Confirmed" => "Sẵn sàng",
+            "Completed" => "Đã hoàn thành",
+            "Cancelled" => "Đã hủy",
+            _ => "Không rõ"
+        };
+        public string TypeText { get; set; }
+        public string PaymentText { get; set; }
+        public string DateFormatted { get; set; }
+        public SolidColorBrush TypeBgBrush => new SolidColorBrush(
+            TypeText == "Online" ? Color.FromArgb(255, 124, 58, 237) : Color.FromArgb(255, 5, 150, 105));
 
-        public AppointmentViewModel(Appointment model, string name)
+        public AppointmentViewModel(Appointment model, string name, string paymentMethod = null)
         {
             Id = model.Id;
             PatientId = model.PatientId;
             PatientName = name;
-            Time = model.StartTime.ToString();
+            Time = model.StartTime.ToString(@"hh\:mm");
             BaseStatus = model.Status;
+            DateFormatted = model.AppointmentDate.ToString("dd/MM/yyyy");
+            TypeText = model.ExaminationType ?? "Offline";
+            PaymentText = paymentMethod == "Online" ? "Chuyển khoản" : (paymentMethod == "Manual" ? "Tại quầy" : "Chưa rõ");
         }
     }
 }
