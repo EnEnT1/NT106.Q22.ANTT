@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -69,9 +69,9 @@ namespace Healthcare.Client.UI.Patient
             LatestAppointmentStatusText.Text = "Trạng thái: Sắp tới";
         }
 
-        private async void BookAppointment_Click(object sender, RoutedEventArgs e)
+        private void BookAppointment_Click(object sender, RoutedEventArgs e)
         {
-            await ShowMessage("Đi tới trang Đặt lịch khám");
+            this.Frame.Navigate(typeof(BookAppointmentPage));
         }
 
         private async void MyRecords_Click(object sender, RoutedEventArgs e)
