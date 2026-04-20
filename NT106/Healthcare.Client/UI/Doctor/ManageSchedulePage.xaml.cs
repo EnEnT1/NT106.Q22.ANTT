@@ -38,6 +38,7 @@ namespace Healthcare.Client.UI.Doctor
         public ObservableCollection<AppointmentViewModel> FridayList { get; } = new();
         public ObservableCollection<AppointmentViewModel> SaturdayList { get; } = new();
         public ObservableCollection<AppointmentViewModel> AllAppointmentsListVM { get; } = new();
+        public ObservableCollection<SlotViewModel> DoctorSlotsList { get; } = new();
 
         public ManageSchedulePage()
         {
@@ -181,6 +182,7 @@ namespace Healthcare.Client.UI.Doctor
                 RefreshWeekView();
                 RefreshMonthView();
                 RefreshListView();
+                await LoadDoctorSlots();
             }
             catch (Exception ex)
             {
@@ -374,6 +376,7 @@ namespace Healthcare.Client.UI.Doctor
                     ListViewPanel.Visibility = Visibility.Visible;
                     WeekViewPanel.Visibility = Visibility.Collapsed;
                     MonthViewPanel.Visibility = Visibility.Collapsed;
+                    SlotManagementPanel.Visibility = Visibility.Collapsed;
                     RefreshListView();
                     UpdateTabStyles(ListTabButton);
                 };
@@ -463,6 +466,7 @@ namespace Healthcare.Client.UI.Doctor
             ListViewPanel.Visibility = Visibility.Visible;
             WeekViewPanel.Visibility = Visibility.Collapsed;
             MonthViewPanel.Visibility = Visibility.Collapsed;
+            SlotManagementPanel.Visibility = Visibility.Collapsed;
             RefreshListView();
 
             UpdateTabStyles(ListTabButton);
@@ -473,6 +477,7 @@ namespace Healthcare.Client.UI.Doctor
             ListViewPanel.Visibility = Visibility.Collapsed;
             WeekViewPanel.Visibility = Visibility.Visible;
             MonthViewPanel.Visibility = Visibility.Collapsed;
+            SlotManagementPanel.Visibility = Visibility.Collapsed;
 
             UpdateTabStyles(WeekTabButton);
         }
@@ -482,24 +487,169 @@ namespace Healthcare.Client.UI.Doctor
             ListViewPanel.Visibility = Visibility.Collapsed;
             WeekViewPanel.Visibility = Visibility.Collapsed;
             MonthViewPanel.Visibility = Visibility.Visible;
+            SlotManagementPanel.Visibility = Visibility.Collapsed;
             RefreshMonthView();
 
             UpdateTabStyles(MonthTabButton);
         }
 
+        private async void SlotTab_Click(object sender, RoutedEventArgs e)
+        {
+            ListViewPanel.Visibility = Visibility.Collapsed;
+            WeekViewPanel.Visibility = Visibility.Collapsed;
+            MonthViewPanel.Visibility = Visibility.Collapsed;
+            SlotManagementPanel.Visibility = Visibility.Visible;
+
+            await LoadDoctorSlots();
+            UpdateTabStyles(SlotTabButton);
+        }
+
+        private async Task LoadDoctorSlots()
+        {
+            if (SessionStorage.CurrentUser == null) return;
+
+            try
+            {
+                var response = await _supabase.From<TimeSlot>()
+                    .Where(x => x.DoctorId == SessionStorage.CurrentUser.Id)
+                    .Get();
+
+                var allSlots = response.Models ?? new List<TimeSlot>();
+                
+                // Filter by date if needed
+                if (FilterSlotDatePicker.Date != null)
+                {
+                    var filterDate = FilterSlotDatePicker.Date.DateTime.Date;
+                    allSlots = allSlots.Where(s => s.SlotDate.Date == filterDate).ToList();
+                }
+
+                DoctorSlotsList.Clear();
+                foreach (var s in allSlots.OrderBy(x => x.SlotDate).ThenBy(x => x.StartTime))
+                {
+                    DoctorSlotsList.Add(new SlotViewModel(s));
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log or show error
+            }
+        }
+
+        private async void BtnAutoCreateSlots_Click(object sender, RoutedEventArgs e)
+        {
+            if (SessionStorage.CurrentUser == null) return;
+
+            var date = NewSlotDatePicker.Date.DateTime.Date;
+            var start = NewSlotStartTime.Time;
+            var end = NewSlotEndTime.Time;
+            var duration = TimeSpan.FromMinutes(SlotDurationBox.Value);
+            var buffer = TimeSpan.FromMinutes(BufferDurationBox.Value);
+
+            if (end <= start)
+            {
+                await ShowMsg("Lỗi", "Giờ kết thúc phải sau giờ bắt đầu.");
+                return;
+            }
+
+            var slotsToCreate = new List<TimeSlot>();
+            var current = start;
+
+            while (current + duration <= end)
+            {
+                slotsToCreate.Add(new TimeSlot
+                {
+                    DoctorId = SessionStorage.CurrentUser.Id,
+                    SlotDate = date,
+                    StartTime = current,
+                    EndTime = current + duration,
+                    Status = "Available"
+                });
+                current += duration + buffer;
+            }
+
+            if (!slotsToCreate.Any())
+            {
+                await ShowMsg("Lỗi", "Không thể tạo khung giờ nào với thiết lập hiện tại.");
+                return;
+            }
+
+            try
+            {
+                await _supabase.From<TimeSlot>().Insert(slotsToCreate);
+                await ShowMsg("Thành công", $"Đã tạo {slotsToCreate.Count} khung giờ cho ngày {date:dd/MM/yyyy}");
+                await LoadDoctorSlots();
+            }
+            catch (Exception ex)
+            {
+                await ShowMsg("Lỗi", "Không thể tạo khung giờ: " + ex.Message);
+            }
+        }
+
+        private async void BtnDeleteSlot_Click(object sender, RoutedEventArgs e)
+        {
+            string id = (sender as Button)?.CommandParameter?.ToString();
+            if (string.IsNullOrEmpty(id)) return;
+
+            try
+            {
+                await _supabase.From<TimeSlot>().Where(x => x.Id == id).Delete();
+                await LoadDoctorSlots();
+            }
+            catch (Exception ex)
+            {
+                await ShowMsg("Lỗi", "Không thể xoá khung giờ: " + ex.Message);
+            }
+        }
+
+        private async void BtnDeleteAllAvailableSlots_Click(object sender, RoutedEventArgs e)
+        {
+            if (SessionStorage.CurrentUser == null) return;
+            var date = FilterSlotDatePicker.Date.DateTime.Date;
+
+            try
+            {
+                await _supabase.From<TimeSlot>()
+                    .Where(x => x.DoctorId == SessionStorage.CurrentUser.Id)
+                    .Where(x => x.SlotDate == date)
+                    .Where(x => x.Status == "Available")
+                    .Delete();
+                await LoadDoctorSlots();
+            }
+            catch (Exception ex)
+            {
+                await ShowMsg("Lỗi", "Không thể xoá: " + ex.Message);
+            }
+        }
+
+        private void FilterSlotDatePicker_DateChanged(object sender, DatePickerValueChangedEventArgs e)
+        {
+            _ = LoadDoctorSlots();
+        }
+
+        private async Task ShowMsg(string title, string content)
+        {
+            await new ContentDialog
+            {
+                Title = title,
+                Content = content,
+                CloseButtonText = "Đóng",
+                XamlRoot = this.XamlRoot
+            }.ShowAsync();
+        }
+
         private void UpdateTabStyles(Button activeBtn)
         {
-            var buttons = new[] { ListTabButton, WeekTabButton, MonthTabButton };
-            var icons = new[] { ListTabIcon, WeekTabIcon, MonthTabIcon };
-            var labels = new[] { ListTabLabel, WeekTabLabel, MonthTabLabel };
+            var buttons = new[] { ListTabButton, WeekTabButton, MonthTabButton, SlotTabButton };
+            var icons = new[] { ListTabIcon, WeekTabIcon, MonthTabIcon, SlotTabIcon };
+            var labels = new[] { ListTabLabel, WeekTabLabel, MonthTabLabel, SlotTabLabel };
 
             for (int i = 0; i < buttons.Length; i++)
             {
                 bool isActive = buttons[i] == activeBtn;
                 buttons[i].Background = new SolidColorBrush(isActive ? Color.FromArgb(255, 0, 89, 187) : Colors.Transparent);
-                icons[i].Foreground = new SolidColorBrush(isActive ? Colors.White : Color.FromArgb(255, 70, 96, 127));
-                labels[i].Foreground = new SolidColorBrush(isActive ? Colors.White : Color.FromArgb(255, 70, 96, 127));
-                labels[i].FontWeight = isActive ? Microsoft.UI.Text.FontWeights.Bold : Microsoft.UI.Text.FontWeights.SemiBold;
+                if (icons[i] != null) icons[i].Foreground = new SolidColorBrush(isActive ? Colors.White : Color.FromArgb(255, 70, 96, 127));
+                if (labels[i] != null) labels[i].Foreground = new SolidColorBrush(isActive ? Colors.White : Color.FromArgb(255, 70, 96, 127));
+                if (labels[i] != null) labels[i].FontWeight = isActive ? Microsoft.UI.Text.FontWeights.Bold : Microsoft.UI.Text.FontWeights.SemiBold;
             }
         }
 
@@ -525,6 +675,34 @@ namespace Healthcare.Client.UI.Doctor
         {
             _currentMonthDate = _currentMonthDate.AddMonths(1);
             RefreshMonthView();
+        }
+    }
+
+    public class SlotViewModel
+    {
+        public string Id { get; set; }
+        public string TimeRange { get; set; }
+        public string DateFormatted { get; set; }
+        public string StatusText { get; set; }
+        public string Status { get; set; }
+        public SolidColorBrush StatusBg => new Microsoft.UI.Xaml.Media.SolidColorBrush(
+            Status == "Available" ? Windows.UI.Color.FromArgb(255, 5, 150, 105) : 
+            (Status == "Booked" ? Windows.UI.Color.FromArgb(255, 0, 89, 187) : Windows.UI.Color.FromArgb(255, 100, 116, 139)));
+        public Visibility CanDeleteVisibility => Status == "Available" ? Visibility.Visible : Visibility.Collapsed;
+
+        public SlotViewModel(TimeSlot model)
+        {
+            Id = model.Id;
+            TimeRange = $"{model.StartTime:hh\\:mm} - {model.EndTime:hh\\:mm}";
+            DateFormatted = model.SlotDate.ToString("dd/MM/yyyy");
+            Status = model.Status;
+            StatusText = Status switch
+            {
+                "Available" => "Trống",
+                "Booked" => "Đã đặt",
+                "Unavailable" => "Khoá",
+                _ => "Không rõ"
+            };
         }
     }
 

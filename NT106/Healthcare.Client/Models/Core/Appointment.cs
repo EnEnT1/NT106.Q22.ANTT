@@ -23,6 +23,8 @@ namespace Healthcare.Client.Models.Core
         [Column("examination_type")] public string ExaminationType { get; set; }
         [Column("room_code")] public string RoomCode { get; set; }
 
-        [Column("created_at")] public DateTime CreatedAt { get; set; }
+        [Column("slot_id")] public string SlotId { get; set; }
+
+        [Column("created_at")] public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

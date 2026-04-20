@@ -136,7 +136,7 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
-                <NavigationViewItem Tag="ManageSchedulePage" Content="Lịch trực">
+                <NavigationViewItem Tag="ManageSchedulePage" Content="Quản lý lịch khám">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE787;"/>
                     </NavigationViewItem.Icon>

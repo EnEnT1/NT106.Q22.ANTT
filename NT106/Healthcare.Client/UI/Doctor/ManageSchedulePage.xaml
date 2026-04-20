@@ -84,13 +84,6 @@
                                 Padding="4,1">
                             <TextBlock Text="{x:Bind TypeText}" FontSize="9" Foreground="White" FontWeight="Bold"/>
                         </Border>
-                        <Border Background="#F1F5F9" 
-                                CornerRadius="4" 
-                                Padding="4,1"
-                                BorderBrush="#E2E8F0"
-                                BorderThickness="1">
-                            <TextBlock Text="{x:Bind PaymentText}" FontSize="9" Foreground="#475569" FontWeight="SemiBold"/>
-                        </Border>
                     </StackPanel>
 
                     <!-- Actions removed - handle in Detail page -->
@@ -269,7 +262,11 @@
             <!-- ═══════════════════════════════════════════════════════ -->
             <!-- PAGE HEADER                                            -->
             <!-- ═══════════════════════════════════════════════════════ -->
-            <Grid Margin="0,0,0,24">
+            <Grid x:Name="PageHeaderGrid" Margin="0,0,0,24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
@@ -281,7 +278,7 @@
                     Spacing="6" 
                     VerticalAlignment="Bottom">
                     <TextBlock
-                        Text="Lịch Khám Của Bệnh Nhân"
+                        Text="Quản lý lịch khám"
                         FontSize="34"
                         FontWeight="ExtraBold"
                         Foreground="{ThemeResource TextFillColorPrimaryBrush}"/>
@@ -294,6 +291,7 @@
 
                 <!-- Real-time Clock -->
                 <StackPanel 
+                    x:Name="ClockPanel"
                     Grid.Column="1" 
                     VerticalAlignment="Bottom" 
                     HorizontalAlignment="Right" 
@@ -375,6 +373,24 @@
                             <TextBlock 
                                 x:Name="MonthTabLabel"
                                 Text="Xem cả tháng" 
+                                Foreground="{StaticResource SecondaryBrush}" 
+                                FontWeight="SemiBold" 
+                                FontSize="13"/>
+                        </StackPanel>
+                    </Button>
+                    <Button 
+                        x:Name="SlotTabButton" 
+                        Click="SlotTab_Click" 
+                        Style="{StaticResource TabButtonStyle}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon 
+                                x:Name="SlotTabIcon"
+                                Glyph="&#xE8B0;" 
+                                FontSize="14" 
+                                Foreground="{StaticResource SecondaryBrush}"/>
+                            <TextBlock 
+                                x:Name="SlotTabLabel"
+                                Text="Quản lý lịch khám" 
                                 Foreground="{StaticResource SecondaryBrush}" 
                                 FontWeight="SemiBold" 
                                 FontSize="13"/>
@@ -735,14 +751,12 @@
                                     <ColumnDefinition Width="140"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="120"/>
-                                    <ColumnDefinition Width="120"/>
                                     <ColumnDefinition Width="100"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="THỜI GIAN" FontSize="10" FontWeight="Bold" Foreground="#6B7280" CharacterSpacing="50"/>
                                 <TextBlock Grid.Column="1" Text="BỆNH NHÂN" FontSize="10" FontWeight="Bold" Foreground="#6B7280" CharacterSpacing="50"/>
                                 <TextBlock Grid.Column="2" Text="HÌNH THỨC" FontSize="10" FontWeight="Bold" Foreground="#6B7280" CharacterSpacing="50"/>
-                                <TextBlock Grid.Column="3" Text="THANH TOÁN" FontSize="10" FontWeight="Bold" Foreground="#6B7280" CharacterSpacing="50"/>
-                                <TextBlock Grid.Column="4" Text="TRẠNG THÁI" FontSize="10" FontWeight="Bold" Foreground="#6B7280" CharacterSpacing="50"/>
+                                <TextBlock Grid.Column="3" Text="TRẠNG THÁI" FontSize="10" FontWeight="Bold" Foreground="#6B7280" CharacterSpacing="50"/>
                             </Grid>
                         </ListView.Header>
                         <ListView.ItemTemplate>
@@ -751,7 +765,6 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="140"/>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="120"/>
                                         <ColumnDefinition Width="120"/>
                                         <ColumnDefinition Width="100"/>
                                     </Grid.ColumnDefinitions>
@@ -767,17 +780,15 @@
                                         <TextBlock Text="{x:Bind TypeText}" FontSize="10" Foreground="White" FontWeight="Bold"/>
                                     </Border>
 
-                                    <TextBlock Grid.Column="3" Text="{x:Bind PaymentText}" VerticalAlignment="Center" FontSize="13" Foreground="#4B5563"/>
-
-                                    <TextBlock Grid.Column="4" Text="{x:Bind StatusText}" VerticalAlignment="Center" Foreground="{x:Bind TagBgBrush}" FontSize="12" FontWeight="Bold"/>
+                                    <TextBlock Grid.Column="3" Text="{x:Bind StatusText}" VerticalAlignment="Center" Foreground="{x:Bind TagBgBrush}" FontSize="12" FontWeight="Bold"/>
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
                 </Border>
-
-                <!-- Pagination Controls -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20" Margin="0,24,0,0">
+                
+                <!-- Pagination -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0" Spacing="20">
                     <Button x:Name="BtnPrevPage" Click="BtnPrevPage_Click" Style="{StaticResource NavIconButtonStyle}">
                         <FontIcon Glyph="&#xE76B;" FontSize="14"/>
                     </Button>
@@ -786,7 +797,146 @@
                         <FontIcon Glyph="&#xE76C;" FontSize="14"/>
                     </Button>
                 </StackPanel>
+
             </StackPanel>
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- SLOT MANAGEMENT PANEL                                   -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <Grid x:Name="SlotManagementPanel" Visibility="Collapsed">
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup>
+                        <VisualState x:Name="WideState">
+                            <VisualState.StateTriggers>
+                                <AdaptiveTrigger MinWindowWidth="1000" />
+                            </VisualState.StateTriggers>
+                        </VisualState>
+                        <VisualState x:Name="NarrowState">
+                            <VisualState.StateTriggers>
+                                <AdaptiveTrigger MinWindowWidth="0" />
+                            </VisualState.StateTriggers>
+                            <VisualState.Setters>
+                                <Setter Target="PageHeaderGrid.ColumnDefinitions[1].Width" Value="0" />
+                                <Setter Target="PageHeaderGrid.RowDefinitions[1].Height" Value="Auto" />
+                                <Setter Target="ClockPanel.(Grid.Column)" Value="0" />
+                                <Setter Target="ClockPanel.(Grid.Row)" Value="1" />
+                                <Setter Target="ClockPanel.HorizontalAlignment" Value="Left" />
+                                <Setter Target="ClockPanel.Margin" Value="0,12,0,0" />
+                                <Setter Target="CurrentTimeText.HorizontalAlignment" Value="Left" />
+                                <Setter Target="CurrentDateText.HorizontalAlignment" Value="Left" />
+
+                                <Setter Target="SlotMainGrid.ColumnDefinitions[0].Width" Value="*" />
+                                <Setter Target="SlotMainGrid.ColumnDefinitions[1].Width" Value="0" />
+                                <Setter Target="SlotMainGrid.RowDefinitions[1].Height" Value="Auto" />
+                                <Setter Target="RightPanelBorder.(Grid.Column)" Value="0" />
+                                <Setter Target="RightPanelBorder.(Grid.Row)" Value="1" />
+                                <Setter Target="RightPanelBorder.Margin" Value="0,20,0,0" />
+                                <Setter Target="SlotHeaderPanel.Orientation" Value="Vertical" />
+                                <Setter Target="SlotHeaderActions.HorizontalAlignment" Value="Left" />
+                                <Setter Target="SlotHeaderActions.Margin" Value="0,12,0,0" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>
+
+                <Grid x:Name="SlotMainGrid" ColumnSpacing="24">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="350"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Create Slots Tool -->
+                    <Border Grid.Column="0" Background="White" CornerRadius="16" BorderBrush="#E5E7EB" BorderThickness="1" Padding="24" VerticalAlignment="Top">
+                        <StackPanel Spacing="16">
+                            <TextBlock Text="Tạo Khung giờ Mới" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
+                            
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Ngày áp dụng" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryBrush}"/>
+                                <DatePicker x:Name="NewSlotDatePicker" HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="8">
+                                    <TextBlock Text="Giờ bắt đầu" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryBrush}"/>
+                                    <TimePicker x:Name="NewSlotStartTime" ClockIdentifier="24HourClock" HorizontalAlignment="Stretch"/>
+                                </StackPanel>
+                                <StackPanel Spacing="8" Grid.Column="1">
+                                    <TextBlock Text="Giờ kết thúc" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryBrush}"/>
+                                    <TimePicker x:Name="NewSlotEndTime" ClockIdentifier="24HourClock" HorizontalAlignment="Stretch"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Thời lượng mỗi ca (phút)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryBrush}"/>
+                                <NumberBox x:Name="SlotDurationBox" Value="30" SpinButtonPlacementMode="Inline" SmallChange="5"/>
+                            </StackPanel>
+
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Thời gian nghỉ (buffer - phút)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryBrush}"/>
+                                <NumberBox x:Name="BufferDurationBox" Value="5" SpinButtonPlacementMode="Inline" SmallChange="5"/>
+                            </StackPanel>
+
+                            <Button Content="Tự động tạo các ca" 
+                                    Click="BtnAutoCreateSlots_Click"
+                                    Style="{StaticResource PrimaryButtonStyle}" 
+                                    HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Slots List -->
+                    <Border x:Name="RightPanelBorder" Grid.Column="1" Background="White" CornerRadius="16" BorderBrush="#E5E7EB" BorderThickness="1" Padding="24">
+                        <StackPanel Spacing="16">
+                            <StackPanel x:Name="SlotHeaderPanel" Orientation="Horizontal" HorizontalAlignment="Stretch">
+                                <TextBlock Text="Danh sách các Khung giờ" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+                                <StackPanel x:Name="SlotHeaderActions" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                                    <DatePicker x:Name="FilterSlotDatePicker" DateChanged="FilterSlotDatePicker_DateChanged"/>
+                                    <Button Content="Xoá tất cả trống" Click="BtnDeleteAllAvailableSlots_Click" Foreground="Red"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <ListView x:Name="SlotsListView" ItemsSource="{x:Bind DoctorSlotsList}" SelectionMode="None">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="local:SlotViewModel">
+                                        <Grid Padding="0,8" BorderBrush="#F3F4F6" BorderThickness="0,0,0,1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="{x:Bind TimeRange}" FontWeight="Bold" FontSize="16"/>
+                                                <TextBlock Text="{x:Bind DateFormatted}" FontSize="12" Foreground="#6B7280"/>
+                                            </StackPanel>
+
+                                            <Border Grid.Column="1" Background="{x:Bind StatusBg}" CornerRadius="6" Padding="8,3" Margin="0,0,12,0" VerticalAlignment="Center">
+                                                <TextBlock Text="{x:Bind StatusText}" FontSize="10" Foreground="White" FontWeight="Bold"/>
+                                            </Border>
+
+                                            <Button Grid.Column="2" 
+                                                    Click="BtnDeleteSlot_Click" 
+                                                    CommandParameter="{x:Bind Id}"
+                                                    Background="Transparent" 
+                                                    Padding="8"
+                                                    Visibility="{x:Bind CanDeleteVisibility}">
+                                                <FontIcon Glyph="&#xE74D;" FontSize="14" Foreground="#BA1A1A"/>
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
         </StackPanel>
     </ScrollViewer>
 </Page>

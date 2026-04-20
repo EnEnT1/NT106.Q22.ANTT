@@ -40,7 +40,6 @@
                             </ComboBox>
                         </StackPanel>
 
-                        <!-- Date and Time -->
                         <Grid ColumnSpacing="20">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -49,14 +48,44 @@
                             
                             <StackPanel Spacing="8">
                                 <TextBlock Text="Ngày khám" FontSize="14" FontWeight="SemiBold" Foreground="#374151"/>
-                                <DatePicker x:Name="ApptDatePicker" HorizontalAlignment="Stretch"/>
-                            </StackPanel>
-
-                            <StackPanel Spacing="8" Grid.Column="1">
-                                <TextBlock Text="Giờ khám" FontSize="14" FontWeight="SemiBold" Foreground="#374151"/>
-                                <TimePicker x:Name="ApptTimePicker" HorizontalAlignment="Stretch" ClockIdentifier="24HourClock"/>
+                                <DatePicker x:Name="ApptDatePicker" HorizontalAlignment="Stretch" DateChanged="ApptDatePicker_DateChanged"/>
                             </StackPanel>
                         </Grid>
+
+                        <!-- Time Slots Grid -->
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Chọn Khung giờ khám" FontSize="14" FontWeight="SemiBold" Foreground="#374151"/>
+                            <GridView x:Name="SlotsGridView" 
+                                      SelectionMode="Single" 
+                                      HorizontalAlignment="Stretch"
+                                      SelectionChanged="SlotsGridView_SelectionChanged">
+                                <GridView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border x:Name="SlotBorder" Width="140" Height="60" 
+                                                BorderBrush="#E5E7EB" BorderThickness="2" 
+                                                CornerRadius="12" Padding="8" Background="White">
+                                            <VisualStateManager.VisualStateGroups>
+                                                <VisualStateGroup x:Name="SelectionStates">
+                                                    <VisualState x:Name="Unselected"/>
+                                                    <VisualState x:Name="Selected">
+                                                        <VisualState.Setters>
+                                                            <Setter Target="SlotBorder.BorderBrush" Value="#2563EB"/>
+                                                            <Setter Target="SlotBorder.Background" Value="#EFF6FF"/>
+                                                        </VisualState.Setters>
+                                                    </VisualState>
+                                                </VisualStateGroup>
+                                            </VisualStateManager.VisualStateGroups>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding StartTimeStr}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#111827"/>
+                                                <TextBlock Text="{Binding DurationStr}" FontSize="11" HorizontalAlignment="Center" Foreground="#6B7280"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </GridView.ItemTemplate>
+                            </GridView>
+                            <TextBlock x:Name="NoSlotsText" Text="Không có khung giờ nào khả dụng cho ngày này." 
+                                       Foreground="#DC2626" FontSize="13" Visibility="Collapsed"/>
+                        </StackPanel>
 
                         <!-- Type of Appointment -->
                         <StackPanel Spacing="12">
