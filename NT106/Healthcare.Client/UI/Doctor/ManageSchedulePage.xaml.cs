@@ -53,6 +53,9 @@ namespace Healthcare.Client.UI.Doctor
             _realtimeTimer.Tick += RealtimeTimer_Tick;
             _realtimeTimer.Start();
             RealtimeTimer_Tick(null, null);
+
+            // Set default date for filters
+            FilterSlotDatePicker.Date = DateTimeOffset.Now;
         }
 
         private void RealtimeTimer_Tick(object sender, object e)
@@ -256,6 +259,43 @@ namespace Healthcare.Client.UI.Doctor
             RefreshListView();
         }
 
+        private void HighlightTodayColumn()
+        {
+            var accentBrush      = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(255, 91, 108, 246));  // #5B6CF6
+            var accentLightBrush = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(255, 238, 240, 254)); // #EEF0FE
+            var transparentBrush = new SolidColorBrush(Microsoft.UI.Colors.Transparent);
+            var whiteBrush       = new SolidColorBrush(Microsoft.UI.Colors.White);
+            var textPrimaryBrush = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(255, 30, 41, 59));     // TextPrimary
+            var outlineBrush     = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(255, 148, 163, 184)); // #94A3B8
+
+            // Array of all elements to reset
+            var headers = new[] { SundayHeader, MondayHeader, TuesdayHeader, WednesdayHeader, ThursdayHeader, FridayHeader, SaturdayHeader };
+            var circles = new[] { SundayCircle, MondayCircle, TuesdayCircle, WednesdayCircle, ThursdayCircle, FridayCircle, SaturdayCircle };
+            var dates   = new[] { SundayDate,   MondayDate,   TuesdayDate,   WednesdayDate,   ThursdayDate,   FridayDate,   SaturdayDate   };
+            var labels  = new[] { SundayLabel,  MondayLabel,  TuesdayLabel,  WednesdayLabel,  ThursdayLabel,  FridayLabel,  SaturdayLabel  };
+
+            // Reset all to default
+            for (int i = 0; i < 7; i++)
+            {
+                if (headers[i] != null) headers[i].Background = transparentBrush;
+                if (circles[i] != null) circles[i].Background = transparentBrush;
+                if (dates[i]   != null) dates[i].Foreground   = textPrimaryBrush;
+                if (labels[i]  != null) labels[i].Foreground  = outlineBrush;
+            }
+
+            // Only highlight if today falls within the currently displayed week
+            int todayDow = (int)DateTime.Today.DayOfWeek; // 0=Sun, 1=Mon, ..., 6=Sat
+            DateTime colDate = _currentWeekSunday.AddDays(todayDow);
+            
+            if (colDate.Date == DateTime.Today)
+            {
+                if (headers[todayDow] != null) headers[todayDow].Background = accentLightBrush;
+                if (circles[todayDow] != null) circles[todayDow].Background = accentBrush;
+                if (dates[todayDow]   != null) dates[todayDow].Foreground   = whiteBrush;
+                if (labels[todayDow]  != null) labels[todayDow].Foreground  = accentBrush;
+            }
+        }
+
         private void RefreshWeekView()
         {
             SundayList.Clear();
@@ -276,6 +316,9 @@ namespace Healthcare.Client.UI.Doctor
             ThursdayDate.Text = _currentWeekSunday.AddDays(4).Day.ToString();
             FridayDate.Text = _currentWeekSunday.AddDays(5).Day.ToString();
             SaturdayDate.Text = _currentWeekSunday.AddDays(6).Day.ToString();
+
+            // Highlight current day's column header
+            HighlightTodayColumn();
 
             var weekAppts = _allAppointments
                 .Where(a => a.AppointmentDate.Date >= _currentWeekSunday.Date
@@ -506,22 +549,22 @@ namespace Healthcare.Client.UI.Doctor
 
         private async Task LoadDoctorSlots()
         {
-            if (SessionStorage.CurrentUser == null) return;
+            if (SessionStorage.CurrentUser == null || string.IsNullOrEmpty(SessionStorage.CurrentUser.Id)) return;
 
             try
             {
-                var response = await _supabase.From<TimeSlot>()
-                    .Where(x => x.DoctorId == SessionStorage.CurrentUser.Id)
-                    .Get();
+                var query = _supabase.From<TimeSlot>()
+                    .Where(x => x.DoctorId == SessionStorage.CurrentUser.Id);
 
-                var allSlots = response.Models ?? new List<TimeSlot>();
-                
-                // Filter by date if needed
+                // Filter by date if set
                 if (FilterSlotDatePicker.Date != null)
                 {
                     var filterDate = FilterSlotDatePicker.Date.DateTime.Date;
-                    allSlots = allSlots.Where(s => s.SlotDate.Date == filterDate).ToList();
+                    query = query.Where(s => s.SlotDate == filterDate);
                 }
+
+                var response = await query.Get();
+                var allSlots = response.Models ?? new List<TimeSlot>();
 
                 DoctorSlotsList.Clear();
                 foreach (var s in allSlots.OrderBy(x => x.SlotDate).ThenBy(x => x.StartTime))
@@ -531,7 +574,7 @@ namespace Healthcare.Client.UI.Doctor
             }
             catch (Exception ex)
             {
-                // Log or show error
+                System.Diagnostics.Debug.WriteLine($"LoadDoctorSlots Error: {ex.Message}");
             }
         }
 
@@ -646,9 +689,9 @@ namespace Healthcare.Client.UI.Doctor
             for (int i = 0; i < buttons.Length; i++)
             {
                 bool isActive = buttons[i] == activeBtn;
-                buttons[i].Background = new SolidColorBrush(isActive ? Color.FromArgb(255, 0, 89, 187) : Colors.Transparent);
-                if (icons[i] != null) icons[i].Foreground = new SolidColorBrush(isActive ? Colors.White : Color.FromArgb(255, 70, 96, 127));
-                if (labels[i] != null) labels[i].Foreground = new SolidColorBrush(isActive ? Colors.White : Color.FromArgb(255, 70, 96, 127));
+                buttons[i].Background = new SolidColorBrush(isActive ? Color.FromArgb(255, 58, 141, 255) : Colors.Transparent);
+                if (icons[i] != null) icons[i].Foreground = new SolidColorBrush(isActive ? Colors.White : Color.FromArgb(255, 100, 116, 139));
+                if (labels[i] != null) labels[i].Foreground = new SolidColorBrush(isActive ? Colors.White : Color.FromArgb(255, 100, 116, 139));
                 if (labels[i] != null) labels[i].FontWeight = isActive ? Microsoft.UI.Text.FontWeights.Bold : Microsoft.UI.Text.FontWeights.SemiBold;
             }
         }

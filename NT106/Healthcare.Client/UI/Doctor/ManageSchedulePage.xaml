@@ -8,401 +8,197 @@
     mc:Ignorable="d">
 
     <Page.Background>
-        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#f0f9ff" Offset="0"/>
-            <GradientStop Color="#e0e7ff" Offset="0.25"/>
-            <GradientStop Color="#faf5ff" Offset="0.50"/>
-            <GradientStop Color="#fdf4ff" Offset="0.75"/>
-            <GradientStop Color="#ffffff" Offset="1"/>
-        </LinearGradientBrush>
+        <SolidColorBrush Color="#F8FAFC"/>
     </Page.Background>
 
     <Page.Resources>
-        <!-- Color Resources -->
-        <SolidColorBrush x:Key="PrimaryBrush" Color="#0059BB"/>
-        <SolidColorBrush x:Key="PrimaryContainerBrush" Color="#0070EA"/>
-        <SolidColorBrush x:Key="SecondaryBrush" Color="#46607F"/>
-        <SolidColorBrush x:Key="SurfaceContainerBrush" Color="#EDEEEF"/>
+        <!-- Design Tokens -->
+        <SolidColorBrush x:Key="MedicalBlue" Color="#3A8DFF"/>
+        <SolidColorBrush x:Key="MedicalBlueLight" Color="#EBF4FF"/>
+        <SolidColorBrush x:Key="SuccessGreen" Color="#10B981"/>
+        <SolidColorBrush x:Key="SuccessGreenLight" Color="#ECFDF5"/>
+        <SolidColorBrush x:Key="WarningAmber" Color="#F59E0B"/>
+        <SolidColorBrush x:Key="WarningAmberLight" Color="#FFFBEB"/>
+        <SolidColorBrush x:Key="DangerRed" Color="#EF4444"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="#1E293B"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#64748B"/>
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#E2E8F0"/>
         <SolidColorBrush x:Key="SurfaceContainerLowestBrush" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="SurfaceContainerLowBrush" Color="#F3F4F5"/>
-        <SolidColorBrush x:Key="ErrorBrush" Color="#BA1A1A"/>
-        <SolidColorBrush x:Key="GreenBrush" Color="#2E7D32"/>
-        <SolidColorBrush x:Key="GreenLightBrush" Color="#E8F5E9"/>
-        <SolidColorBrush x:Key="GreenBorderBrush" Color="#A5D6A7"/>
-        <SolidColorBrush x:Key="OutlineBrush" Color="#717786"/>
-        <SolidColorBrush x:Key="OutlineVariantBrush" Color="#C1C6D7"/>
-        <SolidColorBrush x:Key="TertiaryFixedBrush" Color="#FFDAD6"/>
-        <SolidColorBrush x:Key="TertiaryBrush" Color="#B6171E"/>
-        <SolidColorBrush x:Key="SecondaryContainerBrush" Color="#BFD9FD"/>
-        <SolidColorBrush x:Key="WhiteBrush" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="PrimaryLightBrush" Color="#1A0059BB"/>
+        <SolidColorBrush x:Key="SurfaceContainerBrush" Color="#F1F5F9"/>
+        <SolidColorBrush x:Key="OutlineBrush" Color="#94A3B8"/>
+        <!-- Accent color matching the reference (indigo/blue-purple) -->
+        <SolidColorBrush x:Key="AccentIndigo" Color="#5B6CF6"/>
+        <SolidColorBrush x:Key="AccentIndigoLight" Color="#EEF0FE"/>
+        <SolidColorBrush x:Key="TodayColumnBg" Color="#F4F5FE"/>
 
-        <!-- Appointment Card Template -->
-        <DataTemplate x:Key="AppointmentCardTemplate" x:DataType="local:AppointmentViewModel">
-            <Border 
-                CornerRadius="12" 
-                Padding="14" 
-                Margin="0,0,0,10" 
-                Background="{x:Bind BgBrush}"
-                Tapped="AppointmentCard_Tapped">
-                <Border.BorderThickness>1</Border.BorderThickness>
-                <Border.BorderBrush>
-                    <SolidColorBrush Color="{x:Bind BorderColorCode}"/>
-                </Border.BorderBrush>
-                <StackPanel Spacing="6">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Border 
-                            Grid.Column="0" 
-                            CornerRadius="10" 
-                            Padding="6,2" 
-                            HorizontalAlignment="Left" 
-                            Background="{x:Bind TagBgBrush}">
-                            <TextBlock 
-                                Text="{x:Bind StatusText}" 
-                                FontSize="9" 
-                                FontWeight="Bold" 
-                                Foreground="White" 
-                                CharacterSpacing="50"/>
-                        </Border>
-                        <FontIcon 
-                            Grid.Column="1" 
-                            Glyph="&#xE735;" 
-                            FontSize="14" 
-                            Foreground="{x:Bind TagBgBrush}"/>
-                    </Grid>
-
-                    <StackPanel Spacing="2">
-                        <TextBlock 
-                            Text="{x:Bind Time}" 
-                            FontSize="14" 
-                            FontWeight="Bold"/>
-                        <TextBlock 
-                            Text="{x:Bind PatientName}" 
-                            FontSize="12" 
-                            Foreground="{StaticResource SecondaryBrush}" 
-                            FontWeight="SemiBold"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,2,0,0">
-                        <Border Background="{x:Bind TypeBgBrush}" 
-                                CornerRadius="4" 
-                                Padding="4,1">
-                            <TextBlock Text="{x:Bind TypeText}" FontSize="9" Foreground="White" FontWeight="Bold"/>
-                        </Border>
-                    </StackPanel>
-
-                    <!-- Actions removed - handle in Detail page -->
-                </StackPanel>
-            </Border>
-        </DataTemplate>
-
-        <!-- Primary Button Style -->
-        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="CornerRadius" Value="10"/>
-            <Setter Property="Padding" Value="20,12"/>
+        <!-- Typography -->
+        <Style x:Key="TitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="28"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
         </Style>
 
-        <!-- Secondary Button Style -->
-        <Style x:Key="SecondaryButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
-            <Setter Property="CornerRadius" Value="10"/>
-            <Setter Property="Padding" Value="20,12"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+        <Style x:Key="SubtitleStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+        </Style>
+
+        <!-- Card Styles -->
+        <Style x:Key="SurfaceCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="{StaticResource OutlineVariantBrush}"/>
+            <Setter Property="Padding" Value="20"/>
         </Style>
 
-        <!-- Day Header Style -->
         <Style x:Key="DayHeaderStyle" TargetType="Border">
-            <Setter Property="Background" Value="{StaticResource SurfaceContainerBrush}"/>
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
             <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Padding" Value="8,10"/>
             <Setter Property="Margin" Value="0,0,0,12"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
         </Style>
 
-        <!-- Nav Icon Button Style -->
-        <Style x:Key="NavIconButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="8"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Width" Value="36"/>
-            <Setter Property="Height" Value="36"/>
-        </Style>
-
-        <!-- Tab Button Style -->
+        <!-- Button Styles -->
         <Style x:Key="TabButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="Padding" Value="16,10"/>
             <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Template">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Transitions">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <ContentPresenter x:Name="ContentPresenter"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            Content="{TemplateBinding Content}"
-                            ContentTransitions="{TemplateBinding ContentTransitions}"
-                            ContentTemplate="{TemplateBinding ContentTemplate}"
-                            Padding="{TemplateBinding Padding}"
-                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                            CornerRadius="{TemplateBinding CornerRadius}">
-                            <ContentPresenter.RenderTransform>
-                                <CompositeTransform x:Name="ContentTransform" ScaleX="1.0" ScaleY="1.0" CenterX="40" CenterY="15"/>
-                            </ContentPresenter.RenderTransform>
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="CommonStates">
-                                    <VisualState x:Name="Normal">
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ContentTransform" Storyboard.TargetProperty="ScaleX" To="1.0" Duration="0:0:0.1"/>
-                                            <DoubleAnimation Storyboard.TargetName="ContentTransform" Storyboard.TargetProperty="ScaleY" To="1.0" Duration="0:0:0.1"/>
-                                        </Storyboard>
-                                    </VisualState>
-                                    <VisualState x:Name="PointerOver">
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ContentTransform" Storyboard.TargetProperty="ScaleX" To="1.05" Duration="0:0:0.1"/>
-                                            <DoubleAnimation Storyboard.TargetName="ContentTransform" Storyboard.TargetProperty="ScaleY" To="1.05" Duration="0:0:0.1"/>
-                                        </Storyboard>
-                                    </VisualState>
-                                    <VisualState x:Name="Pressed">
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ContentTransform" Storyboard.TargetProperty="ScaleX" To="0.95" Duration="0:0:0.05"/>
-                                            <DoubleAnimation Storyboard.TargetName="ContentTransform" Storyboard.TargetProperty="ScaleY" To="0.95" Duration="0:0:0.05"/>
-                                        </Storyboard>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
-                        </ContentPresenter>
-                    </ControlTemplate>
+                    <TransitionCollection>
+                        <EntranceThemeTransition/>
+                    </TransitionCollection>
                 </Setter.Value>
             </Setter>
         </Style>
-    </Page.Resources>
 
-    <ScrollViewer 
-        VerticalScrollBarVisibility="Auto" 
-        HorizontalScrollBarVisibility="Disabled">
-        <StackPanel 
-            Margin="32,24,32,80" 
-            Spacing="0">
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource MedicalBlue}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="24,12"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
 
-            <!-- ═══════════════════════════════════════════════════════ -->
-            <!-- UPCOMING SHIFT BANNER                                   -->
-            <!-- ═══════════════════════════════════════════════════════ -->
-            <Border
-                CornerRadius="16"
-                Margin="0,0,0,32"
-                Padding="24,18">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                        <GradientStop Color="#0059BB" Offset="0"/>
-                        <GradientStop Color="#0070EA" Offset="1"/>
-                    </LinearGradientBrush>
-                </Border.Background>
+        <Style x:Key="NavIconButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="36"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="CornerRadius" Value="18"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+
+        <!-- Appointment Card Template (reference-style: left accent border + time top) -->
+        <DataTemplate x:Key="AppointmentCardTemplate" x:DataType="local:AppointmentViewModel">
+            <Border Margin="0,0,0,10"
+                    Background="{StaticResource SurfaceBrush}"
+                    CornerRadius="10"
+                    Tapped="AppointmentCard_Tapped">
+                <Border.Shadow>
+                    <ThemeShadow/>
+                </Border.Shadow>
+                <!-- Outer card with subtle shadow -->
                 <Grid>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel 
-                        Grid.Column="0" 
-                        Orientation="Horizontal" 
-                        Spacing="16" 
-                        VerticalAlignment="Center">
-                        <Border 
-                            Background="#33FFFFFF" 
-                            CornerRadius="24" 
-                            Width="44" 
-                            Height="44">
-                            <FontIcon 
-                                Glyph="&#xE8F9;" 
-                                FontSize="20" 
-                                Foreground="White" 
-                                VerticalAlignment="Center" 
-                                HorizontalAlignment="Center"/>
-                        </Border>
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock 
-                                Text="CA KHÁM SẮP TỚI" 
-                                FontSize="10" 
-                                FontWeight="Bold" 
-                                Foreground="#CCFFFFFF" 
-                                CharacterSpacing="150"/>
-                            <TextBlock 
-                                x:Name="UpcomingShiftText" 
-                                Text="Đang cập nhật..." 
-                                FontSize="16" 
-                                FontWeight="SemiBold" 
-                                Foreground="White"/>
-                        </StackPanel>
-                    </StackPanel>
+                    <!-- Left accent bar -->
+                    <Border Grid.Column="0" 
+                            Background="{StaticResource AccentIndigo}" 
+                            CornerRadius="10,0,0,10"/>
 
-                    <Button 
-                        Grid.Column="1" 
-                        Content="Làm mới lịch khám" 
-                        Background="White" 
-                        Foreground="{StaticResource PrimaryBrush}" 
-                        CornerRadius="10" 
-                        Padding="18,10" 
-                        FontWeight="Bold" 
-                        FontSize="13" 
-                        VerticalAlignment="Center" 
-                        Click="BtnRefresh_Click"/>
+                    <!-- Content -->
+                    <StackPanel Grid.Column="1" Padding="10,10,10,10" Spacing="6">
+
+                        <!-- Time range -->
+                        <TextBlock Text="{x:Bind Time}"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource AccentIndigo}"/>
+
+                        <!-- Patient name -->
+                        <TextBlock Text="{x:Bind PatientName}"
+                                   FontSize="13"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   TextWrapping="Wrap"/>
+
+                        <!-- Status badge -->
+                        <Border Background="{x:Bind TagBgBrush}"
+                                CornerRadius="20"
+                                Padding="8,3"
+                                HorizontalAlignment="Left">
+                            <TextBlock Text="{x:Bind StatusText}"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Foreground="White"/>
+                        </Border>
+                    </StackPanel>
                 </Grid>
             </Border>
+        </DataTemplate>
+    </Page.Resources>
 
-            <!-- ═══════════════════════════════════════════════════════ -->
-            <!-- PAGE HEADER                                            -->
-            <!-- ═══════════════════════════════════════════════════════ -->
-            <Grid x:Name="PageHeaderGrid" Margin="0,0,0,24">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+    <ScrollViewer x:Name="MainScrollViewer" Background="Transparent" Padding="32,24">
+        <StackPanel Spacing="32" HorizontalAlignment="Stretch">
+            
+            <!-- HEADER SECTION -->
+            <Grid x:Name="PageHeaderGrid">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="0"/> <!-- For narrow stack -->
+                </Grid.RowDefinitions>
 
-                <!-- Title -->
-                <StackPanel 
-                    Grid.Column="0" 
-                    Spacing="6" 
-                    VerticalAlignment="Bottom">
-                    <TextBlock
-                        Text="Quản lý lịch khám"
-                        FontSize="34"
-                        FontWeight="ExtraBold"
-                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"/>
-                    <TextBlock
-                        Text="Quản lý lịch hẹn, gọi video và nhập bệnh án"
-                        FontSize="14"
-                        FontWeight="Medium"
-                        Foreground="{StaticResource SecondaryBrush}"/>
+                <StackPanel Grid.Column="0" Spacing="4">
+                    <TextBlock Text="Quản lý lịch khám" Style="{StaticResource TitleStyle}"/>
+                    <TextBlock Text="Quản lý lịch hẹn, gọi video và nhập bệnh án chuyên nghiệp" Style="{StaticResource SubtitleStyle}"/>
                 </StackPanel>
 
-                <!-- Real-time Clock -->
-                <StackPanel 
-                    x:Name="ClockPanel"
-                    Grid.Column="1" 
-                    VerticalAlignment="Bottom" 
-                    HorizontalAlignment="Right" 
-                    Spacing="2">
-                    <TextBlock 
-                        x:Name="CurrentTimeText" 
-                        Text="00:00:00" 
-                        FontSize="30" 
-                        FontWeight="Black" 
-                        Foreground="{StaticResource PrimaryBrush}" 
-                        HorizontalAlignment="Right"/>
-                    <TextBlock 
-                        x:Name="CurrentDateText" 
-                        Text="Thời gian thực" 
-                        FontSize="13" 
-                        FontWeight="Bold" 
-                        Foreground="{StaticResource SecondaryBrush}" 
-                        HorizontalAlignment="Right"/>
+                <StackPanel x:Name="ClockPanel" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <TextBlock x:Name="CurrentTimeText" Text="00:00:00" FontSize="24" FontWeight="Bold" Foreground="{StaticResource MedicalBlue}" HorizontalAlignment="Right"/>
+                    <TextBlock x:Name="CurrentDateText" Text="Thứ Hai, 20/04/2026" FontSize="13" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Right"/>
                 </StackPanel>
             </Grid>
 
-            <!-- ═══════════════════════════════════════════════════════ -->
-            <!-- VIEW MODE TABS                                         -->
-            <!-- ═══════════════════════════════════════════════════════ -->
-            <Border
-                Background="{StaticResource SurfaceContainerLowBrush}"
-                CornerRadius="12"
-                Padding="4"
-                Margin="0,0,0,20"
-                HorizontalAlignment="Left">
-                <StackPanel Orientation="Horizontal" Spacing="2">
-                    <Button 
-                        x:Name="ListTabButton" 
-                        Click="ListTab_Click" 
-                        Style="{StaticResource TabButtonStyle}">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <FontIcon 
-                                x:Name="ListTabIcon"
-                                Glyph="&#xE8FD;" 
-                                FontSize="14" 
-                                Foreground="{StaticResource SecondaryBrush}"/>
-                            <TextBlock 
-                                x:Name="ListTabLabel"
-                                Text="Dạng danh sách" 
-                                Foreground="{StaticResource SecondaryBrush}" 
-                                FontWeight="SemiBold" 
-                                FontSize="13"/>
+            <!-- NAVIGATION TABS -->
+            <Border Background="#F1F5F9" CornerRadius="12" Padding="6" HorizontalAlignment="Stretch">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <Button x:Name="ListTabButton" Click="ListTab_Click" Style="{StaticResource TabButtonStyle}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon x:Name="ListTabIcon" Glyph="&#xE8EF;" FontSize="14"/>
+                            <TextBlock x:Name="ListTabLabel" Text="Dạng danh sách" FontSize="13"/>
                         </StackPanel>
                     </Button>
-                    <Button 
-                        x:Name="WeekTabButton" 
-                        Click="WeekTab_Click" 
-                        Style="{StaticResource TabButtonStyle}"
-                        Background="{StaticResource PrimaryBrush}">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <FontIcon 
-                                x:Name="WeekTabIcon"
-                                Glyph="&#xE8BF;" 
-                                FontSize="14" 
-                                Foreground="White"/>
-                            <TextBlock 
-                                x:Name="WeekTabLabel"
-                                Text="Xem theo tuần" 
-                                Foreground="White" 
-                                FontWeight="Bold" 
-                                FontSize="13"/>
+                    <Button x:Name="WeekTabButton" Click="WeekTab_Click" Style="{StaticResource TabButtonStyle}" Background="{StaticResource MedicalBlueLight}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon x:Name="WeekTabIcon" Glyph="&#xE8BF;" FontSize="14" Foreground="{StaticResource MedicalBlue}"/>
+                            <TextBlock x:Name="WeekTabLabel" Text="Xem theo tuần" FontSize="13" Foreground="{StaticResource MedicalBlue}" FontWeight="Bold"/>
                         </StackPanel>
                     </Button>
-                    <Button 
-                        x:Name="MonthTabButton" 
-                        Click="MonthTab_Click" 
-                        Style="{StaticResource TabButtonStyle}">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <FontIcon 
-                                x:Name="MonthTabIcon"
-                                Glyph="&#xE787;" 
-                                FontSize="14" 
-                                Foreground="{StaticResource SecondaryBrush}"/>
-                            <TextBlock 
-                                x:Name="MonthTabLabel"
-                                Text="Xem cả tháng" 
-                                Foreground="{StaticResource SecondaryBrush}" 
-                                FontWeight="SemiBold" 
-                                FontSize="13"/>
+                    <Button x:Name="MonthTabButton" Click="MonthTab_Click" Style="{StaticResource TabButtonStyle}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon x:Name="MonthTabIcon" Glyph="&#xE787;" FontSize="14"/>
+                            <TextBlock x:Name="MonthTabLabel" Text="Xem cả tháng" FontSize="13"/>
                         </StackPanel>
                     </Button>
-                    <Button 
-                        x:Name="SlotTabButton" 
-                        Click="SlotTab_Click" 
-                        Style="{StaticResource TabButtonStyle}">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <FontIcon 
-                                x:Name="SlotTabIcon"
-                                Glyph="&#xE8B0;" 
-                                FontSize="14" 
-                                Foreground="{StaticResource SecondaryBrush}"/>
-                            <TextBlock 
-                                x:Name="SlotTabLabel"
-                                Text="Quản lý lịch khám" 
-                                Foreground="{StaticResource SecondaryBrush}" 
-                                FontWeight="SemiBold" 
-                                FontSize="13"/>
+                    <Button x:Name="SlotTabButton" Click="SlotTab_Click" Style="{StaticResource TabButtonStyle}" Margin="12,0,0,0">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon x:Name="SlotTabIcon" Glyph="&#xE8B0;" FontSize="14"/>
+                            <TextBlock x:Name="SlotTabLabel" Text="Quản lý lịch khám" FontSize="13"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -411,53 +207,39 @@
             <!-- ═══════════════════════════════════════════════════════ -->
             <!-- WEEK VIEW PANEL                                         -->
             <!-- ═══════════════════════════════════════════════════════ -->
-            <StackPanel x:Name="WeekViewPanel" Visibility="Visible">
+            <StackPanel x:Name="WeekViewPanel" Visibility="Visible" Spacing="0">
 
                 <!-- ── Week Navigation Bar ── -->
-                <Border
-                    Background="{StaticResource SurfaceContainerLowestBrush}"
-                    CornerRadius="14"
-                    Padding="16,12"
-                    Margin="0,0,0,20">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                        <Button 
-                            Grid.Column="0" 
-                            Style="{StaticResource NavIconButtonStyle}" 
-                            Click="PrevWeek_Click">
-                            <FontIcon Glyph="&#xE76B;" FontSize="14"/>
-                        </Button>
+                    <Button Grid.Column="0" Style="{StaticResource NavIconButtonStyle}" Click="PrevWeek_Click"
+                            Background="White" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                        <FontIcon Glyph="&#xE76B;" FontSize="14" Foreground="{StaticResource TextSecondary}"/>
+                    </Button>
 
-                        <StackPanel 
-                            Grid.Column="1" 
-                            HorizontalAlignment="Center" 
-                            VerticalAlignment="Center" 
-                            Spacing="2">
-                            <TextBlock 
-                                x:Name="WeekRangeText" 
-                                Text="Tuần hiện tại" 
-                                FontSize="15" 
-                                FontWeight="Bold" 
-                                HorizontalAlignment="Center" 
-                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"/>
-                        </StackPanel>
+                    <TextBlock
+                        x:Name="WeekRangeText"
+                        Grid.Column="1"
+                        Text="Tuần hiện tại"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Foreground="{StaticResource TextPrimary}"/>
 
-                        <Button 
-                            Grid.Column="2" 
-                            Style="{StaticResource NavIconButtonStyle}" 
-                            Click="NextWeek_Click">
-                            <FontIcon Glyph="&#xE76C;" FontSize="14"/>
-                        </Button>
-                    </Grid>
-                </Border>
+                    <Button Grid.Column="2" Style="{StaticResource NavIconButtonStyle}" Click="NextWeek_Click"
+                            Background="White" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                        <FontIcon Glyph="&#xE76C;" FontSize="14" Foreground="{StaticResource TextSecondary}"/>
+                    </Button>
+                </Grid>
 
-                <!-- ── CALENDAR BENTO GRID ── -->
-                <Grid x:Name="WeekGrid" Margin="0,0,0,32">
+                <!-- ── 7-Day Calendar Grid ── -->
+                <Grid x:Name="WeekGrid" ColumnSpacing="10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
@@ -468,254 +250,146 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Border Grid.Column="0" CornerRadius="16" Margin="0,0,6,0" Background="Transparent">
-                        <StackPanel Spacing="0" Margin="4">
-                            <Border Style="{StaticResource DayHeaderStyle}">
-                                <StackPanel HorizontalAlignment="Center" Spacing="2">
-                                    <TextBlock 
-                                        Text="CHỦ NHẬT" 
-                                        FontSize="9" 
-                                        FontWeight="Bold" 
-                                        Foreground="{StaticResource OutlineBrush}" 
-                                        CharacterSpacing="100"/>
-                                    <TextBlock 
-                                        x:Name="SundayDate" 
-                                        Text="-" 
-                                        FontSize="20" 
-                                        FontWeight="Black" 
-                                        HorizontalAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
-                            <ItemsControl 
-                                ItemsSource="{x:Bind SundayList}" 
-                                ItemTemplate="{StaticResource AppointmentCardTemplate}"/>
-                        </StackPanel>
-                    </Border>
+                    <!-- CHU NHAT -->
+                    <StackPanel Grid.Column="0" Spacing="8">
+                        <!-- Day Header -->
+                        <Border x:Name="SundayHeader" CornerRadius="12" Padding="8,4" Height="85" HorizontalAlignment="Stretch" Background="Transparent">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock x:Name="SundayLabel" Text="CN" FontSize="10" FontWeight="Bold"
+                                           Foreground="{StaticResource OutlineBrush}"
+                                           HorizontalAlignment="Center" CharacterSpacing="80"/>
+                                <Border x:Name="SundayCircle" Background="Transparent" CornerRadius="20" Width="38" Height="38">
+                                    <TextBlock x:Name="SundayDate" Text="-" FontSize="22" FontWeight="Black"
+                                               Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                        <ItemsControl ItemsSource="{x:Bind SundayList}" ItemTemplate="{StaticResource AppointmentCardTemplate}"/>
+                    </StackPanel>
 
-                    <Border Grid.Column="1" CornerRadius="16" Margin="0,0,6,0" Background="Transparent">
-                        <StackPanel Spacing="0" Margin="4">
-                            <Border CornerRadius="8" Padding="8,10" Margin="0,0,0,12" Background="{StaticResource SurfaceContainerBrush}">
-                                <StackPanel HorizontalAlignment="Center" Spacing="2">
-                                    <TextBlock 
-                                        Text="THỨ HAI" 
-                                        FontSize="9" 
-                                        FontWeight="Bold" 
-                                        Foreground="{StaticResource OutlineBrush}" 
-                                        CharacterSpacing="100"/>
-                                    <TextBlock 
-                                        x:Name="MondayDate" 
-                                        Text="-" 
-                                        FontSize="20" 
-                                        FontWeight="Black" 
-                                        HorizontalAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
-                            <ItemsControl 
-                                ItemsSource="{x:Bind MondayList}" 
-                                ItemTemplate="{StaticResource AppointmentCardTemplate}"/>
-                        </StackPanel>
-                    </Border>
+                    <!-- THU HAI -->
+                    <StackPanel Grid.Column="1" Spacing="8">
+                        <Border x:Name="MondayHeader" CornerRadius="12" Padding="8,4" Height="85" HorizontalAlignment="Stretch" Background="Transparent">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock x:Name="MondayLabel" Text="T2" FontSize="10" FontWeight="Bold"
+                                           Foreground="{StaticResource OutlineBrush}"
+                                           HorizontalAlignment="Center" CharacterSpacing="80"/>
+                                <Border x:Name="MondayCircle" Background="Transparent" CornerRadius="20" Width="38" Height="38">
+                                    <TextBlock x:Name="MondayDate" Text="-" FontSize="22" FontWeight="Black"
+                                               Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                        <ItemsControl ItemsSource="{x:Bind MondayList}" ItemTemplate="{StaticResource AppointmentCardTemplate}"/>
+                    </StackPanel>
 
-                    <Border Grid.Column="2" CornerRadius="16" Margin="0,0,6,0" Background="Transparent">
-                        <StackPanel Spacing="0" Margin="4">
-                            <Border Style="{StaticResource DayHeaderStyle}">
-                                <StackPanel HorizontalAlignment="Center" Spacing="2">
-                                    <TextBlock 
-                                        Text="THỨ BA" 
-                                        FontSize="9" 
-                                        FontWeight="Bold" 
-                                        Foreground="{StaticResource OutlineBrush}" 
-                                        CharacterSpacing="100"/>
-                                    <TextBlock 
-                                        x:Name="TuesdayDate" 
-                                        Text="-" 
-                                        FontSize="20" 
-                                        FontWeight="Black" 
-                                        HorizontalAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
-                            <ItemsControl 
-                                ItemsSource="{x:Bind TuesdayList}" 
-                                ItemTemplate="{StaticResource AppointmentCardTemplate}"/>
-                        </StackPanel>
-                    </Border>
+                    <!-- THU BA -->
+                    <StackPanel Grid.Column="2" Spacing="8">
+                        <Border x:Name="TuesdayHeader" CornerRadius="12" Padding="8,4" Height="85" HorizontalAlignment="Stretch" Background="Transparent">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock x:Name="TuesdayLabel" Text="T3" FontSize="10" FontWeight="Bold"
+                                           Foreground="{StaticResource OutlineBrush}"
+                                           HorizontalAlignment="Center" CharacterSpacing="80"/>
+                                <Border x:Name="TuesdayCircle" Background="Transparent" CornerRadius="20" Width="38" Height="38">
+                                    <TextBlock x:Name="TuesdayDate" Text="-" FontSize="22" FontWeight="Black"
+                                               Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                        <ItemsControl ItemsSource="{x:Bind TuesdayList}" ItemTemplate="{StaticResource AppointmentCardTemplate}"/>
+                    </StackPanel>
 
-                    <Border Grid.Column="3" CornerRadius="16" Margin="0,0,6,0" Background="Transparent">
-                        <StackPanel Spacing="0" Margin="4">
-                            <Border Style="{StaticResource DayHeaderStyle}">
-                                <StackPanel HorizontalAlignment="Center" Spacing="2">
-                                    <TextBlock 
-                                        Text="THỨ TƯ" 
-                                        FontSize="9" 
-                                        FontWeight="Bold" 
-                                        Foreground="{StaticResource OutlineBrush}" 
-                                        CharacterSpacing="100"/>
-                                    <TextBlock 
-                                        x:Name="WednesdayDate" 
-                                        Text="-" 
-                                        FontSize="20" 
-                                        FontWeight="Black" 
-                                        HorizontalAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
-                            <ItemsControl 
-                                ItemsSource="{x:Bind WednesdayList}" 
-                                ItemTemplate="{StaticResource AppointmentCardTemplate}"/>
-                        </StackPanel>
-                    </Border>
+                    <!-- THU TU -->
+                    <StackPanel Grid.Column="3" Spacing="8">
+                        <Border x:Name="WednesdayHeader" CornerRadius="12" Padding="8,4" Height="85" HorizontalAlignment="Stretch" Background="Transparent">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock x:Name="WednesdayLabel" Text="T4" FontSize="10" FontWeight="Bold"
+                                           Foreground="{StaticResource OutlineBrush}"
+                                           HorizontalAlignment="Center" CharacterSpacing="80"/>
+                                <Border x:Name="WednesdayCircle" Background="Transparent" CornerRadius="20" Width="38" Height="38">
+                                    <TextBlock x:Name="WednesdayDate" Text="-" FontSize="20" FontWeight="Black"
+                                               Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="{StaticResource TodayColumnBg}" CornerRadius="12" Padding="4">
+                            <ItemsControl ItemsSource="{x:Bind WednesdayList}" ItemTemplate="{StaticResource AppointmentCardTemplate}"/>
+                        </Border>
+                    </StackPanel>
 
-                    <Border Grid.Column="4" CornerRadius="16" Margin="0,0,6,0" Background="Transparent">
-                        <StackPanel Spacing="0" Margin="4">
-                            <Border Style="{StaticResource DayHeaderStyle}">
-                                <StackPanel HorizontalAlignment="Center" Spacing="2">
-                                    <TextBlock 
-                                        Text="THỨ NĂM" 
-                                        FontSize="9" 
-                                        FontWeight="Bold" 
-                                        Foreground="{StaticResource OutlineBrush}" 
-                                        CharacterSpacing="100"/>
-                                    <TextBlock 
-                                        x:Name="ThursdayDate" 
-                                        Text="-" 
-                                        FontSize="20" 
-                                        FontWeight="Black" 
-                                        HorizontalAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
-                            <ItemsControl 
-                                ItemsSource="{x:Bind ThursdayList}" 
-                                ItemTemplate="{StaticResource AppointmentCardTemplate}"/>
-                        </StackPanel>
-                    </Border>
+                    <!-- THU NAM -->
+                    <StackPanel Grid.Column="4" Spacing="8">
+                        <Border x:Name="ThursdayHeader" CornerRadius="12" Padding="8,4" Height="85" HorizontalAlignment="Stretch" Background="Transparent">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock x:Name="ThursdayLabel" Text="T5" FontSize="10" FontWeight="Bold"
+                                           Foreground="{StaticResource OutlineBrush}"
+                                           HorizontalAlignment="Center" CharacterSpacing="80"/>
+                                <Border x:Name="ThursdayCircle" Background="Transparent" CornerRadius="20" Width="38" Height="38">
+                                    <TextBlock x:Name="ThursdayDate" Text="-" FontSize="22" FontWeight="Black"
+                                               Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                        <ItemsControl ItemsSource="{x:Bind ThursdayList}" ItemTemplate="{StaticResource AppointmentCardTemplate}"/>
+                    </StackPanel>
 
-                    <Border Grid.Column="5" CornerRadius="16" Margin="0,0,6,0" Background="Transparent">
-                        <StackPanel Spacing="0" Margin="4">
-                            <Border Style="{StaticResource DayHeaderStyle}">
-                                <StackPanel HorizontalAlignment="Center" Spacing="2">
-                                    <TextBlock 
-                                        Text="THỨ SÁU" 
-                                        FontSize="9" 
-                                        FontWeight="Bold" 
-                                        Foreground="{StaticResource OutlineBrush}" 
-                                        CharacterSpacing="100"/>
-                                    <TextBlock 
-                                        x:Name="FridayDate" 
-                                        Text="-" 
-                                        FontSize="20" 
-                                        FontWeight="Black" 
-                                        HorizontalAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
-                            <ItemsControl 
-                                ItemsSource="{x:Bind FridayList}" 
-                                ItemTemplate="{StaticResource AppointmentCardTemplate}"/>
-                        </StackPanel>
-                    </Border>
+                    <!-- THU SAU -->
+                    <StackPanel Grid.Column="5" Spacing="8">
+                        <Border x:Name="FridayHeader" CornerRadius="12" Padding="8,4" Height="85" HorizontalAlignment="Stretch" Background="Transparent">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock x:Name="FridayLabel" Text="T6" FontSize="10" FontWeight="Bold"
+                                           Foreground="{StaticResource OutlineBrush}"
+                                           HorizontalAlignment="Center" CharacterSpacing="80"/>
+                                <Border x:Name="FridayCircle" Background="Transparent" CornerRadius="20" Width="38" Height="38">
+                                    <TextBlock x:Name="FridayDate" Text="-" FontSize="22" FontWeight="Black"
+                                               Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                        <ItemsControl ItemsSource="{x:Bind FridayList}" ItemTemplate="{StaticResource AppointmentCardTemplate}"/>
+                    </StackPanel>
 
-                    <Border Grid.Column="6" CornerRadius="16" Background="Transparent">
-                        <StackPanel Spacing="0" Margin="4">
-                            <Border Style="{StaticResource DayHeaderStyle}">
-                                <StackPanel HorizontalAlignment="Center" Spacing="2">
-                                    <TextBlock 
-                                        Text="THỨ BẢY" 
-                                        FontSize="9" 
-                                        FontWeight="Bold" 
-                                        Foreground="{StaticResource OutlineBrush}" 
-                                        CharacterSpacing="100"/>
-                                    <TextBlock 
-                                        x:Name="SaturdayDate" 
-                                        Text="-" 
-                                        FontSize="20" 
-                                        FontWeight="Black" 
-                                        HorizontalAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
-                            <ItemsControl 
-                                ItemsSource="{x:Bind SaturdayList}" 
-                                ItemTemplate="{StaticResource AppointmentCardTemplate}"/>
-                        </StackPanel>
-                    </Border>
+                    <!-- THU BAY -->
+                    <StackPanel Grid.Column="6" Spacing="8">
+                        <Border x:Name="SaturdayHeader" CornerRadius="12" Padding="8,4" Height="85" HorizontalAlignment="Stretch" Background="Transparent">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock x:Name="SaturdayLabel" Text="T7" FontSize="10" FontWeight="Bold"
+                                           Foreground="{StaticResource OutlineBrush}"
+                                           HorizontalAlignment="Center" CharacterSpacing="80"/>
+                                <Border x:Name="SaturdayCircle" Background="Transparent" CornerRadius="20" Width="38" Height="38">
+                                    <TextBlock x:Name="SaturdayDate" Text="-" FontSize="22" FontWeight="Black"
+                                               Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                        <ItemsControl ItemsSource="{x:Bind SaturdayList}" ItemTemplate="{StaticResource AppointmentCardTemplate}"/>
+                    </StackPanel>
                 </Grid>
             </StackPanel>
+
 
             <!-- ═══════════════════════════════════════════════════════ -->
             <!-- MONTH VIEW PANEL                                        -->
             <!-- ═══════════════════════════════════════════════════════ -->
-            <StackPanel x:Name="MonthViewPanel" Visibility="Collapsed">
-                <Border 
-                    Background="{StaticResource SurfaceContainerLowestBrush}" 
-                    CornerRadius="14" 
-                    Padding="16,12" 
-                    Margin="0,0,0,20">
+            <StackPanel x:Name="MonthViewPanel" Visibility="Collapsed" Spacing="24">
+                <Border Style="{StaticResource SurfaceCardStyle}" Padding="16">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-
-                        <Button 
-                            Grid.Column="0" 
-                            Style="{StaticResource NavIconButtonStyle}" 
-                            Click="PrevMonth_Click">
+                        <Button Grid.Column="0" Click="PrevMonth_Click" Style="{StaticResource NavIconButtonStyle}">
                             <FontIcon Glyph="&#xE76B;" FontSize="14"/>
                         </Button>
-
-                        <StackPanel 
-                            Grid.Column="1" 
-                            HorizontalAlignment="Center" 
-                            VerticalAlignment="Center" 
-                            Spacing="2">
-                            <TextBlock 
-                                x:Name="MonthYearText" 
-                                Text="Tháng 1, 2025" 
-                                FontSize="16" 
-                                FontWeight="Bold" 
-                                HorizontalAlignment="Center" 
-                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"/>
-                        </StackPanel>
-
-                        <Button 
-                            Grid.Column="2" 
-                            Style="{StaticResource NavIconButtonStyle}" 
-                            Click="NextMonth_Click">
+                        <TextBlock x:Name="MonthYearText" Grid.Column="1" Text="Tháng 4, 2026" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button Grid.Column="2" Click="NextMonth_Click" Style="{StaticResource NavIconButtonStyle}">
                             <FontIcon Glyph="&#xE76C;" FontSize="14"/>
                         </Button>
                     </Grid>
                 </Border>
 
-                <!-- Day-of-week headers -->
-                <Border 
-                    Background="{StaticResource SurfaceContainerBrush}" 
-                    CornerRadius="10" 
-                    Padding="0,10" 
-                    Margin="0,0,0,4">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="CN" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource OutlineBrush}"/>
-                        <TextBlock Grid.Column="1" Text="T2" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource OutlineBrush}"/>
-                        <TextBlock Grid.Column="2" Text="T3" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource OutlineBrush}"/>
-                        <TextBlock Grid.Column="3" Text="T4" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource OutlineBrush}"/>
-                        <TextBlock Grid.Column="4" Text="T5" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource OutlineBrush}"/>
-                        <TextBlock Grid.Column="5" Text="T6" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource OutlineBrush}"/>
-                        <TextBlock Grid.Column="6" Text="T7" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource OutlineBrush}"/>
-                    </Grid>
-                </Border>
-
-                <!-- Month Calendar Grid -->
-                <Border 
-                    Background="{StaticResource SurfaceContainerLowestBrush}" 
-                    CornerRadius="14" 
-                    Padding="8" 
-                    Margin="0,0,0,32">
+                <Border Style="{StaticResource SurfaceCardStyle}" Padding="8">
                     <Grid x:Name="MonthCalendarGrid">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -727,6 +401,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/> <!-- Header -->
                             <RowDefinition Height="100"/>
                             <RowDefinition Height="100"/>
                             <RowDefinition Height="100"/>
@@ -734,85 +409,84 @@
                             <RowDefinition Height="100"/>
                             <RowDefinition Height="100"/>
                         </Grid.RowDefinitions>
+                        
+                        <!-- Day labels -->
+                        <TextBlock Grid.Column="0" Text="CN" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}" Margin="0,8"/>
+                        <TextBlock Grid.Column="1" Text="T2" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}" Margin="0,8"/>
+                        <TextBlock Grid.Column="2" Text="T3" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}" Margin="0,8"/>
+                        <TextBlock Grid.Column="3" Text="T4" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}" Margin="0,8"/>
+                        <TextBlock Grid.Column="4" Text="T5" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}" Margin="0,8"/>
+                        <TextBlock Grid.Column="5" Text="T6" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}" Margin="0,8"/>
+                        <TextBlock Grid.Column="6" Text="T7" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}" Margin="0,8"/>
                     </Grid>
                 </Border>
             </StackPanel>
-            
+
             <!-- ═══════════════════════════════════════════════════════ -->
             <!-- LIST VIEW PANEL                                         -->
             <!-- ═══════════════════════════════════════════════════════ -->
-            <StackPanel x:Name="ListViewPanel" Visibility="Collapsed">
-                <Border Background="White" CornerRadius="16" BorderBrush="#E5E7EB" BorderThickness="1" Padding="8">
+            <StackPanel x:Name="ListViewPanel" Visibility="Collapsed" Spacing="24">
+                <Border Style="{StaticResource SurfaceCardStyle}" Padding="0">
                     <ListView x:Name="AllAppointmentsListView"
                               ItemsSource="{x:Bind AllAppointmentsListVM}"
-                              SelectionMode="None">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                <Setter Property="Padding" Value="16,12"/>
-                                <Setter Property="BorderBrush" Value="#F3F4F6"/>
-                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                            </Style>
-                        </ListView.ItemContainerStyle>
+                              SelectionMode="None"
+                              Padding="12">
                         <ListView.Header>
-                            <Grid Padding="16,4,16,12" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Margin="0,0,0,8">
+                            <Grid Padding="16,8" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Margin="0,0,0,8">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="150"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="120"/>
-                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="120"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="THỜI GIAN" FontSize="10" FontWeight="Bold" Foreground="#6B7280" CharacterSpacing="50"/>
-                                <TextBlock Grid.Column="1" Text="BỆNH NHÂN" FontSize="10" FontWeight="Bold" Foreground="#6B7280" CharacterSpacing="50"/>
-                                <TextBlock Grid.Column="2" Text="HÌNH THỨC" FontSize="10" FontWeight="Bold" Foreground="#6B7280" CharacterSpacing="50"/>
-                                <TextBlock Grid.Column="3" Text="TRẠNG THÁI" FontSize="10" FontWeight="Bold" Foreground="#6B7280" CharacterSpacing="50"/>
+                                <TextBlock Text="THỜI GIAN" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" CharacterSpacing="50"/>
+                                <TextBlock Grid.Column="1" Text="BỆNH NHÂN" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" CharacterSpacing="50"/>
+                                <TextBlock Grid.Column="2" Text="HÌNH THỨC" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" CharacterSpacing="50"/>
+                                <TextBlock Grid.Column="3" Text="TRẠNG THÁI" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" CharacterSpacing="50"/>
                             </Grid>
                         </ListView.Header>
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="local:AppointmentViewModel">
-                                <Grid Tapped="AppointmentCard_Tapped" Background="Transparent">
+                                <Grid Tapped="AppointmentCard_Tapped" Padding="16,12" Background="Transparent" ColumnSpacing="12">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="140"/>
+                                        <ColumnDefinition Width="150"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="120"/>
-                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="120"/>
                                     </Grid.ColumnDefinitions>
-
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="{x:Bind Time}" FontWeight="Bold" FontSize="15" Foreground="#111827"/>
-                                        <TextBlock Text="{x:Bind DateFormatted}" FontSize="12" Foreground="#6B7280"/>
+                                        <TextBlock Text="{x:Bind Time}" FontWeight="Bold" FontSize="14" Foreground="{StaticResource TextPrimary}"/>
+                                        <TextBlock Text="{x:Bind DateFormatted}" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
                                     </StackPanel>
-
-                                    <TextBlock Grid.Column="1" Text="{x:Bind PatientName}" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14" Foreground="#111827"/>
-
+                                    <TextBlock Grid.Column="1" Text="{x:Bind PatientName}" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14" Foreground="{StaticResource TextPrimary}"/>
                                     <Border Grid.Column="2" Background="{x:Bind TypeBgBrush}" CornerRadius="6" Padding="8,3" HorizontalAlignment="Left" VerticalAlignment="Center">
                                         <TextBlock Text="{x:Bind TypeText}" FontSize="10" Foreground="White" FontWeight="Bold"/>
                                     </Border>
-
-                                    <TextBlock Grid.Column="3" Text="{x:Bind StatusText}" VerticalAlignment="Center" Foreground="{x:Bind TagBgBrush}" FontSize="12" FontWeight="Bold"/>
+                                    <Border Grid.Column="3" Background="{x:Bind TagBgBrush}" CornerRadius="6" Padding="8,3" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                        <TextBlock Text="{x:Bind StatusText}" FontSize="10" Foreground="White" FontWeight="Bold"/>
+                                    </Border>
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
                 </Border>
-                
+
                 <!-- Pagination -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0" Spacing="20">
-                    <Button x:Name="BtnPrevPage" Click="BtnPrevPage_Click" Style="{StaticResource NavIconButtonStyle}">
-                        <FontIcon Glyph="&#xE76B;" FontSize="14"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="24">
+                    <Button x:Name="BtnPrevPage" Click="BtnPrevPage_Click" Style="{StaticResource NavIconButtonStyle}" Background="{StaticResource SurfaceBrush}">
+                        <FontIcon Glyph="&#xE76B;" FontSize="12"/>
                     </Button>
-                    <TextBlock x:Name="PageInfoText" Text="Trang 1 / 1" VerticalAlignment="Center" FontWeight="Bold" Foreground="{StaticResource SecondaryBrush}"/>
-                    <Button x:Name="BtnNextPage" Click="BtnNextPage_Click" Style="{StaticResource NavIconButtonStyle}">
-                        <FontIcon Glyph="&#xE76C;" FontSize="14"/>
+                    <TextBlock x:Name="PageInfoText" Text="Trang 1 / 1" VerticalAlignment="Center" FontWeight="Bold" Foreground="{StaticResource TextSecondary}"/>
+                    <Button x:Name="BtnNextPage" Click="BtnNextPage_Click" Style="{StaticResource NavIconButtonStyle}" Background="{StaticResource SurfaceBrush}">
+                        <FontIcon Glyph="&#xE76C;" FontSize="12"/>
                     </Button>
                 </StackPanel>
-
             </StackPanel>
 
             <!-- ═══════════════════════════════════════════════════════ -->
             <!-- SLOT MANAGEMENT PANEL                                   -->
             <!-- ═══════════════════════════════════════════════════════ -->
-            <Grid x:Name="SlotManagementPanel" Visibility="Collapsed">
+            <Grid x:Name="SlotManagementPanel" Visibility="Collapsed" ColumnSpacing="32">
                 <VisualStateManager.VisualStateGroups>
                     <VisualStateGroup>
                         <VisualState x:Name="WideState">
@@ -825,46 +499,36 @@
                                 <AdaptiveTrigger MinWindowWidth="0" />
                             </VisualState.StateTriggers>
                             <VisualState.Setters>
-                                <Setter Target="PageHeaderGrid.ColumnDefinitions[1].Width" Value="0" />
-                                <Setter Target="PageHeaderGrid.RowDefinitions[1].Height" Value="Auto" />
-                                <Setter Target="ClockPanel.(Grid.Column)" Value="0" />
-                                <Setter Target="ClockPanel.(Grid.Row)" Value="1" />
-                                <Setter Target="ClockPanel.HorizontalAlignment" Value="Left" />
-                                <Setter Target="ClockPanel.Margin" Value="0,12,0,0" />
-                                <Setter Target="CurrentTimeText.HorizontalAlignment" Value="Left" />
-                                <Setter Target="CurrentDateText.HorizontalAlignment" Value="Left" />
-
-                                <Setter Target="SlotMainGrid.ColumnDefinitions[0].Width" Value="*" />
-                                <Setter Target="SlotMainGrid.ColumnDefinitions[1].Width" Value="0" />
-                                <Setter Target="SlotMainGrid.RowDefinitions[1].Height" Value="Auto" />
-                                <Setter Target="RightPanelBorder.(Grid.Column)" Value="0" />
+                                <!-- Setters for narrow layout if needed -->
+                                <Setter Target="SlotGrid.ColumnDefinitions[0].Width" Value="*" />
+                                <Setter Target="SlotGrid.ColumnDefinitions[1].Width" Value="0" />
                                 <Setter Target="RightPanelBorder.(Grid.Row)" Value="1" />
-                                <Setter Target="RightPanelBorder.Margin" Value="0,20,0,0" />
-                                <Setter Target="SlotHeaderPanel.Orientation" Value="Vertical" />
-                                <Setter Target="SlotHeaderActions.HorizontalAlignment" Value="Left" />
-                                <Setter Target="SlotHeaderActions.Margin" Value="0,12,0,0" />
+                                <Setter Target="RightPanelBorder.(Grid.Column)" Value="0" />
                             </VisualState.Setters>
                         </VisualState>
                     </VisualStateGroup>
                 </VisualStateManager.VisualStateGroups>
 
-                <Grid x:Name="SlotMainGrid" ColumnSpacing="24">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+                <Grid x:Name="SlotGrid" ColumnSpacing="32">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="350"/>
+                        <ColumnDefinition Width="380"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                    <!-- Create Slots Tool -->
-                    <Border Grid.Column="0" Background="White" CornerRadius="16" BorderBrush="#E5E7EB" BorderThickness="1" Padding="24" VerticalAlignment="Top">
-                        <StackPanel Spacing="16">
-                            <TextBlock Text="Tạo Khung giờ Mới" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
-                            
+                    <!-- Left: Configuration Tool -->
+                    <Border Grid.Column="0" Style="{StaticResource SurfaceCardStyle}" VerticalAlignment="Top">
+                        <StackPanel Spacing="20">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Tạo Khung Giờ" FontSize="20" FontWeight="Bold" Foreground="{StaticResource MedicalBlue}"/>
+                                <TextBlock Text="Thiết lập các ca khám tự động cho ngày làm việc" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
+                            </StackPanel>
+
                             <StackPanel Spacing="8">
-                                <TextBlock Text="Ngày áp dụng" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryBrush}"/>
+                                <TextBlock Text="Ngày áp dụng" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
                                 <DatePicker x:Name="NewSlotDatePicker" HorizontalAlignment="Stretch"/>
                             </StackPanel>
 
@@ -874,69 +538,71 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Spacing="8">
-                                    <TextBlock Text="Giờ bắt đầu" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryBrush}"/>
+                                    <TextBlock Text="Bắt đầu" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
                                     <TimePicker x:Name="NewSlotStartTime" ClockIdentifier="24HourClock" HorizontalAlignment="Stretch"/>
                                 </StackPanel>
                                 <StackPanel Spacing="8" Grid.Column="1">
-                                    <TextBlock Text="Giờ kết thúc" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryBrush}"/>
+                                    <TextBlock Text="Kết thúc" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
                                     <TimePicker x:Name="NewSlotEndTime" ClockIdentifier="24HourClock" HorizontalAlignment="Stretch"/>
                                 </StackPanel>
                             </Grid>
 
                             <StackPanel Spacing="8">
-                                <TextBlock Text="Thời lượng mỗi ca (phút)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryBrush}"/>
-                                <NumberBox x:Name="SlotDurationBox" Value="30" SpinButtonPlacementMode="Inline" SmallChange="5"/>
+                                <TextBlock Text="Thời lượng (phút)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                                <NumberBox x:Name="SlotDurationBox" Value="30" SpinButtonPlacementMode="Inline" HorizontalAlignment="Stretch"/>
                             </StackPanel>
 
                             <StackPanel Spacing="8">
-                                <TextBlock Text="Thời gian nghỉ (buffer - phút)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryBrush}"/>
-                                <NumberBox x:Name="BufferDurationBox" Value="5" SpinButtonPlacementMode="Inline" SmallChange="5"/>
+                                <TextBlock Text="Nghỉ giữa ca (phút)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                                <NumberBox x:Name="BufferDurationBox" Value="5" SpinButtonPlacementMode="Inline" HorizontalAlignment="Stretch"/>
                             </StackPanel>
 
-                            <Button Content="Tự động tạo các ca" 
-                                    Click="BtnAutoCreateSlots_Click"
-                                    Style="{StaticResource PrimaryButtonStyle}" 
-                                    HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+                            <Button x:Name="BtnAutoCreateSlots" Click="BtnAutoCreateSlots_Click" Content="Tự động tạo ca" Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Stretch" Margin="0,12,0,0"/>
                         </StackPanel>
                     </Border>
 
-                    <!-- Slots List -->
-                    <Border x:Name="RightPanelBorder" Grid.Column="1" Background="White" CornerRadius="16" BorderBrush="#E5E7EB" BorderThickness="1" Padding="24">
-                        <StackPanel Spacing="16">
-                            <StackPanel x:Name="SlotHeaderPanel" Orientation="Horizontal" HorizontalAlignment="Stretch">
-                                <TextBlock Text="Danh sách các Khung giờ" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
-                                <StackPanel x:Name="SlotHeaderActions" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
-                                    <DatePicker x:Name="FilterSlotDatePicker" DateChanged="FilterSlotDatePicker_DateChanged"/>
-                                    <Button Content="Xoá tất cả trống" Click="BtnDeleteAllAvailableSlots_Click" Foreground="Red"/>
+                    <!-- Right: Slot Inventory -->
+                    <Border x:Name="RightPanelBorder" Grid.Column="1" Style="{StaticResource SurfaceCardStyle}">
+                        <StackPanel Spacing="20">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Danh Sách Ca Khám" FontSize="20" FontWeight="Bold"/>
+                                    <TextBlock Text="Các khung giờ hiện có trong hệ thống" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
                                 </StackPanel>
-                            </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                                    <DatePicker x:Name="FilterSlotDatePicker" DateChanged="FilterSlotDatePicker_DateChanged" Height="38"/>
+                                    <Button Click="BtnDeleteAllAvailableSlots_Click" Content="Xóa trống" Foreground="{StaticResource DangerRed}" Background="Transparent" BorderThickness="1" BorderBrush="#FECACA" HorizontalAlignment="Right"/>
+                                </StackPanel>
+                            </Grid>
 
                             <ListView x:Name="SlotsListView" ItemsSource="{x:Bind DoctorSlotsList}" SelectionMode="None">
                                 <ListView.ItemTemplate>
                                     <DataTemplate x:DataType="local:SlotViewModel">
-                                        <Grid Padding="0,8" BorderBrush="#F3F4F6" BorderThickness="0,0,0,1">
+                                        <Grid Padding="8,12" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" ColumnSpacing="20">
                                             <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             
-                                            <StackPanel VerticalAlignment="Center">
-                                                <TextBlock Text="{x:Bind TimeRange}" FontWeight="Bold" FontSize="16"/>
-                                                <TextBlock Text="{x:Bind DateFormatted}" FontSize="12" Foreground="#6B7280"/>
+                                            <FontIcon Glyph="&#xE822;" FontSize="18" Foreground="{StaticResource MedicalBlue}" VerticalAlignment="Center"/>
+                                            
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{x:Bind TimeRange}" FontWeight="Bold" FontSize="15" Foreground="{StaticResource TextPrimary}"/>
+                                                <TextBlock Text="{x:Bind DateFormatted}" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
                                             </StackPanel>
 
-                                            <Border Grid.Column="1" Background="{x:Bind StatusBg}" CornerRadius="6" Padding="8,3" Margin="0,0,12,0" VerticalAlignment="Center">
+                                            <Border Grid.Column="2" Background="{x:Bind StatusBg}" CornerRadius="12" Padding="12,3" VerticalAlignment="Center">
                                                 <TextBlock Text="{x:Bind StatusText}" FontSize="10" Foreground="White" FontWeight="Bold"/>
                                             </Border>
 
-                                            <Button Grid.Column="2" 
-                                                    Click="BtnDeleteSlot_Click" 
-                                                    CommandParameter="{x:Bind Id}"
-                                                    Background="Transparent" 
-                                                    Padding="8"
-                                                    Visibility="{x:Bind CanDeleteVisibility}">
-                                                <FontIcon Glyph="&#xE74D;" FontSize="14" Foreground="#BA1A1A"/>
+                                            <Button Grid.Column="3" Click="BtnDeleteSlot_Click" CommandParameter="{x:Bind Id}" Visibility="{x:Bind CanDeleteVisibility}" Style="{StaticResource NavIconButtonStyle}" Foreground="{StaticResource DangerRed}">
+                                                <FontIcon Glyph="&#xE74D;" FontSize="14"/>
                                             </Button>
                                         </Grid>
                                     </DataTemplate>
