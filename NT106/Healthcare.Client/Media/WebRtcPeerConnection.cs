@@ -1,4 +1,4 @@
-﻿using Microsoft.MixedReality.WebRTC;
+using Microsoft.MixedReality.WebRTC;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,10 +22,10 @@ namespace Healthcare.Client.Communication
         private DeviceVideoTrackSource _videoSource;
         private LocalVideoTrack _localVideoTrack;
         private Transceiver _videoTransceiver;
-        public delegate void VideoFrameDelegate(I420AVideoFrame frame);
+        public delegate void Argb32VideoFrameDelegate(Argb32VideoFrame frame);
 
-        public event VideoFrameDelegate OnLocalFrameReady;
-        public event VideoFrameDelegate OnRemoteFrameReady;
+        public event Argb32VideoFrameDelegate OnLocalFrameReady;
+        public event Argb32VideoFrameDelegate OnRemoteFrameReady;
 
         public event Action<string, string> OnSignalingGenerated;
 
@@ -55,13 +55,13 @@ namespace Healthcare.Client.Communication
 
                 _peerConnection.VideoTrackAdded += (RemoteVideoTrack track) =>
                 {
-                    track.I420AVideoFrameReady += (I420AVideoFrame frame) =>
+                    // Đổi sang Argb32 để xử lý ảnh màu trực tiếp
+                    track.Argb32VideoFrameReady += (Argb32VideoFrame frame) =>
                     {
                         OnRemoteFrameReady?.Invoke(frame);
                     };
                 };
 
-                // Gọi hàm đã được nâng cấp lên API 2.x
                 await SetupLocalMedia();
             }
             catch (Exception ex)
@@ -71,31 +71,23 @@ namespace Healthcare.Client.Communication
         }
         private async Task SetupLocalMedia()
         {
-            //Cài đặt âm thanh 
-            // Bước 1: Tạo nguồn âm thanh 
             _audioSource = await DeviceAudioTrackSource.CreateAsync();
-            // Bước 2: Tạo Track từ nguồn
             var audioConfig = new LocalAudioTrackInitConfig { trackName = "local_audio_track" };
             _localAudioTrack = LocalAudioTrack.CreateFromSource(_audioSource, audioConfig);
-            // Bước 3: Thêm vào PeerConnection qua Transceiver (Dùng MediaKind.Audio)
             _audioTransceiver = _peerConnection.AddTransceiver(MediaKind.Audio);
             _audioTransceiver.DesiredDirection = Transceiver.Direction.SendReceive;
             _audioTransceiver.LocalAudioTrack = _localAudioTrack;
 
-            // Cài đặt Camera 
-            // Bước 1: Tạo Nguồn hình ảnh (Source) - Tự động lấy camera mặc định
             _videoSource = await DeviceVideoTrackSource.CreateAsync();
-            // Bước 2: Tạo Track từ Nguồn
             var videoConfig = new LocalVideoTrackInitConfig { trackName = "local_video_track" };
             _localVideoTrack = LocalVideoTrack.CreateFromSource(_videoSource, videoConfig);
 
-            // Bắt sự kiện hiển thị hình ảnh bản thân (Preview)
-            _localVideoTrack.I420AVideoFrameReady += (I420AVideoFrame frame) =>
+            // Đổi sang Argb32 cho local preview
+            _localVideoTrack.Argb32VideoFrameReady += (Argb32VideoFrame frame) =>
             {
                 OnLocalFrameReady?.Invoke(frame);
             };
 
-            // Bước 3: Thêm vào PeerConnection qua Transceiver (Dùng MediaKind.Video)
             _videoTransceiver = _peerConnection.AddTransceiver(MediaKind.Video);
             _videoTransceiver.DesiredDirection = Transceiver.Direction.SendReceive;
             _videoTransceiver.LocalVideoTrack = _localVideoTrack;

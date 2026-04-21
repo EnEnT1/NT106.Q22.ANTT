@@ -35,8 +35,8 @@
                     </StackPanel>
                 </Border>
 
-                <!-- TODO sau này: Remote video -->
-                <!-- <MediaPlayerElement x:Name="RemoteVideo"/> -->
+                <!-- Remote video display -->
+                <Image x:Name="RemoteVideo" Stretch="UniformToFill"/>
 
                 <!-- Badge góc trên -->
                 <StackPanel Orientation="Horizontal"
@@ -99,12 +99,17 @@
                         HorizontalAlignment="Right"
                         Margin="0,0,20,90">
                     <Grid>
-                        <FontIcon FontFamily="Segoe MDL2 Assets"
-                                  Glyph="&#xE77B;"
-                                  FontSize="32"
-                                  Foreground="#475569"
-                                  HorizontalAlignment="Center"
-                                  VerticalAlignment="Center"/>
+                        <!-- Local video preview (PiP) -->
+                        <Image x:Name="LocalVideo" Stretch="UniformToFill"/>
+                        
+                        <Border x:Name="LocalVideoPlaceholder" Background="#0F172A" Visibility="Collapsed">
+                             <FontIcon FontFamily="Segoe MDL2 Assets"
+                                      Glyph="&#xE77B;"
+                                      FontSize="32"
+                                      Foreground="#475569"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
 
                         <Border VerticalAlignment="Bottom"
                                 HorizontalAlignment="Left"
