@@ -13,6 +13,7 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using Windows.UI;
 
 namespace Healthcare.Client.UI.Doctor
@@ -52,9 +53,28 @@ namespace Healthcare.Client.UI.Doctor
 
         private async Task InitializePageAsync()
         {
-            await LoadPatientInfoAsync();
-            await VideoCall.InitializeAsync(_appointmentId, _patientId);
-            await Chat.InitializeAsync(_appointmentId, _currentUserId, _patientId);
+            try
+            {
+                var client = Healthcare.Client.SupabaseIntegration.SupabaseManager.Instance.Client;
+                var appointmentResponse = await client.From<Appointment>().Where(a => a.Id == _appointmentId).Single();
+                
+                if (appointmentResponse != null)
+                {
+                    _patientId = appointmentResponse.PatientId;
+                    await LoadPatientInfoAsync();
+                    
+                    await VideoCall.InitializeAsync(_appointmentId, _patientId, appointmentResponse.RoomCode);
+                    await Chat.InitializeAsync(_appointmentId, _currentUserId, _patientId);
+                }
+                else
+                {
+                    await new ContentDialog { Title = "Lỗi", Content = "Không tìm thấy thông tin lịch hẹn này.", CloseButtonText = "Đóng", XamlRoot = this.XamlRoot }.ShowAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[DoctorExam] Init Error: {ex.Message}");
+            }
         }
 
         private async Task LoadPatientInfoAsync()
