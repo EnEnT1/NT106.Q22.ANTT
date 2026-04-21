@@ -1,24 +1,127 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Page
     x:Class="Healthcare.Client.UI.Patient.MyRecordsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Healthcare.Client.UI.Patient"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
-
-    <Page.Background>
-        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#f0f9ff" Offset="0"/>
-            <GradientStop Color="#e0e7ff" Offset="0.25"/>
-            <GradientStop Color="#faf5ff" Offset="0.50"/>
-            <GradientStop Color="#fdf4ff" Offset="0.75"/>
-            <GradientStop Color="#ffffff" Offset="1"/>
-        </LinearGradientBrush>
-    </Page.Background>
+    xmlns:models="using:Healthcare.Client.Models.Core"
+    mc:Ignorable="d"
+    Background="#F8FAFC">
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
+        <!-- Header -->
+        <Border Grid.Row="0" Background="White" Padding="30,20" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <StackPanel>
+                    <TextBlock Text="Hồ Sơ Của Tôi" FontSize="28" FontWeight="Bold" Foreground="#1E293B"/>
+                    <TextBlock Text="Lịch sử khám bệnh và đơn thuốc" FontSize="14" Foreground="#64748B" Margin="0,4,0,0"/>
+                </StackPanel>
+                
+                <Button HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0" 
+                        Background="#F1F5F9" BorderThickness="0" CornerRadius="8" Padding="12,8" Click="BtnRefresh_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE72C;" FontSize="14"/>
+                        <TextBlock Text="Làm mới" FontSize="14"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" Padding="30" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="30" MaxWidth="1000" HorizontalAlignment="Left">
+                
+                <!-- Active Appointments / Join Call Section -->
+                <StackPanel x:Name="ActiveApptsSection" Visibility="Collapsed" Spacing="15">
+                    <TextBlock Text="Tư Vấn Đang Diễn Ra" FontSize="18" FontWeight="SemiBold" Foreground="#0F172A"/>
+                    <ItemsControl x:Name="ActiveApptsList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#0284C7" CornerRadius="12" Padding="20" Margin="0,0,0,10">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Lịch hẹn tư vấn trực tuyến" FontSize="16" FontWeight="Bold" Foreground="White"/>
+                                            <TextBlock Text="{Binding DoctorName}" FontSize="14" Foreground="#E0F2FE" Margin="0,4,0,0"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1" Click="BtnJoinCall_Click" Tag="{Binding Id}"
+                                                Background="White" Foreground="#0284C7" Padding="20,10" CornerRadius="8" FontWeight="Bold">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE714;"/>
+                                                <TextBlock Text="Vào phòng khám"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <!-- Medical Records History -->
+                <StackPanel Spacing="15">
+                    <TextBlock Text="Lịch Sử Khám Bệnh" FontSize="18" FontWeight="SemiBold" Foreground="#0F172A"/>
+                    
+                    <ProgressRing x:Name="LoadingRing" IsActive="True" HorizontalAlignment="Center" Margin="0,50"/>
+                    
+                    <TextBlock x:Name="EmptyStateText" Text="Bạn chưa có hồ sơ khám bệnh nào." 
+                               Visibility="Collapsed" HorizontalAlignment="Center" Margin="0,50" Foreground="#64748B"/>
+
+                    <ItemsControl x:Name="RecordsList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="White" CornerRadius="12" Padding="20" Margin="0,0,0,15" 
+                                        BorderBrush="#E2E8F0" BorderThickness="1">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Header: Date and Doctor -->
+                                        <Grid Grid.Row="0" Margin="0,0,0,15">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding DateStr}" FontSize="12" Foreground="#64748B" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding DoctorName}" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
+                                            </StackPanel>
+                                            <Border HorizontalAlignment="Right" VerticalAlignment="Top" 
+                                                    Background="#F0FDF4" Padding="8,4" CornerRadius="4">
+                                                <TextBlock Text="Đã hoàn thành" FontSize="11" Foreground="#166534" FontWeight="Bold"/>
+                                            </Border>
+                                        </Grid>
+
+                                        <!-- Diagnosis and Notes -->
+                                        <StackPanel Grid.Row="1" Spacing="10" Padding="0,15" BorderBrush="#F1F5F9" BorderThickness="0,1,0,1">
+                                            <StackPanel>
+                                                <TextBlock Text="Chẩn đoán:" FontSize="13" Foreground="#64748B" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding Diagnosis}" FontSize="15" Foreground="#1E293B" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                            <StackPanel>
+                                                <TextBlock Text="Ghi chú &amp; Đơn thuốc:" FontSize="13" Foreground="#64748B" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding Prescription}" FontSize="14" Foreground="#334155" Margin="0,2,0,0" TextWrapping="Wrap" FontStyle="Italic"/>
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <!-- Actions -->
+                                        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" Margin="0,15,0,0">
+                                            <Button Style="{StaticResource AccentButtonStyle}" Content="Xem đơn thuốc" Padding="15,6" CornerRadius="6" FontSize="13"/>
+                                            <Button Content="Tải về file PDF" Padding="15,6" CornerRadius="6" FontSize="13" Background="Transparent" BorderBrush="#CBD5E1"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>
