@@ -1,21 +1,20 @@
 using Healthcare.Client.Models.Core;
 using Healthcare.Client.SupabaseIntegration;
-
 using Microsoft.UI;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-
 using Postgrest.Attributes;
 using Postgrest.Models;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI;
+using Supabase.Realtime;
+using Supabase.Realtime.PostgresChanges;
 
 namespace Healthcare.Client.UI.Components
 {
@@ -26,6 +25,8 @@ namespace Healthcare.Client.UI.Components
         private string _appointmentId = string.Empty;
         private string _currentUserId = string.Empty;
         private string _patientId = string.Empty;
+
+        private RealtimeChannel? _chatChannel;
 
         private string _activeTab = "chat";
         private readonly List<string> _quickNotes = new();
@@ -45,12 +46,12 @@ namespace Healthcare.Client.UI.Components
             _patientId = patientId;
 
             await LoadChatHistoryAsync();
-            SubscribeRealtime();
+            await SubscribeRealtimeAsync();
         }
 
         public void Cleanup()
         {
-            // TODO: unsubscribe realtime nếu sau này có channel thật
+            _chatChannel?.Unsubscribe();
         }
 
         private async Task LoadChatHistoryAsync()
@@ -61,16 +62,13 @@ namespace Healthcare.Client.UI.Components
 
                 var response = await client
                     .From<ChatMessageItem>()
-                    .Get();
-
-                var messages = response.Models
                     .Where(m => m.AppointmentId == _appointmentId)
-                    .OrderBy(m => m.CreatedAt)
-                    .ToList();
+                    .Order("created_at", Postgrest.Constants.Ordering.Ascending)
+                    .Get();
 
                 MessageList.Children.Clear();
 
-                foreach (var msg in messages)
+                foreach (var msg in response.Models)
                 {
                     bool isSelf = msg.SenderId == _currentUserId;
                     MessageList.Children.Add(BuildBubble(msg, isSelf));
@@ -84,13 +82,31 @@ namespace Healthcare.Client.UI.Components
             }
         }
 
-        private void SubscribeRealtime()
+        private async Task SubscribeRealtimeAsync()
         {
-            // TODO:
-            // Sau này nối Supabase realtime ở đây.
-            // Hiện tại để trống trước để app chạy ổn định.
-        }
+            try
+            {
+                var client = SupabaseManager.Instance.Client;
+                _chatChannel = client.Realtime.Channel("chat_" + _appointmentId, "public", "chat_messages");
 
+                _chatChannel.AddPostgresChangeHandler(
+                    PostgresChangesOptions.ListenType.Inserts,
+                    (sender, change) =>
+                    {
+                        var msg = change.Model<ChatMessageItem>();
+                        if (msg != null && msg.AppointmentId == _appointmentId && msg.SenderId != _currentUserId)
+                        {
+                            DispatcherQueue.TryEnqueue(() =>
+                            {
+                                AppendBubble(msg, false);
+                            });
+                        }
+                    });
+
+                await _chatChannel.Subscribe();
+            }
+            catch { }
+        }
 
         private async void BtnSend_Click(object sender, RoutedEventArgs e)
         {
@@ -118,7 +134,7 @@ namespace Healthcare.Client.UI.Components
                 AppointmentId = _appointmentId,
                 SenderId = _currentUserId,
                 Content = text,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
 
             AppendBubble(msg, true);
@@ -150,35 +166,29 @@ namespace Healthcare.Client.UI.Components
                 Margin = new Thickness(0, 4, 0, 4)
             };
 
+            var time = msg.CreatedAt.ToLocalTime();
             wrapper.Children.Add(new TextBlock
             {
                 Text = isSelf
-                    ? $"Bạn • {msg.CreatedAt:HH:mm}"
-                    : $"Bệnh nhân • {msg.CreatedAt:HH:mm}",
+                    ? $"Bạn • {time:HH:mm}"
+                    : $"Bác sĩ/Bệnh nhân • {time:HH:mm}",
                 FontSize = 9,
                 FontWeight = FontWeights.Bold,
                 Foreground = new SolidColorBrush(HexToColor("#64748B")),
-                HorizontalAlignment = isSelf
-                    ? HorizontalAlignment.Right
-                    : HorizontalAlignment.Left
+                HorizontalAlignment = isSelf ? HorizontalAlignment.Right : HorizontalAlignment.Left
             });
 
             wrapper.Children.Add(new Border
             {
-                Background = new SolidColorBrush(
-                    isSelf ? HexToColor("#0059BB") : HexToColor("#E7E8E9")),
-                CornerRadius = new CornerRadius(
-                    isSelf ? 12 : 2,
-                    isSelf ? 2 : 12,
-                    12, 12),
+                Background = new SolidColorBrush(isSelf ? HexToColor("#0059BB") : HexToColor("#E7E8E9")),
+                CornerRadius = new CornerRadius(isSelf ? 12 : 2, isSelf ? 2 : 12, 12, 12),
                 Padding = new Thickness(12, 8, 12, 8),
                 Child = new TextBlock
                 {
                     Text = msg.Content ?? string.Empty,
                     FontSize = 13,
                     TextWrapping = TextWrapping.Wrap,
-                    Foreground = new SolidColorBrush(
-                        isSelf ? Colors.White : HexToColor("#1E293B"))
+                    Foreground = new SolidColorBrush(isSelf ? Colors.White : HexToColor("#1E293B"))
                 }
             });
 
@@ -193,46 +203,25 @@ namespace Healthcare.Client.UI.Components
 
         private async Task ShowDialogAsync(string title, string message)
         {
-            var d = new ContentDialog
-            {
-                Title = title,
-                Content = message,
-                CloseButtonText = "Đóng",
-                XamlRoot = this.XamlRoot,
-                DefaultButton = ContentDialogButton.Close
-            };
-
+            var d = new ContentDialog { Title = title, Content = message, CloseButtonText = "Đóng", XamlRoot = this.XamlRoot, DefaultButton = ContentDialogButton.Close };
             await d.ShowAsync();
         }
 
         private static Color HexToColor(string hex)
         {
             hex = hex.TrimStart('#');
-            return Color.FromArgb(
-                255,
-                Convert.ToByte(hex.Substring(0, 2), 16),
-                Convert.ToByte(hex.Substring(2, 2), 16),
-                Convert.ToByte(hex.Substring(4, 2), 16));
+            return Color.FromArgb(255, Convert.ToByte(hex.Substring(0, 2), 16), Convert.ToByte(hex.Substring(2, 2), 16), Convert.ToByte(hex.Substring(4, 2), 16));
         }
     }
 
     [Table("chat_messages")]
     public class ChatMessageItem : BaseModel
     {
-        [PrimaryKey("id", false)]
-        public string Id { get; set; } = string.Empty;
-
-        [Column("appointment_id")]
-        public string AppointmentId { get; set; } = string.Empty;
-
-        [Column("sender_id")]
-        public string SenderId { get; set; } = string.Empty;
-
-        [Column("content")]
-        public string Content { get; set; } = string.Empty;
-
-        [Column("created_at")]
-        public DateTime CreatedAt { get; set; }
+        [PrimaryKey("id", false)] public string Id { get; set; } = string.Empty;
+        [Column("appointment_id")] public string AppointmentId { get; set; } = string.Empty;
+        [Column("sender_id")] public string SenderId { get; set; } = string.Empty;
+        [Column("content")] public string Content { get; set; } = string.Empty;
+        [Column("created_at")] public DateTime CreatedAt { get; set; }
     }
 
     public class MedicalNotesSavedEventArgs : EventArgs
