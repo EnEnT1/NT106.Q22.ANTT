@@ -1,0 +1,131 @@
+<Page
+    x:Class="Healthcare.Client.UI.Patient.PatientExaminationPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:components="using:Healthcare.Client.UI.Components"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#f0f9ff" Offset="0"/>
+            <GradientStop Color="#e0e7ff" Offset="0.25"/>
+            <GradientStop Color="#faf5ff" Offset="0.50"/>
+            <GradientStop Color="#fdf4ff" Offset="0.75"/>
+            <GradientStop Color="#ffffff" Offset="1"/>
+        </LinearGradientBrush>
+    </Page.Background>
+
+    <Page.Resources>
+        <ThemeShadow x:Name="SharedShadow"/>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- LEFT SIDE: VIDEO AREA -->
+        <Border Grid.Column="0" Margin="20" CornerRadius="20" Background="Black" Shadow="{StaticResource SharedShadow}">
+            <components:VideoCallControl x:Name="VideoCall"
+                                         CallStarted="VideoCall_CallStarted"
+                                         CallEnded="VideoCall_CallEnded"
+                                         Visibility="Visible"/>
+        </Border>
+
+        <!-- RIGHT SIDE: INFO & CHAT -->
+        <Grid Grid.Column="1" Margin="0,20,20,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Nav Tabs -->
+            <Border Grid.Row="0" Background="White" CornerRadius="16" Padding="8" Margin="0,0,0,16" Shadow="{StaticResource SharedShadow}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Click="BtnNav_Click" Tag="info" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Stretch" Padding="0,10">
+                        <FontIcon x:Name="IconInfo" Glyph="&#xE77B;" FontSize="20" Foreground="#2563EB"/>
+                    </Button>
+                    <Button Grid.Column="1" Click="BtnNav_Click" Tag="chat" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Stretch" Padding="0,10">
+                        <FontIcon x:Name="IconChat" Glyph="&#xE8F2;" FontSize="20" Foreground="#64748B"/>
+                    </Button>
+                    <Button Grid.Column="2" Click="BtnNav_Click" Tag="notes" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Stretch" Padding="0,10">
+                        <FontIcon x:Name="IconNotes" Glyph="&#xE70B;" FontSize="20" Foreground="#64748B"/>
+                    </Button>
+                    <Button Grid.Column="3" Click="BtnNav_Click" Tag="prescription" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Stretch" Padding="0,10">
+                        <FontIcon x:Name="IconPrescription" Glyph="&#xE950;" FontSize="20" Foreground="#64748B"/>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Panels -->
+            <Grid Grid.Row="1">
+                <!-- Info Panel -->
+                <Border x:Name="InfoPanel" Visibility="Visible" Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource SharedShadow}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="24">
+                            <TextBlock Text="Thông tin bác sĩ" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
+                            
+                            <StackPanel HorizontalAlignment="Center" Spacing="12">
+                                <PersonPicture x:Name="DoctorAvatar" Width="120" Height="120" Background="#F1F5F9"/>
+                                <TextBlock x:Name="TxtDoctorName" Text="Đang tải..." FontSize="22" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                <Border Background="#EEF2FF" CornerRadius="20" Padding="14,6" HorizontalAlignment="Center">
+                                    <TextBlock x:Name="TxtSpecialty" Text="Khoa Nội Tổng Quát" FontSize="12" FontWeight="Bold" Foreground="#2563EB"/>
+                                </Border>
+                            </StackPanel>
+
+                            <StackPanel Spacing="16">
+                                <Grid>
+                                    <TextBlock Text="Mã bác sĩ" Foreground="#64748B" FontSize="14"/>
+                                    <TextBlock x:Name="TxtDoctorID" Text="--" FontWeight="SemiBold" HorizontalAlignment="Right" FontSize="14"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <Button x:Name="BtnExit" Click="BtnExit_Click" HorizontalAlignment="Stretch" Margin="0,12,0,0" Padding="0,14" Background="#EF4444" Foreground="White" CornerRadius="12" BorderThickness="0" FontWeight="Bold">
+                                <TextBlock Text="Thoát phiên khám"/>
+                            </Button>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+
+                <!-- Chat Panel -->
+                <Border x:Name="ChatPanel" Visibility="Collapsed" Background="White" CornerRadius="20" Shadow="{StaticResource SharedShadow}">
+                    <components:ChatControl x:Name="Chat"/>
+                </Border>
+
+                <!-- Notes Panel (Read-only for Patient) -->
+                <Border x:Name="NotesPanel" Visibility="Collapsed" Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource SharedShadow}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="20">
+                            <TextBlock Text="Ghi chú &amp; Chẩn đoán" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
+                            <TextBlock Text="Thông tin do bác sĩ cung cấp sẽ xuất hiện tại đây sau khi buổi khám kết thúc." FontSize="14" Foreground="#64748B" TextWrapping="Wrap" FontStyle="Italic"/>
+                            <Border Background="#F8FAFC" CornerRadius="12" Padding="16">
+                                <TextBlock x:Name="TxtDiagnosis" Text="Chưa có chẩn đoán." FontSize="15" FontWeight="Medium" Foreground="#334155" TextWrapping="Wrap"/>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+
+                <!-- Prescription Panel (Read-only for Patient) -->
+                <Border x:Name="PrescriptionPanel" Visibility="Collapsed" Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource SharedShadow}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="20">
+                            <TextBlock Text="Đơn thuốc" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
+                            <TextBlock Text="Đơn thuốc sẽ được cập nhật bởi bác sĩ trực tiếp trong buổi khám." FontSize="14" Foreground="#64748B" TextWrapping="Wrap" FontStyle="Italic"/>
+                            <StackPanel x:Name="PrescriptionList" Spacing="8"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>
