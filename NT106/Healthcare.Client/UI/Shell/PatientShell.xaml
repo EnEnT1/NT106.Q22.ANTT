@@ -191,13 +191,12 @@
                         Background="{StaticResource SlateGray50}"
                         CornerRadius="16">
                     <StackPanel Orientation="Horizontal" Spacing="16" Padding="16">
-                        <PersonPicture Width="44" Height="44"
-                                       ProfilePicture="ms-appx:///Assets/PatientA.jpg"
+                        <PersonPicture x:Name="PatientAvatar" Width="44" Height="44"
                                        Initials="BA"/>
                         <StackPanel VerticalAlignment="Center" Spacing="2">
-                            <TextBlock Text="Bệnh Nhân A" FontSize="13" FontWeight="Bold"
+                            <TextBlock x:Name="TxtPatientName" Text="Bệnh Nhân A" FontSize="13" FontWeight="Bold"
                                        Foreground="{StaticResource SlateGray800}"/>
-                            <TextBlock Text="ID: 12345678" FontSize="11" FontWeight="SemiBold"
+                            <TextBlock x:Name="TxtPatientID" Text="ID: 12345678" FontSize="11" FontWeight="SemiBold"
                                        Foreground="{StaticResource SlateGray400}"
                                        CharacterSpacing="50"/>
                         </StackPanel>
@@ -205,74 +204,75 @@
                 </Border>
 
                 <!-- Navigation Items -->
-                <StackPanel Grid.Row="2" Spacing="4" Margin="16,0">
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">
+                    <StackPanel Spacing="4" Margin="16,0">
+                        <!-- Home (Active) -->
+                        <Button x:Name="NavHome" Style="{StaticResource NavItemActiveStyle}"
+                                Click="NavHome_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                <FontIcon x:Name="NavHomeIcon" Glyph="&#xE80F;" FontSize="18" Foreground="#2D6CDF"
+                                          FontFamily="Segoe Fluent Icons"/>
+                                <TextBlock x:Name="NavHomeText" Text="Trang chủ" FontSize="14" FontWeight="Bold"
+                                           Foreground="#2D6CDF" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
 
-                    <!-- Home (Active) -->
-                    <Button x:Name="NavHome" Style="{StaticResource NavItemActiveStyle}"
-                            Click="NavHome_Click">
-                        <StackPanel Orientation="Horizontal" Spacing="14">
-                            <FontIcon x:Name="NavHomeIcon" Glyph="&#xE80F;" FontSize="18" Foreground="#2D6CDF"
-                                      FontFamily="Segoe Fluent Icons"/>
-                            <TextBlock x:Name="NavHomeText" Text="Trang chủ" FontSize="14" FontWeight="Bold"
-                                       Foreground="#2D6CDF" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
+                        <!-- Appointment -->
+                        <Button x:Name="NavAppointment" Style="{StaticResource NavItemButtonStyle}"
+                                Click="NavAppointment_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                <FontIcon Glyph="&#xE787;" FontSize="18"
+                                          FontFamily="Segoe Fluent Icons"/>
+                                <TextBlock Text="Đặt lịch khám" FontSize="14"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
 
-                    <!-- Appointment -->
-                    <Button x:Name="NavAppointment" Style="{StaticResource NavItemButtonStyle}"
-                            Click="NavAppointment_Click">
-                        <StackPanel Orientation="Horizontal" Spacing="14">
-                            <FontIcon Glyph="&#xE787;" FontSize="18"
-                                      FontFamily="Segoe Fluent Icons"/>
-                            <TextBlock Text="Đặt lịch khám" FontSize="14"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
+                        <!-- Records -->
+                        <Button x:Name="NavRecords" Style="{StaticResource NavItemButtonStyle}"
+                                Click="NavRecords_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                <FontIcon Glyph="&#xE8A5;" FontSize="18"
+                                          FontFamily="Segoe Fluent Icons"/>
+                                <TextBlock Text="Hồ sơ bệnh án" FontSize="14"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
 
-                    <!-- Records -->
-                    <Button x:Name="NavRecords" Style="{StaticResource NavItemButtonStyle}"
-                            Click="NavRecords_Click">
-                        <StackPanel Orientation="Horizontal" Spacing="14">
-                            <FontIcon Glyph="&#xE8A5;" FontSize="18"
-                                      FontFamily="Segoe Fluent Icons"/>
-                            <TextBlock Text="Hồ sơ bệnh án" FontSize="14"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
+                        <!-- Payment -->
+                        <Button x:Name="NavPayment" Style="{StaticResource NavItemButtonStyle}"
+                                Click="NavPayment_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                <FontIcon Glyph="&#xE8A1;" FontSize="18"
+                                          FontFamily="Segoe Fluent Icons"/>
+                                <TextBlock Text="Thanh toán" FontSize="14"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
 
-                    <!-- Payment -->
-                    <Button x:Name="NavPayment" Style="{StaticResource NavItemButtonStyle}"
-                            Click="NavPayment_Click">
-                        <StackPanel Orientation="Horizontal" Spacing="14">
-                            <FontIcon Glyph="&#xE8A1;" FontSize="18"
-                                      FontFamily="Segoe Fluent Icons"/>
-                            <TextBlock Text="Thanh toán" FontSize="14"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
+                        <!-- Health Metrics -->
+                        <Button x:Name="NavHealthMetrics" Style="{StaticResource NavItemButtonStyle}"
+                                Click="NavHealthMetrics_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                <FontIcon Glyph="&#xE9F9;" FontSize="18"
+                                          FontFamily="Segoe Fluent Icons"/>
+                                <TextBlock Text="Chỉ số sức khỏe" FontSize="14"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
 
-                    <!-- Health Metrics -->
-                    <Button x:Name="NavHealthMetrics" Style="{StaticResource NavItemButtonStyle}"
-                            Click="NavHealthMetrics_Click">
-                        <StackPanel Orientation="Horizontal" Spacing="14">
-                            <FontIcon Glyph="&#xE9F9;" FontSize="18"
-                                      FontFamily="Segoe Fluent Icons"/>
-                            <TextBlock Text="Chỉ số sức khỏe" FontSize="14"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-
-                    <!-- Online Consultation -->
-                    <Button x:Name="NavOnline" Style="{StaticResource NavItemButtonStyle}"
-                            Click="NavOnline_Click">
-                        <StackPanel Orientation="Horizontal" Spacing="14">
-                            <FontIcon Glyph="&#xE8AA;" FontSize="18"
-                                      FontFamily="Segoe Fluent Icons"/>
-                            <TextBlock Text="Khám trực tuyến" FontSize="14"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
+                        <!-- Online Consultation -->
+                        <Button x:Name="NavOnline" Style="{StaticResource NavItemButtonStyle}"
+                                Click="NavOnline_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                <FontIcon Glyph="&#xE8AA;" FontSize="18"
+                                          FontFamily="Segoe Fluent Icons"/>
+                                <TextBlock Text="Khám trực tuyến" FontSize="14"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </ScrollViewer>
 
                 <!-- Logout -->
                 <Border Grid.Row="3" Margin="0,0,0,16">

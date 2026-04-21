@@ -21,6 +21,7 @@ namespace Healthcare.Client.UI.Shell
         public PatientShell()
         {
             this.InitializeComponent();
+            LoadUserInfo();
             UpdateDateDisplay();
 
             // Khởi tạo danh sách nav buttons
@@ -33,6 +34,16 @@ namespace Healthcare.Client.UI.Shell
             // Navigate tới trang chủ khi load
             ContentFrame.Navigate(typeof(PatientHomePage), this);
             SetActiveButton(NavHome);
+        }
+
+        private void LoadUserInfo()
+        {
+            var user = SessionStorage.CurrentUser;
+            if (user == null) return;
+
+            TxtPatientName.Text = user.FullName ?? "Bệnh nhân";
+            TxtPatientID.Text = "ID: " + (user.Id?.Length > 6 ? user.Id.Substring(0, 6).ToUpper() : user.Id?.ToUpper());
+            PatientAvatar.DisplayName = user.FullName;
         }
 
         // ──────────────────────────────────────────────
@@ -71,9 +82,10 @@ namespace Healthcare.Client.UI.Shell
 
         private void NavOnline_Click(object sender, RoutedEventArgs e)
         {
-            NavigateTo(typeof(LabResultsPage));
+            NavigateTo(typeof(OnlineConsultationPage));
             SetActiveButton(NavOnline);
         }
+
 
         // ──────────────────────────────────────────────
         // Public: Được gọi từ PatientHomePage (Quick Access)
@@ -89,7 +101,7 @@ namespace Healthcare.Client.UI.Shell
             else if (pageType == typeof(MyRecordsPage))    SetActiveButton(NavRecords);
             else if (pageType == typeof(PaymentCheckoutPage)) SetActiveButton(NavPayment);
             else if (pageType == typeof(HealthMetricsPage)) SetActiveButton(NavHealthMetrics);
-            else if (pageType == typeof(LabResultsPage))   SetActiveButton(NavOnline);
+            else if (pageType == typeof(OnlineConsultationPage))   SetActiveButton(NavOnline);
         }
 
         // ──────────────────────────────────────────────
