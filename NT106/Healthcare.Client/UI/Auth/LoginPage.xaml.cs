@@ -10,6 +10,7 @@ using Healthcare.Client.UI.Doctor;
 using Healthcare.Client.UI.Admin;
 // THÊM NAMESPACE CỦA SHELL VÀO ĐÂY
 using Healthcare.Client.UI.Shell;
+using Healthcare.Client.UI.Staff;
 
 namespace Healthcare.Client.UI.Auth
 {
@@ -92,6 +93,14 @@ namespace Healthcare.Client.UI.Auth
                 {
                     // ✅ Đã sửa: Điều hướng tới PatientShell
                     Frame.Navigate(typeof(PatientShell), null,
+                        new SlideNavigationTransitionInfo
+                        {
+                            Effect = SlideNavigationTransitionEffect.FromRight
+                        });
+                }
+                else if (result.Role.Equals("Staff", StringComparison.OrdinalIgnoreCase))
+                {
+                    Frame.Navigate(typeof(StaffHomePage), null,
                         new SlideNavigationTransitionInfo
                         {
                             Effect = SlideNavigationTransitionEffect.FromRight

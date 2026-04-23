@@ -156,6 +156,7 @@
             <NavigationView.MenuItems>
                 <NavigationViewItem Content="Quản lý Bệnh nhân" Tag="Patient" Icon="ContactInfo"/>
                 <NavigationViewItem Content="Quản lý Bác sĩ" Tag="Doctor" Icon="Contact"/>
+                <NavigationViewItem Content="Quản lý Nhân viên" Tag="Staff" Icon="People"/>
                 <NavigationViewItemSeparator/>
                 <NavigationViewItem Content="Danh sách Lịch hẹn" Tag="Appointment" Icon="Calendar"/>
                 <NavigationViewItem Content="Lịch sử Giao dịch" Tag="Transaction" Icon="Calculator"/>

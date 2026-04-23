@@ -41,10 +41,11 @@ namespace Healthcare.Client.UI.Admin
             {
                 case "Patient":
                 case "Doctor":
+                case "Staff":
                     AdminDataGrid.ItemTemplate = (DataTemplate)Resources["UserTemplate"];
                     ColHeader0.Text = "MÃ QUẢN LÝ";
                     ColHeader1.Text = "HỌ TÊN / EMAIL";
-                    ColHeader2.Text = (_currentTab == "Doctor" ? "CHUYÊN KHOA" : "SĐT / NĂM SINH");
+                    ColHeader2.Text = (_currentTab == "Doctor" ? "CHUYÊN KHOA" : (_currentTab == "Staff" ? "SĐT" : "SĐT / NĂM SINH"));
                     ColHeader3.Text = "NGÀY TẠO";
                     ActionButtonsPanel.Visibility = Visibility.Visible;
                     break;
@@ -83,6 +84,9 @@ namespace Healthcare.Client.UI.Admin
                     case "Doctor":
                         await LoadUsersByRoleAsync("Doctor");
                         break;
+                    case "Staff":
+                        await LoadUsersByRoleAsync("Staff");
+                        break;
                     case "Appointment":
                         await LoadAppointmentsAsync();
                         break;
@@ -115,6 +119,13 @@ namespace Healthcare.Client.UI.Admin
                 {
                     Id = u.Id, FullName = u.FullName, Email = u.Email, Phone = u.Phone, CreatedAt = u.CreatedAt,
                     Specialty = profiles.FirstOrDefault(p => p.DoctorId == u.Id)?.Specialty
+                }).ToList();
+            }
+            else if (role == "Staff")
+            {
+                displayList = users.Select(u => new UserDisplayModel
+                {
+                    Id = u.Id, FullName = u.FullName, Email = u.Email, Phone = u.Phone, CreatedAt = u.CreatedAt
                 }).ToList();
             }
             else
@@ -215,8 +226,8 @@ namespace Healthcare.Client.UI.Admin
         private async Task ShowUserEditorDialog(User existingUser)
         {
             bool isEdit = existingUser != null;
-            string roleLabel = _currentTab == "Doctor" ? "Bác sĩ" : "Bệnh nhân";
-            string roleValue = _currentTab == "Doctor" ? "Doctor" : "Patient";
+            string roleLabel = _currentTab == "Doctor" ? "Bác sĩ" : (_currentTab == "Staff" ? "Nhân viên" : "Bệnh nhân");
+            string roleValue = _currentTab == "Doctor" ? "Doctor" : (_currentTab == "Staff" ? "Staff" : "Patient");
 
             // Tạo giao diện Form
             TextBox nameBox = new TextBox { Header = "Họ và Tên", Text = existingUser?.FullName ?? "", PlaceholderText = "Ví dụ: Nguyễn Văn A", Margin = new Thickness(0, 0, 0, 12) };
