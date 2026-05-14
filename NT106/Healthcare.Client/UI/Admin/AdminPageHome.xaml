@@ -322,7 +322,6 @@
                             </ListView.ItemTemplate>
                         </ListView>
                     </Grid>
-                    </Grid>
                 </Border>
                 </Grid>
 
