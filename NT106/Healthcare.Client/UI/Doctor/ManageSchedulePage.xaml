@@ -5,11 +5,8 @@
     xmlns:local="using:Healthcare.Client.UI.Doctor"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
-
-    <Page.Background>
-        <SolidColorBrush Color="#F8FAFC"/>
-    </Page.Background>
+    mc:Ignorable="d"
+    Background="{StaticResource AppBackdropGradientBrush}">
 
     <Page.Resources>
         <!-- Design Tokens -->

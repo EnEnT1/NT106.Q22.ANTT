@@ -5,17 +5,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    RequestedTheme="Light">
-
-    <Page.Background>
-        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#f0f9ff" Offset="0"/>
-            <GradientStop Color="#e0e7ff" Offset="0.25"/>
-            <GradientStop Color="#faf5ff" Offset="0.50"/>
-            <GradientStop Color="#fdf4ff" Offset="0.75"/>
-            <GradientStop Color="#ffffff" Offset="1"/>
-        </LinearGradientBrush>
-    </Page.Background>
+    RequestedTheme="Light"
+    Background="{StaticResource AppBackdropGradientBrush}">
 
     <Grid Background="Transparent">
         <Grid.RowDefinitions>
@@ -24,10 +15,12 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0"
-                Background="#EEF4FF"
+                Background="{StaticResource ShellTopBarAcrylicBrush}"
                 BorderBrush="#C7D7F0"
                 BorderThickness="0,0,0,1"
-                Padding="24,0">
+                Padding="24,0"
+                Translation="0,0,1"
+                Shadow="{StaticResource HealthcareThemeShadow}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -102,6 +95,8 @@
             Background="Transparent">
 
             <NavigationView.Resources>
+                <StaticResource x:Key="NavigationViewDefaultPaneBackground" ResourceKey="ShellSidebarAcrylicBrush"/>
+                <StaticResource x:Key="NavigationViewExpandedPaneBackground" ResourceKey="ShellSidebarAcrylicBrush"/>
                 <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="#0078D4" />
                 <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="#005A9E" />
                 <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPressed" Color="#004578" />

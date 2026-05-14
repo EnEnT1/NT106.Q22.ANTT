@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:Healthcare.Client.Models.Core"
     mc:Ignorable="d"
-    Background="#F8FAFC">
+    Background="{StaticResource AppBackdropGradientBrush}">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -15,7 +15,8 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Border Grid.Row="0" Background="White" Padding="30,20" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
+        <Border Grid.Row="0" Background="{StaticResource GlassHeaderAcrylicBrush}" Padding="30,20" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1"
+                Translation="0,0,2" Shadow="{StaticResource HealthcareThemeShadow}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                 <StackPanel>
                     <TextBlock Text="Hồ Sơ Của Tôi" FontSize="28" FontWeight="Bold" Foreground="#1E293B"/>
@@ -47,8 +48,9 @@
                     <ItemsControl x:Name="RecordsList">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="White" CornerRadius="12" Padding="20" Margin="0,0,0,15" 
-                                        BorderBrush="#E2E8F0" BorderThickness="1">
+                                <Border Background="{StaticResource GlassCardAcrylicBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,15" 
+                                        BorderBrush="#E2E8F0" BorderThickness="1"
+                                        Translation="0,0,2" Shadow="{StaticResource HealthcareThemeShadow}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>

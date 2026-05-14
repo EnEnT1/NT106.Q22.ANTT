@@ -1,0 +1,41 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Nền gradient dùng chung (Patient / Doctor / Shell) -->
+    <LinearGradientBrush x:Key="AppBackdropGradientBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#f0f9ff" Offset="0"/>
+        <GradientStop Color="#e0e7ff" Offset="0.25"/>
+        <GradientStop Color="#faf5ff" Offset="0.50"/>
+        <GradientStop Color="#fdf4ff" Offset="0.75"/>
+        <GradientStop Color="#ffffff" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Acrylic: WinUI 3 XAML không có BackgroundSource; blur in-app theo mặc định của AcrylicBrush -->
+    <AcrylicBrush x:Key="ShellSidebarAcrylicBrush"
+                  TintColor="#E6EEF9"
+                  TintOpacity="0.72"
+                  TintLuminosityOpacity="0.92"
+                  FallbackColor="#E6EEF9"/>
+
+    <AcrylicBrush x:Key="ShellTopBarAcrylicBrush"
+                  TintColor="#F0F6FF"
+                  TintOpacity="0.78"
+                  TintLuminosityOpacity="0.94"
+                  FallbackColor="#F0F6FF"/>
+
+    <AcrylicBrush x:Key="GlassCardAcrylicBrush"
+                  TintColor="#FAFCFF"
+                  TintOpacity="0.88"
+                  TintLuminosityOpacity="0.96"
+                  FallbackColor="#F8FAFC"/>
+
+    <AcrylicBrush x:Key="GlassHeaderAcrylicBrush"
+                  TintColor="#FFFFFF"
+                  TintOpacity="0.82"
+                  TintLuminosityOpacity="0.95"
+                  FallbackColor="#FFFFFF"/>
+
+    <!-- ThemeShadow: gán Shadow + Translation="0,0,z" trực tiếp trên Border/Button (không dùng Setter trong Style — Translation không hỗ trợ Setter) -->
+    <ThemeShadow x:Key="HealthcareThemeShadow"/>
+</ResourceDictionary>
