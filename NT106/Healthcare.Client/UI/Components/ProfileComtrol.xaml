@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <ScrollViewer>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Padding="24" Spacing="18">
 
             <TextBlock Text="Thông tin cá nhân"
@@ -20,16 +20,16 @@
                     BorderBrush="#E5E7EB"
                     BorderThickness="1">
 
-                <StackPanel Spacing="14">
+                <StackPanel Spacing="16">
 
                     <TextBlock Text="Thông tin cơ bản"
                                FontSize="18"
                                FontWeight="SemiBold"
                                Foreground="#0059BB"/>
 
-                    <Grid ColumnSpacing="16" RowSpacing="12">
+                    <Grid ColumnSpacing="16" RowSpacing="14">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="150"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
@@ -40,34 +40,95 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Grid.Column="0"
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="0"
                                    Text="Họ tên:"
-                                   FontWeight="SemiBold"/>
-                        <TextBlock Grid.Row="0" Grid.Column="1"
-                                   x:Name="FullNameText"
-                                   Text="Đang tải..."/>
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
 
-                        <TextBlock Grid.Row="1" Grid.Column="0"
+                        <TextBox Grid.Row="0"
+                                 Grid.Column="1"
+                                 x:Name="FullNameBox"
+                                 PlaceholderText="Nhập họ tên"/>
+
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="0"
                                    Text="Email:"
-                                   FontWeight="SemiBold"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1"
-                                   x:Name="EmailText"
-                                   Text="Đang tải..."/>
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
 
-                        <TextBlock Grid.Row="2" Grid.Column="0"
+                        <TextBox Grid.Row="1"
+                                 Grid.Column="1"
+                                 x:Name="EmailBox"
+                                 IsReadOnly="True"
+                                 Background="#F8FAFC"
+                                 Foreground="#64748B"/>
+
+                        <TextBlock Grid.Row="2"
+                                   Grid.Column="0"
                                    Text="Số điện thoại:"
-                                   FontWeight="SemiBold"/>
-                        <TextBlock Grid.Row="2" Grid.Column="1"
-                                   x:Name="PhoneText"
-                                   Text="Đang tải..."/>
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
 
-                        <TextBlock Grid.Row="3" Grid.Column="0"
+                        <TextBox Grid.Row="2"
+                                 Grid.Column="1"
+                                 x:Name="PhoneBox"
+                                 PlaceholderText="Nhập số điện thoại"/>
+
+                        <TextBlock Grid.Row="3"
+                                   Grid.Column="0"
                                    Text="Vai trò:"
-                                   FontWeight="SemiBold"/>
-                        <TextBlock Grid.Row="3" Grid.Column="1"
-                                   x:Name="RoleText"
-                                   Text="Đang tải..."/>
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
+
+                        <TextBox Grid.Row="3"
+                                 Grid.Column="1"
+                                 x:Name="RoleBox"
+                                 IsReadOnly="True"
+                                 Background="#F8FAFC"
+                                 Foreground="#64748B"/>
                     </Grid>
+
+                    <Border x:Name="StatusMessageBorder"
+                            Background="#F8FAFC"
+                            BorderBrush="#E2E8F0"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            Padding="12"
+                            Visibility="Collapsed">
+
+                        <TextBlock x:Name="StatusMessageText"
+                                   Text=""
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="#334155"
+                                   TextWrapping="Wrap"/>
+                    </Border>
+
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Spacing="10">
+
+                        <Button x:Name="ReloadButton"
+                                Content="Tải lại"
+                                Background="#F8FAFC"
+                                BorderBrush="#CBD5E1"
+                                BorderThickness="1"
+                                Foreground="#334155"
+                                CornerRadius="10"
+                                Padding="18,10"
+                                Click="ReloadButton_Click"/>
+
+                        <Button x:Name="SaveButton"
+                                Content="Lưu thay đổi"
+                                Background="#0059BB"
+                                BorderThickness="0"
+                                Foreground="White"
+                                CornerRadius="10"
+                                Padding="22,10"
+                                FontWeight="SemiBold"
+                                Click="SaveButton_Click"/>
+                    </StackPanel>
                 </StackPanel>
             </Border>
 
@@ -79,7 +140,7 @@
                     BorderThickness="1"
                     Visibility="Collapsed">
 
-                <StackPanel Spacing="14">
+                <StackPanel Spacing="10">
                     <TextBlock Text="Thông tin dành cho bệnh nhân"
                                FontSize="18"
                                FontWeight="SemiBold"
@@ -99,7 +160,7 @@
                     BorderThickness="1"
                     Visibility="Collapsed">
 
-                <StackPanel Spacing="14">
+                <StackPanel Spacing="10">
                     <TextBlock Text="Thông tin dành cho bác sĩ"
                                FontSize="18"
                                FontWeight="SemiBold"
@@ -119,7 +180,7 @@
                     BorderThickness="1"
                     Visibility="Collapsed">
 
-                <StackPanel Spacing="14">
+                <StackPanel Spacing="10">
                     <TextBlock Text="Thông tin dành cho quản trị viên"
                                FontSize="18"
                                FontWeight="SemiBold"
