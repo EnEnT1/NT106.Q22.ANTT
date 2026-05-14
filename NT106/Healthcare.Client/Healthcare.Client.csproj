@@ -52,6 +52,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="UI\Components\ProfileComtrol.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Components\ChatbotAIControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
     <Page Update="UI\Patient\LabResultsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
