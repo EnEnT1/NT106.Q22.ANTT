@@ -9,51 +9,47 @@
     Background="{StaticResource AppBackdropGradientBrush}">
 
     <Page.Resources>
-        <!-- ── Colors ── -->
-        <SolidColorBrush x:Key="PrimaryBrush"         Color="#2D6CDF"/>
-        <SolidColorBrush x:Key="PrimaryLightBrush"    Color="#EFF4FD"/>
-        <SolidColorBrush x:Key="SlateGray50"          Color="#F8FAFC"/>
-        <SolidColorBrush x:Key="SlateGray100"         Color="#F1F5F9"/>
-        <SolidColorBrush x:Key="SlateGray400"         Color="#94A3B8"/>
-        <SolidColorBrush x:Key="SlateGray500"         Color="#64748B"/>
-        <SolidColorBrush x:Key="SlateGray800"         Color="#1E293B"/>
-        <SolidColorBrush x:Key="SlateGray900"         Color="#0F172A"/>
-        <SolidColorBrush x:Key="EmeraldBrush"         Color="#10B981"/>
-        <SolidColorBrush x:Key="WhiteBrush"           Color="White"/>
-        <SolidColorBrush x:Key="BorderSubtleBrush"    Color="#F1F5F9"/>
-        <SolidColorBrush x:Key="BorderBlue50"         Color="#DBEAFE"/>
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#2D6CDF"/>
+        <SolidColorBrush x:Key="PrimaryLightBrush" Color="#EFF4FD"/>
+        <SolidColorBrush x:Key="SlateGray50" Color="#F8FAFC"/>
+        <SolidColorBrush x:Key="SlateGray100" Color="#F1F5F9"/>
+        <SolidColorBrush x:Key="SlateGray400" Color="#94A3B8"/>
+        <SolidColorBrush x:Key="SlateGray500" Color="#64748B"/>
+        <SolidColorBrush x:Key="SlateGray800" Color="#1E293B"/>
+        <SolidColorBrush x:Key="SlateGray900" Color="#0F172A"/>
+        <SolidColorBrush x:Key="EmeraldBrush" Color="#10B981"/>
+        <SolidColorBrush x:Key="WhiteBrush" Color="White"/>
+        <SolidColorBrush x:Key="BorderSubtleBrush" Color="#F1F5F9"/>
+        <SolidColorBrush x:Key="BorderBlue50" Color="#DBEAFE"/>
 
-        <!-- ── Card Style (glass + bóng gán trực tiếp trên từng Border) ── -->
         <Style x:Key="CardStyle" TargetType="Border">
-            <Setter Property="Background"    Value="{StaticResource GlassCardAcrylicBrush}"/>
-            <Setter Property="CornerRadius"  Value="16"/>
-            <Setter Property="BorderBrush"   Value="#D0E4FF"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtleBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding"       Value="32"/>
+            <Setter Property="Padding" Value="32"/>
         </Style>
 
-        <!-- ── Quick Access Button ── -->
         <Style x:Key="QuickAccessButtonStyle" TargetType="Button">
-            <Setter Property="Background"             Value="{StaticResource GlassCardAcrylicBrush}"/>
-            <Setter Property="BorderBrush"            Value="#D0E4FF"/>
-            <Setter Property="BorderThickness"        Value="1"/>
-            <Setter Property="CornerRadius"           Value="16"/>
-            <Setter Property="Padding"                Value="0"/>
-            <Setter Property="HorizontalAlignment"    Value="Stretch"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtleBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
         </Style>
 
-        <!-- ── Doctor "Đặt lịch" Button ── -->
         <Style x:Key="BookButtonStyle" TargetType="Button">
-            <Setter Property="Background"             Value="{StaticResource GlassHeaderAcrylicBrush}"/>
-            <Setter Property="Foreground"             Value="#2D6CDF"/>
-            <Setter Property="BorderBrush"            Value="{StaticResource BorderBlue50}"/>
-            <Setter Property="BorderThickness"        Value="1"/>
-            <Setter Property="CornerRadius"           Value="12"/>
-            <Setter Property="Padding"                Value="0,8"/>
-            <Setter Property="HorizontalAlignment"    Value="Stretch"/>
-            <Setter Property="FontSize"               Value="12"/>
-            <Setter Property="FontWeight"             Value="Bold"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#2D6CDF"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBlue50}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="0,8"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
         </Style>
 
         <!-- ── Đồng bộ với HealthMetricsPage: thẻ glass + metric + typography ── -->
@@ -91,599 +87,611 @@
         </Style>
     </Page.Resources>
 
-    <!-- ═══════════════════════════════════════════════════════════════ -->
-    <!--  Scrollable main content                                        -->
-    <!-- ═══════════════════════════════════════════════════════════════ -->
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="Transparent">
-        <StackPanel Margin="40,32,40,64" Spacing="32">
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="40,32,40,64" Spacing="32">
 
-            <!-- ── Welcome Section ── -->
-            <StackPanel Spacing="8">
-                <TextBlock Text="Chào buổi sáng, Bệnh Nhân A"
-                           FontSize="28" FontWeight="ExtraBold"
-                           Foreground="{StaticResource SlateGray900}"
-                           CharacterSpacing="-10"/>
-                <TextBlock Text="Hôm nay là một ngày tuyệt vời để chăm sóc sức khỏe của bạn."
-                           FontSize="16" FontWeight="Medium"
-                           Foreground="{StaticResource SlateGray500}"/>
-            </StackPanel>
+                <!-- WELCOME -->
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Chào buổi sáng, Bệnh Nhân A"
+                               FontSize="28"
+                               FontWeight="ExtraBold"
+                               Foreground="{StaticResource SlateGray900}"
+                               CharacterSpacing="-10"/>
 
-            <!-- ═══════════════════════════════════════════════════════ -->
-            <!--  ROW 1: Upcoming Appointment + Health Indicators        -->
-            <!-- ═══════════════════════════════════════════════════════ -->
-            <Grid ColumnSpacing="24">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>   <!-- Appointment (≈1/3) -->
-                    <ColumnDefinition Width="3*"/>   <!-- Health Indicators (≈2/3) -->
-                </Grid.ColumnDefinitions>
-
-                <!-- ── Upcoming Appointment Card (Blue) ── -->
-                <Border Grid.Column="0"
-                        Background="{StaticResource PrimaryBrush}"
-                        CornerRadius="16" Padding="32"
-                        MinHeight="220"
-                        Translation="0,0,3"
-                        Shadow="{StaticResource HealthcareThemeShadow}">
-                    <Grid>
-                        <!-- Background watermark icon -->
-                        <FontIcon Glyph="&#xEAD4;" FontSize="160"
-                                  FontFamily="Segoe Fluent Icons"
-                                  Foreground="#1AFFFFFF"
-                                  HorizontalAlignment="Right"
-                                  VerticalAlignment="Bottom"
-                                  Margin="0,0,-24,-24"/>
-
-                        <StackPanel Spacing="0">
-                            <!-- Header -->
-                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,24">
-                                <FontIcon Glyph="&#xE787;" FontSize="18" Foreground="#CCFFFFFF"
-                                          FontFamily="Segoe Fluent Icons"/>
-                                <TextBlock Text="Lịch hẹn sắp tới"
-                                           FontSize="14" FontWeight="Bold"
-                                           Foreground="#CCFFFFFF"/>
-                            </StackPanel>
-
-                            <!-- Time -->
-                            <TextBlock Text="09:30 AM"
-                                       FontSize="36" FontWeight="ExtraBold"
-                                       Foreground="White" CharacterSpacing="-10"
-                                       Margin="0,0,0,4"/>
-                            <TextBlock Text="Thứ Tư, 26 Tháng 5"
-                                       FontSize="14" FontWeight="Medium"
-                                       Foreground="#CCFFFFFF"
-                                       Margin="0,0,0,24"/>
-
-                            <!-- Doctor Info -->
-                            <Border Background="#1AFFFFFF" CornerRadius="16" Padding="16">
-                                <StackPanel Orientation="Horizontal" Spacing="16">
-                                    <PersonPicture Width="48" Height="48"
-                                                   Initials="NB"
-                                                   ProfilePicture="ms-appx:///Assets/DoctorB.jpg"/>
-                                    <StackPanel VerticalAlignment="Center" Spacing="2">
-                                        <TextBlock Text="BS. Nguyễn Văn B"
-                                                   FontSize="13" FontWeight="Bold"
-                                                   Foreground="White"/>
-                                        <TextBlock Text="Chuyên khoa Nội"
-                                                   FontSize="12" Foreground="#99FFFFFF"/>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
-                    </Grid>
-                </Border>
-
-                <!-- ── Health Indicators Card (đồng bộ HealthMetricsPage) ── -->
-                <Border Grid.Column="1"
-                        Style="{StaticResource GlassCardStyle}"
-                        Translation="0,0,2"
-                        Shadow="{StaticResource HealthcareThemeShadow}">
-                    <StackPanel Spacing="20">
-                        <!-- Header -->
-                        <Grid>
-                            <TextBlock Text="Chỉ số sức khỏe"
-                                       Style="{StaticResource TitleTextStyle}"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Left"/>
-                            <TextBlock Text="Cập nhật 2 giờ trước"
-                                       Style="{StaticResource CaptionTextStyle}"
-                                       HorizontalAlignment="Right"
-                                       VerticalAlignment="Center"/>
-                        </Grid>
-
-                        <!-- Metric tiles -->
-                        <Grid ColumnSpacing="16">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <!-- Blood Pressure -->
-                            <Border Grid.Column="0" Style="{StaticResource MetricCardStyle}">
-                                <StackPanel Spacing="8">
-                                    <Grid ColumnSpacing="12">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Border Grid.Column="0" Width="52" Height="52"
-                                                CornerRadius="14" Background="#EFF4FD"
-                                                VerticalAlignment="Top">
-                                            <FontIcon Glyph="&#xEC4E;" FontSize="24"
-                                                      Foreground="{StaticResource PrimaryBrush}"
-                                                      FontFamily="Segoe Fluent Icons"
-                                                      HorizontalAlignment="Center"
-                                                      VerticalAlignment="Center"/>
-                                        </Border>
-                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                                            <TextBlock Text="Huyết áp"
-                                                       FontSize="14" FontWeight="SemiBold"
-                                                       Foreground="#334155"/>
-                                            <TextBlock Text="Bình thường"
-                                                       Style="{StaticResource CaptionTextStyle}"/>
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="2" HorizontalAlignment="Right"
-                                                    VerticalAlignment="Center">
-                                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                                <TextBlock Text="120/80"
-                                                           FontSize="22" FontWeight="Bold"
-                                                           Foreground="{StaticResource TextPrimaryBrush}"/>
-                                                <TextBlock Text="mmHg"
-                                                           Style="{StaticResource CaptionTextStyle}"
-                                                           VerticalAlignment="Bottom" Margin="0,0,0,3"/>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </Grid>
-                                    <Grid Height="6">
-                                        <Border Background="{StaticResource TrackBrush}" CornerRadius="3"/>
-                                        <Border Width="120" Background="#CC3B82F6" CornerRadius="3" HorizontalAlignment="Left"/>
-                                    </Grid>
-                                    <Grid>
-                                        <TextBlock Text="60" FontSize="10" Foreground="#64748B"/>
-                                        <TextBlock Text="130" FontSize="10" Foreground="#64748B" HorizontalAlignment="Right"/>
-                                    </Grid>
-                                </StackPanel>
-                            </Border>
-
-                            <!-- Heart Rate -->
-                            <Border Grid.Column="1" Style="{StaticResource MetricCardStyle}">
-                                <StackPanel Spacing="8">
-                                    <Grid ColumnSpacing="12">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Border Grid.Column="0" Width="52" Height="52"
-                                                CornerRadius="14" Background="#FEE2E2"
-                                                VerticalAlignment="Top">
-                                            <FontIcon Glyph="&#xEB51;" FontSize="24"
-                                                      Foreground="#EF4444"
-                                                      FontFamily="Segoe Fluent Icons"
-                                                      HorizontalAlignment="Center"
-                                                      VerticalAlignment="Center"/>
-                                        </Border>
-                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                                            <TextBlock Text="Nhịp tim"
-                                                       FontSize="14" FontWeight="SemiBold"
-                                                       Foreground="#334155"/>
-                                            <TextBlock Text="Ổn định"
-                                                       Style="{StaticResource CaptionTextStyle}"/>
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="2" HorizontalAlignment="Right"
-                                                    VerticalAlignment="Center">
-                                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                                <TextBlock Text="72"
-                                                           FontSize="22" FontWeight="Bold"
-                                                           Foreground="{StaticResource TextPrimaryBrush}"/>
-                                                <TextBlock Text="bpm"
-                                                           Style="{StaticResource CaptionTextStyle}"
-                                                           VerticalAlignment="Bottom" Margin="0,0,0,3"/>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </Grid>
-                                    <Grid Height="6">
-                                        <Border Background="{StaticResource TrackBrush}" CornerRadius="3"/>
-                                        <Border Width="88" Background="#E63B82F6" CornerRadius="3" HorizontalAlignment="Left"/>
-                                    </Grid>
-                                    <Grid>
-                                        <TextBlock Text="40" FontSize="10" Foreground="#64748B"/>
-                                        <TextBlock Text="120" FontSize="10" Foreground="#64748B" HorizontalAlignment="Right"/>
-                                    </Grid>
-                                </StackPanel>
-                            </Border>
-                        </Grid>
-                    </StackPanel>
-                </Border>
-            </Grid>
-
-            <!-- ═══════════════════════════════════════════════════════ -->
-            <!--  ROW 2: Quick Access Buttons                            -->
-            <!-- ═══════════════════════════════════════════════════════ -->
-            <StackPanel Spacing="0">
-                <!-- Section Header -->
-                <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,0,24">
-                    <Border Width="32" Height="32" CornerRadius="8"
-                            Background="{StaticResource PrimaryLightBrush}">
-                        <FontIcon Glyph="&#xE945;" FontSize="16"
-                                  Foreground="{StaticResource PrimaryBrush}"
-                                  FontFamily="Segoe Fluent Icons"/>
-                    </Border>
-                    <TextBlock Text="Truy cập nhanh"
-                               FontSize="17" FontWeight="Bold"
-                               Foreground="{StaticResource SlateGray800}"
-                               VerticalAlignment="Center"/>
+                    <TextBlock Text="Hôm nay là một ngày tuyệt vời để chăm sóc sức khỏe của bạn."
+                               FontSize="16"
+                               FontWeight="Medium"
+                               Foreground="{StaticResource SlateGray500}"/>
                 </StackPanel>
 
-                <!-- 5 Quick Access Cards -->
-                <Grid ColumnSpacing="20">
+                <!-- ROW 1 -->
+                <Grid ColumnSpacing="24">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Lịch trực -->
-                    <Button Grid.Column="0"
-                            Style="{StaticResource QuickAccessButtonStyle}"
-                            Translation="0,0,2"
-                            Shadow="{StaticResource HealthcareThemeShadow}"
-                            Click="QuickAccess_BookAppointment_Click">
-                        <StackPanel Padding="24,24" Spacing="16" HorizontalAlignment="Center">
-                            <Border Width="52" Height="52" CornerRadius="14"
-                                    Background="#EFF4FD" HorizontalAlignment="Center">
-                                <FontIcon Glyph="&#xE787;" FontSize="24"
-                                          Foreground="#2D6CDF"
-                                          FontFamily="Segoe Fluent Icons"/>
-                            </Border>
-                            <TextBlock Text="Lịch trực" FontSize="13" FontWeight="Bold"
-                                       Foreground="{StaticResource SlateGray800}"
-                                       HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
+                    <!-- UPCOMING APPOINTMENT -->
+                    <Border Grid.Column="0"
+                            Background="{StaticResource PrimaryBrush}"
+                            CornerRadius="16"
+                            Padding="32"
+                            MinHeight="220">
+                        <Grid>
+                            <FontIcon Glyph="&#xEAD4;"
+                                      FontSize="160"
+                                      FontFamily="Segoe Fluent Icons"
+                                      Foreground="#1AFFFFFF"
+                                      HorizontalAlignment="Right"
+                                      VerticalAlignment="Bottom"
+                                      Margin="0,0,-24,-24"/>
 
-                    <!-- Khám từ xa -->
-                    <Button Grid.Column="1"
-                            Style="{StaticResource QuickAccessButtonStyle}"
-                            Translation="0,0,2"
-                            Shadow="{StaticResource HealthcareThemeShadow}"
-                            Click="QuickAccess_OnlineConsult_Click">
-                        <StackPanel Padding="24,24" Spacing="16" HorizontalAlignment="Center">
-                            <Border Width="52" Height="52" CornerRadius="14"
-                                    Background="#EEF2FF" HorizontalAlignment="Center">
-                                <FontIcon Glyph="&#xE714;" FontSize="24"
-                                          Foreground="#6366F1"
-                                          FontFamily="Segoe Fluent Icons"/>
-                            </Border>
-                            <TextBlock Text="Khám từ xa" FontSize="13" FontWeight="Bold"
-                                       Foreground="{StaticResource SlateGray800}"
-                                       HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-
-                    <!-- Tiền sử -->
-                    <Button Grid.Column="2"
-                            Style="{StaticResource QuickAccessButtonStyle}"
-                            Translation="0,0,2"
-                            Shadow="{StaticResource HealthcareThemeShadow}"
-                            Click="QuickAccess_Records_Click">
-                        <StackPanel Padding="24,24" Spacing="16" HorizontalAlignment="Center">
-                            <Border Width="52" Height="52" CornerRadius="14"
-                                    Background="#ECFDF5" HorizontalAlignment="Center">
-                                <FontIcon Glyph="&#xE8A5;" FontSize="24"
-                                          Foreground="#10B981"
-                                          FontFamily="Segoe Fluent Icons"/>
-                            </Border>
-                            <TextBlock Text="Tiền sử" FontSize="13" FontWeight="Bold"
-                                       Foreground="{StaticResource SlateGray800}"
-                                       HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-
-                    <!-- Báo cáo -->
-                    <Button Grid.Column="3"
-                            Style="{StaticResource QuickAccessButtonStyle}"
-                            Translation="0,0,2"
-                            Shadow="{StaticResource HealthcareThemeShadow}"
-                            Click="QuickAccess_LabResults_Click">
-                        <StackPanel Padding="24,24" Spacing="16" HorizontalAlignment="Center">
-                            <Border Width="52" Height="52" CornerRadius="14"
-                                    Background="#F5F3FF" HorizontalAlignment="Center">
-                                <FontIcon Glyph="&#xE9D9;" FontSize="24"
-                                          Foreground="#8B5CF6"
-                                          FontFamily="Segoe Fluent Icons"/>
-                            </Border>
-                            <TextBlock Text="Báo cáo" FontSize="13" FontWeight="Bold"
-                                       Foreground="{StaticResource SlateGray800}"
-                                       HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-
-                    <!-- Tư vấn -->
-                    <Button Grid.Column="4"
-                            Style="{StaticResource QuickAccessButtonStyle}"
-                            Translation="0,0,2"
-                            Shadow="{StaticResource HealthcareThemeShadow}"
-                            Click="QuickAccess_HealthMetrics_Click">
-                        <StackPanel Padding="24,24" Spacing="16" HorizontalAlignment="Center">
-                            <Border Width="52" Height="52" CornerRadius="14"
-                                    Background="#FFF7ED" HorizontalAlignment="Center">
-                                <FontIcon Glyph="&#xE8BD;" FontSize="24"
-                                          Foreground="#F97316"
-                                          FontFamily="Segoe Fluent Icons"/>
-                            </Border>
-                            <TextBlock Text="Tư vấn" FontSize="13" FontWeight="Bold"
-                                       Foreground="{StaticResource SlateGray800}"
-                                       HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </Grid>
-            </StackPanel>
-
-            <!-- ═══════════════════════════════════════════════════════ -->
-            <!--  ROW 3: Reminders + Suggested Doctors                   -->
-            <!-- ═══════════════════════════════════════════════════════ -->
-            <Grid ColumnSpacing="24">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="3*"/>
-                </Grid.ColumnDefinitions>
-
-                <!-- ── Reminders Card ── -->
-                <Border Grid.Column="0"
-                        Style="{StaticResource CardStyle}"
-                        Translation="0,0,2"
-                        Shadow="{StaticResource HealthcareThemeShadow}">
-                    <StackPanel Spacing="0">
-                        <!-- Header -->
-                        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,28">
-                            <FontIcon Glyph="&#xEA8F;" FontSize="20"
-                                      Foreground="{StaticResource PrimaryBrush}"
-                                      FontFamily="Segoe Fluent Icons"/>
-                            <TextBlock Text="Lời nhắc bác sĩ"
-                                       FontSize="17" FontWeight="Bold"
-                                       Foreground="{StaticResource SlateGray800}"/>
-                        </StackPanel>
-
-                        <!-- Reminder Items -->
-                        <StackPanel Spacing="20">
-
-                            <!-- Reminder 1: Blue accent -->
-                            <Border Padding="0,0,0,0">
-                                <Grid ColumnSpacing="16">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="6"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Border Grid.Column="0"
-                                            Width="6" CornerRadius="3"
-                                            Background="{StaticResource PrimaryBrush}"
-                                            MinHeight="48"/>
-                                    <StackPanel Grid.Column="1" Spacing="4">
-                                        <TextBlock Text="Uống thuốc đúng giờ"
-                                                   FontSize="13" FontWeight="Bold"
-                                                   Foreground="{StaticResource SlateGray800}"/>
-                                        <TextBlock Text="Uống thuốc dạ dày trước ăn 30 phút để đạt hiệu quả tối ưu."
-                                                   FontSize="12" Foreground="{StaticResource SlateGray500}"
-                                                   TextWrapping="Wrap" LineHeight="18"/>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-
-                            <!-- Reminder 2: Orange accent -->
-                            <Border Padding="0,0,0,0">
-                                <Grid ColumnSpacing="16">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="6"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Border Grid.Column="0"
-                                            Width="6" CornerRadius="3"
-                                            Background="#FB923C"
-                                            MinHeight="48"/>
-                                    <StackPanel Grid.Column="1" Spacing="4">
-                                        <TextBlock Text="Hẹn xét nghiệm"
-                                                   FontSize="13" FontWeight="Bold"
-                                                   Foreground="{StaticResource SlateGray800}"/>
-                                        <TextBlock Text="Nhịn ăn trước 8h sáng mai để thực hiện xét nghiệm máu định kỳ."
-                                                   FontSize="12" Foreground="{StaticResource SlateGray500}"
-                                                   TextWrapping="Wrap" LineHeight="18"/>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
-
-                <!-- ── Suggested Doctors Card ── -->
-                <Border Grid.Column="1"
-                        Style="{StaticResource CardStyle}"
-                        Translation="0,0,2"
-                        Shadow="{StaticResource HealthcareThemeShadow}">
-                    <StackPanel Spacing="0">
-                        <!-- Header -->
-                        <Grid Margin="0,0,0,28">
-                            <TextBlock Text="Danh sách bác sĩ gợi ý"
-                                       FontSize="17" FontWeight="Bold"
-                                       Foreground="{StaticResource SlateGray800}"
-                                       HorizontalAlignment="Left"
-                                       VerticalAlignment="Center"/>
-                            <StackPanel Orientation="Horizontal" Spacing="8"
-                                        HorizontalAlignment="Right">
-                                <Button Width="36" Height="36" Padding="0" CornerRadius="12"
-                                        Background="{StaticResource GlassHeaderAcrylicBrush}"
-                                        BorderBrush="#D0E4FF"
-                                        BorderThickness="1">
-                                    <FontIcon Glyph="&#xE76B;" FontSize="16"
+                            <StackPanel Spacing="0">
+                                <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,24">
+                                    <FontIcon Glyph="&#xE787;"
+                                              FontSize="18"
+                                              Foreground="#CCFFFFFF"
                                               FontFamily="Segoe Fluent Icons"/>
-                                </Button>
-                                <Button Width="36" Height="36" Padding="0" CornerRadius="12"
-                                        Background="{StaticResource GlassHeaderAcrylicBrush}"
-                                        BorderBrush="#D0E4FF"
-                                        BorderThickness="1">
-                                    <FontIcon Glyph="&#xE76C;" FontSize="16"
-                                              FontFamily="Segoe Fluent Icons"/>
-                                </Button>
+                                    <TextBlock Text="Lịch hẹn sắp tới"
+                                               FontSize="14"
+                                               FontWeight="Bold"
+                                               Foreground="#CCFFFFFF"/>
+                                </StackPanel>
+
+                                <TextBlock Text="09:30 AM"
+                                           FontSize="36"
+                                           FontWeight="ExtraBold"
+                                           Foreground="White"
+                                           CharacterSpacing="-10"
+                                           Margin="0,0,0,4"/>
+
+                                <TextBlock Text="Thứ Tư, 26 Tháng 5"
+                                           FontSize="14"
+                                           FontWeight="Medium"
+                                           Foreground="#CCFFFFFF"
+                                           Margin="0,0,0,24"/>
+
+                                <Border Background="#1AFFFFFF"
+                                        CornerRadius="16"
+                                        Padding="16">
+                                    <StackPanel Orientation="Horizontal" Spacing="16">
+                                        <PersonPicture Width="48"
+                                                       Height="48"
+                                                       Initials="NB"
+                                                       ProfilePicture="ms-appx:///Assets/DoctorB.jpg"/>
+
+                                        <StackPanel VerticalAlignment="Center" Spacing="2">
+                                            <TextBlock Text="BS. Nguyễn Văn B"
+                                                       FontSize="13"
+                                                       FontWeight="Bold"
+                                                       Foreground="White"/>
+                                            <TextBlock Text="Chuyên khoa Nội"
+                                                       FontSize="12"
+                                                       Foreground="#99FFFFFF"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
                             </StackPanel>
                         </Grid>
+                    </Border>
 
-                        <!-- Doctor Grid (4 columns) -->
-                        <Grid ColumnSpacing="16">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
+                    <!-- HEALTH INDICATORS -->
+                    <Border Grid.Column="1" Style="{StaticResource CardStyle}">
+                        <StackPanel Spacing="0">
+                            <Grid Margin="0,0,0,24">
+                                <TextBlock Text="Chỉ số sức khỏe"
+                                           FontSize="17"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource SlateGray800}"
+                                           HorizontalAlignment="Left"/>
 
-                            <!-- Doctor 1: ThS.BS Trần Thu C -->
-                            <Border Grid.Column="0"
-                                    Background="{StaticResource GlassHeaderAcrylicBrush}"
-                                    BorderBrush="#E2E8F0"
-                                    BorderThickness="1"
-                                    CornerRadius="16" Padding="16"
-                                    Translation="0,0,1"
-                                    Shadow="{StaticResource HealthcareThemeShadow}">
-                                <StackPanel HorizontalAlignment="Center" Spacing="8">
-                                    <Grid HorizontalAlignment="Center">
+                                <TextBlock Text="Cập nhật 2 giờ trước"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource SlateGray400}"
+                                           CharacterSpacing="50"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0"
+                                        Background="{StaticResource SlateGray50}"
+                                        CornerRadius="16"
+                                        BorderBrush="#F1F5F9"
+                                        BorderThickness="1"
+                                        Padding="20">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border Grid.Column="0"
+                                                Width="52"
+                                                Height="52"
+                                                CornerRadius="14"
+                                                Background="#EFF4FD"
+                                                Margin="0,0,16,0">
+                                            <FontIcon Glyph="&#xEC4E;"
+                                                      FontSize="24"
+                                                      Foreground="#2D6CDF"
+                                                      FontFamily="Segoe Fluent Icons"/>
+                                        </Border>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                            <TextBlock Text="Huyết áp"
+                                                       FontSize="13"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource SlateGray500}"/>
+                                            <TextBlock Text="Bình thường"
+                                                       FontSize="10"
+                                                       FontWeight="Bold"
+                                                       Foreground="#10B981"
+                                                       CharacterSpacing="50"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <TextBlock Text="120/80"
+                                                       FontSize="26"
+                                                       FontWeight="ExtraBold"
+                                                       Foreground="{StaticResource SlateGray800}"
+                                                       HorizontalAlignment="Right"/>
+                                            <TextBlock Text="mmHg"
+                                                       FontSize="11"
+                                                       Foreground="{StaticResource SlateGray400}"
+                                                       HorizontalAlignment="Right"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                <Border Grid.Column="1"
+                                        Background="{StaticResource SlateGray50}"
+                                        CornerRadius="16"
+                                        BorderBrush="#F1F5F9"
+                                        BorderThickness="1"
+                                        Padding="20">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border Grid.Column="0"
+                                                Width="52"
+                                                Height="52"
+                                                CornerRadius="14"
+                                                Background="#FEE2E2"
+                                                Margin="0,0,16,0">
+                                            <FontIcon Glyph="&#xEB51;"
+                                                      FontSize="24"
+                                                      Foreground="#EF4444"
+                                                      FontFamily="Segoe Fluent Icons"/>
+                                        </Border>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                            <TextBlock Text="Nhịp tim"
+                                                       FontSize="13"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource SlateGray500}"/>
+                                            <TextBlock Text="Ổn định"
+                                                       FontSize="10"
+                                                       FontWeight="Bold"
+                                                       Foreground="#10B981"
+                                                       CharacterSpacing="50"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <TextBlock Text="72"
+                                                       FontSize="26"
+                                                       FontWeight="ExtraBold"
+                                                       Foreground="{StaticResource SlateGray800}"
+                                                       HorizontalAlignment="Right"/>
+                                            <TextBlock Text="bpm"
+                                                       FontSize="11"
+                                                       Foreground="{StaticResource SlateGray400}"
+                                                       HorizontalAlignment="Right"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- QUICK ACCESS -->
+                <StackPanel Spacing="0">
+                    <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,0,24">
+                        <Border Width="32" Height="32" CornerRadius="8"
+                                Background="{StaticResource PrimaryLightBrush}">
+                            <FontIcon Glyph="&#xE945;"
+                                      FontSize="16"
+                                      Foreground="{StaticResource PrimaryBrush}"
+                                      FontFamily="Segoe Fluent Icons"/>
+                        </Border>
+
+                        <TextBlock Text="Truy cập nhanh"
+                                   FontSize="17"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource SlateGray800}"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <Grid ColumnSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0"
+                                Style="{StaticResource QuickAccessButtonStyle}"
+                                Click="QuickAccess_BookAppointment_Click">
+                            <StackPanel Padding="24,24" Spacing="16" HorizontalAlignment="Center">
+                                <Border Width="52" Height="52" CornerRadius="14"
+                                        Background="#EFF4FD" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE787;"
+                                              FontSize="24"
+                                              Foreground="#2D6CDF"
+                                              FontFamily="Segoe Fluent Icons"/>
+                                </Border>
+                                <TextBlock Text="Lịch trực"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource SlateGray800}"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Grid.Column="1"
+                                Style="{StaticResource QuickAccessButtonStyle}"
+                                Click="QuickAccess_OnlineConsult_Click">
+                            <StackPanel Padding="24,24" Spacing="16" HorizontalAlignment="Center">
+                                <Border Width="52" Height="52" CornerRadius="14"
+                                        Background="#EEF2FF" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE714;"
+                                              FontSize="24"
+                                              Foreground="#6366F1"
+                                              FontFamily="Segoe Fluent Icons"/>
+                                </Border>
+                                <TextBlock Text="Khám từ xa"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource SlateGray800}"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Grid.Column="2"
+                                Style="{StaticResource QuickAccessButtonStyle}"
+                                Click="QuickAccess_Records_Click">
+                            <StackPanel Padding="24,24" Spacing="16" HorizontalAlignment="Center">
+                                <Border Width="52" Height="52" CornerRadius="14"
+                                        Background="#ECFDF5" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE8A5;"
+                                              FontSize="24"
+                                              Foreground="#10B981"
+                                              FontFamily="Segoe Fluent Icons"/>
+                                </Border>
+                                <TextBlock Text="Hồ sơ bệnh án"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource SlateGray800}"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Grid.Column="3"
+                                Style="{StaticResource QuickAccessButtonStyle}"
+                                Click="QuickAccess_LabResults_Click">
+                            <StackPanel Padding="24,24" Spacing="16" HorizontalAlignment="Center">
+                                <Border Width="52" Height="52" CornerRadius="14"
+                                        Background="#F5F3FF" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE9D9;"
+                                              FontSize="24"
+                                              Foreground="#8B5CF6"
+                                              FontFamily="Segoe Fluent Icons"/>
+                                </Border>
+                                <TextBlock Text="Báo cáo"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource SlateGray800}"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Grid.Column="4"
+                                Style="{StaticResource QuickAccessButtonStyle}"
+                                Click="QuickAccess_ChatbotAI_Click">
+                            <StackPanel Padding="24,24" Spacing="16" HorizontalAlignment="Center">
+                                <Border Width="52" Height="52" CornerRadius="14"
+                                        Background="#FFF7ED" HorizontalAlignment="Center">
+                                    <FontIcon Glyph="&#xE8BD;"
+                                              FontSize="24"
+                                              Foreground="#F97316"
+                                              FontFamily="Segoe Fluent Icons"/>
+                                </Border>
+                                <TextBlock Text="Tư vấn AI"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource SlateGray800}"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+
+                <!-- ROW 3 -->
+                <Grid ColumnSpacing="24">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource CardStyle}">
+                        <StackPanel Spacing="0">
+                            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,28">
+                                <FontIcon Glyph="&#xEA8F;"
+                                          FontSize="20"
+                                          Foreground="{StaticResource PrimaryBrush}"
+                                          FontFamily="Segoe Fluent Icons"/>
+                                <TextBlock Text="Lời nhắc bác sĩ"
+                                           FontSize="17"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource SlateGray800}"/>
+                            </StackPanel>
+
+                            <StackPanel Spacing="20">
+                                <Border>
+                                    <Grid ColumnSpacing="16">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="6"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border Grid.Column="0"
+                                                Width="6"
+                                                CornerRadius="3"
+                                                Background="{StaticResource PrimaryBrush}"
+                                                MinHeight="48"/>
+
+                                        <StackPanel Grid.Column="1" Spacing="4">
+                                            <TextBlock Text="Uống thuốc đúng giờ"
+                                                       FontSize="13"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource SlateGray800}"/>
+                                            <TextBlock Text="Uống thuốc dạ dày trước ăn 30 phút để đạt hiệu quả tối ưu."
+                                                       FontSize="12"
+                                                       Foreground="{StaticResource SlateGray500}"
+                                                       TextWrapping="Wrap"
+                                                       LineHeight="18"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                <Border>
+                                    <Grid ColumnSpacing="16">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="6"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border Grid.Column="0"
+                                                Width="6"
+                                                CornerRadius="3"
+                                                Background="#FB923C"
+                                                MinHeight="48"/>
+
+                                        <StackPanel Grid.Column="1" Spacing="4">
+                                            <TextBlock Text="Hẹn xét nghiệm"
+                                                       FontSize="13"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource SlateGray800}"/>
+                                            <TextBlock Text="Nhịn ăn trước 8h sáng mai để thực hiện xét nghiệm máu định kỳ."
+                                                       FontSize="12"
+                                                       Foreground="{StaticResource SlateGray500}"
+                                                       TextWrapping="Wrap"
+                                                       LineHeight="18"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Style="{StaticResource CardStyle}">
+                        <StackPanel Spacing="0">
+                            <Grid Margin="0,0,0,28">
+                                <TextBlock Text="Danh sách bác sĩ gợi ý"
+                                           FontSize="17"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource SlateGray800}"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center"/>
+
+                                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                                    <Button Width="36" Height="36" Padding="0" CornerRadius="12"
+                                            Background="White"
+                                            BorderBrush="{StaticResource BorderSubtleBrush}"
+                                            BorderThickness="1">
+                                        <FontIcon Glyph="&#xE76B;"
+                                                  FontSize="16"
+                                                  FontFamily="Segoe Fluent Icons"/>
+                                    </Button>
+
+                                    <Button Width="36" Height="36" Padding="0" CornerRadius="12"
+                                            Background="White"
+                                            BorderBrush="{StaticResource BorderSubtleBrush}"
+                                            BorderThickness="1">
+                                        <FontIcon Glyph="&#xE76C;"
+                                                  FontSize="16"
+                                                  FontFamily="Segoe Fluent Icons"/>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0"
+                                        Background="{StaticResource SlateGray50}"
+                                        CornerRadius="16"
+                                        Padding="16">
+                                    <StackPanel HorizontalAlignment="Center" Spacing="8">
                                         <PersonPicture Width="72" Height="72"
                                                        Initials="TC"
                                                        ProfilePicture="ms-appx:///Assets/DoctorC.jpg"/>
-                                        <!-- Online indicator -->
-                                        <Ellipse Width="16" Height="16"
-                                                 Fill="#22C55E"
-                                                 Stroke="White" StrokeThickness="2"
-                                                 HorizontalAlignment="Right"
-                                                 VerticalAlignment="Bottom"
-                                                 Margin="0,0,-2,-2"/>
-                                    </Grid>
-                                    <TextBlock Text="ThS.BS Trần Thu C"
-                                               FontSize="12" FontWeight="Bold"
-                                               Foreground="{StaticResource SlateGray800}"
-                                               HorizontalAlignment="Center"
-                                               TextAlignment="Center"
-                                               TextWrapping="Wrap"/>
-                                    <TextBlock Text="Khoa Nhi"
-                                               FontSize="11" FontWeight="Medium"
-                                               Foreground="{StaticResource SlateGray400}"
-                                               HorizontalAlignment="Center"/>
-                                    <Button Style="{StaticResource BookButtonStyle}"
-                                            Content="Đặt lịch"/>
-                                </StackPanel>
-                            </Border>
+                                        <TextBlock Text="ThS.BS Trần Thu C"
+                                                   FontSize="12"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource SlateGray800}"
+                                                   HorizontalAlignment="Center"
+                                                   TextAlignment="Center"
+                                                   TextWrapping="Wrap"/>
+                                        <TextBlock Text="Khoa Nhi"
+                                                   FontSize="11"
+                                                   FontWeight="Medium"
+                                                   Foreground="{StaticResource SlateGray400}"
+                                                   HorizontalAlignment="Center"/>
+                                        <Button Style="{StaticResource BookButtonStyle}"
+                                                Content="Đặt lịch"
+                                                Click="QuickAccess_BookAppointment_Click"/>
+                                    </StackPanel>
+                                </Border>
 
-                            <!-- Doctor 2: BSCKI Lê Văn D -->
-                            <Border Grid.Column="1"
-                                    Background="{StaticResource GlassHeaderAcrylicBrush}"
-                                    BorderBrush="#E2E8F0"
-                                    BorderThickness="1"
-                                    CornerRadius="16" Padding="16"
-                                    Translation="0,0,1"
-                                    Shadow="{StaticResource HealthcareThemeShadow}">
-                                <StackPanel HorizontalAlignment="Center" Spacing="8">
-                                    <Grid HorizontalAlignment="Center">
+                                <Border Grid.Column="1"
+                                        Background="{StaticResource SlateGray50}"
+                                        CornerRadius="16"
+                                        Padding="16">
+                                    <StackPanel HorizontalAlignment="Center" Spacing="8">
                                         <PersonPicture Width="72" Height="72"
                                                        Initials="LD"
                                                        ProfilePicture="ms-appx:///Assets/DoctorD.jpg"/>
-                                        <Ellipse Width="16" Height="16"
-                                                 Fill="#22C55E"
-                                                 Stroke="White" StrokeThickness="2"
-                                                 HorizontalAlignment="Right"
-                                                 VerticalAlignment="Bottom"
-                                                 Margin="0,0,-2,-2"/>
-                                    </Grid>
-                                    <TextBlock Text="BSCKI Lê Văn D"
-                                               FontSize="12" FontWeight="Bold"
-                                               Foreground="{StaticResource SlateGray800}"
-                                               HorizontalAlignment="Center"
-                                               TextAlignment="Center"
-                                               TextWrapping="Wrap"/>
-                                    <TextBlock Text="Khoa Mắt"
-                                               FontSize="11" FontWeight="Medium"
-                                               Foreground="{StaticResource SlateGray400}"
-                                               HorizontalAlignment="Center"/>
-                                    <Button Style="{StaticResource BookButtonStyle}"
-                                            Content="Đặt lịch"/>
-                                </StackPanel>
-                            </Border>
+                                        <TextBlock Text="BSCKI Lê Văn D"
+                                                   FontSize="12"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource SlateGray800}"
+                                                   HorizontalAlignment="Center"
+                                                   TextAlignment="Center"
+                                                   TextWrapping="Wrap"/>
+                                        <TextBlock Text="Khoa Mắt"
+                                                   FontSize="11"
+                                                   FontWeight="Medium"
+                                                   Foreground="{StaticResource SlateGray400}"
+                                                   HorizontalAlignment="Center"/>
+                                        <Button Style="{StaticResource BookButtonStyle}"
+                                                Content="Đặt lịch"
+                                                Click="QuickAccess_BookAppointment_Click"/>
+                                    </StackPanel>
+                                </Border>
 
-                            <!-- Doctor 3: BS. Nguyễn Thị E -->
-                            <Border Grid.Column="2"
-                                    Background="{StaticResource GlassHeaderAcrylicBrush}"
-                                    BorderBrush="#E2E8F0"
-                                    BorderThickness="1"
-                                    CornerRadius="16" Padding="16"
-                                    Translation="0,0,1"
-                                    Shadow="{StaticResource HealthcareThemeShadow}">
-                                <StackPanel HorizontalAlignment="Center" Spacing="8">
-                                    <Grid HorizontalAlignment="Center">
+                                <Border Grid.Column="2"
+                                        Background="{StaticResource SlateGray50}"
+                                        CornerRadius="16"
+                                        Padding="16">
+                                    <StackPanel HorizontalAlignment="Center" Spacing="8">
                                         <PersonPicture Width="72" Height="72"
                                                        Initials="NE"
                                                        ProfilePicture="ms-appx:///Assets/DoctorE.jpg"/>
-                                        <!-- Offline indicator (gray) -->
-                                        <Ellipse Width="16" Height="16"
-                                                 Fill="#CBD5E1"
-                                                 Stroke="White" StrokeThickness="2"
-                                                 HorizontalAlignment="Right"
-                                                 VerticalAlignment="Bottom"
-                                                 Margin="0,0,-2,-2"/>
-                                    </Grid>
-                                    <TextBlock Text="BS. Nguyễn Thị E"
-                                               FontSize="12" FontWeight="Bold"
-                                               Foreground="{StaticResource SlateGray800}"
-                                               HorizontalAlignment="Center"
-                                               TextAlignment="Center"
-                                               TextWrapping="Wrap"/>
-                                    <TextBlock Text="Da liễu"
-                                               FontSize="11" FontWeight="Medium"
-                                               Foreground="{StaticResource SlateGray400}"
-                                               HorizontalAlignment="Center"/>
-                                    <Button Style="{StaticResource BookButtonStyle}"
-                                            Content="Đặt lịch"/>
-                                </StackPanel>
-                            </Border>
+                                        <TextBlock Text="BS. Nguyễn Thị E"
+                                                   FontSize="12"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource SlateGray800}"
+                                                   HorizontalAlignment="Center"
+                                                   TextAlignment="Center"
+                                                   TextWrapping="Wrap"/>
+                                        <TextBlock Text="Da liễu"
+                                                   FontSize="11"
+                                                   FontWeight="Medium"
+                                                   Foreground="{StaticResource SlateGray400}"
+                                                   HorizontalAlignment="Center"/>
+                                        <Button Style="{StaticResource BookButtonStyle}"
+                                                Content="Đặt lịch"
+                                                Click="QuickAccess_BookAppointment_Click"/>
+                                    </StackPanel>
+                                </Border>
 
-                            <!-- Doctor 4: TS.BS Phạm Văn F -->
-                            <Border Grid.Column="3"
-                                    Background="{StaticResource GlassHeaderAcrylicBrush}"
-                                    BorderBrush="#E2E8F0"
-                                    BorderThickness="1"
-                                    CornerRadius="16" Padding="16"
-                                    Translation="0,0,1"
-                                    Shadow="{StaticResource HealthcareThemeShadow}">
-                                <StackPanel HorizontalAlignment="Center" Spacing="8">
-                                    <Grid HorizontalAlignment="Center">
+                                <Border Grid.Column="3"
+                                        Background="{StaticResource SlateGray50}"
+                                        CornerRadius="16"
+                                        Padding="16">
+                                    <StackPanel HorizontalAlignment="Center" Spacing="8">
                                         <PersonPicture Width="72" Height="72"
                                                        Initials="PF"
                                                        ProfilePicture="ms-appx:///Assets/DoctorF.jpg"/>
-                                        <Ellipse Width="16" Height="16"
-                                                 Fill="#22C55E"
-                                                 Stroke="White" StrokeThickness="2"
-                                                 HorizontalAlignment="Right"
-                                                 VerticalAlignment="Bottom"
-                                                 Margin="0,0,-2,-2"/>
-                                    </Grid>
-                                    <TextBlock Text="TS.BS Phạm Văn F"
-                                               FontSize="12" FontWeight="Bold"
-                                               Foreground="{StaticResource SlateGray800}"
-                                               HorizontalAlignment="Center"
-                                               TextAlignment="Center"
-                                               TextWrapping="Wrap"/>
-                                    <TextBlock Text="Thần kinh"
-                                               FontSize="11" FontWeight="Medium"
-                                               Foreground="{StaticResource SlateGray400}"
-                                               HorizontalAlignment="Center"/>
-                                    <Button Style="{StaticResource BookButtonStyle}"
-                                            Content="Đặt lịch"/>
-                                </StackPanel>
-                            </Border>
-                        </Grid>
-                    </StackPanel>
-                </Border>
-            </Grid>
+                                        <TextBlock Text="TS.BS Phạm Văn F"
+                                                   FontSize="12"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource SlateGray800}"
+                                                   HorizontalAlignment="Center"
+                                                   TextAlignment="Center"
+                                                   TextWrapping="Wrap"/>
+                                        <TextBlock Text="Thần kinh"
+                                                   FontSize="11"
+                                                   FontWeight="Medium"
+                                                   Foreground="{StaticResource SlateGray400}"
+                                                   HorizontalAlignment="Center"/>
+                                        <Button Style="{StaticResource BookButtonStyle}"
+                                                Content="Đặt lịch"
+                                                Click="QuickAccess_BookAppointment_Click"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
 
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- FLOATING BUTTONS -->
+        <StackPanel HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Orientation="Horizontal"
+                    Spacing="12"
+                    Margin="0,0,32,28">
+
+            <Button Width="56"
+                    Height="56"
+                    CornerRadius="18"
+                    Background="#F8FAFC"
+                    BorderBrush="#E2E8F0"
+                    BorderThickness="1"
+                    ToolTipService.ToolTip="Cài đặt tài khoản"
+                    Click="FloatingSettings_Click">
+                <FontIcon Glyph="&#xE713;"
+                          FontSize="22"
+                          Foreground="#64748B"
+                          FontFamily="Segoe Fluent Icons"/>
+            </Button>
+
+            <Button Width="64"
+                    Height="64"
+                    CornerRadius="18"
+                    Background="#2D6CDF"
+                    BorderThickness="0"
+                    ToolTipService.ToolTip="Tư vấn AI"
+                    Click="FloatingChatbot_Click">
+                <FontIcon Glyph="&#xE8BD;"
+                          FontSize="28"
+                          Foreground="White"
+                          FontFamily="Segoe Fluent Icons"/>
+            </Button>
         </StackPanel>
-    </ScrollViewer>
+    </Grid>
 </Page>
