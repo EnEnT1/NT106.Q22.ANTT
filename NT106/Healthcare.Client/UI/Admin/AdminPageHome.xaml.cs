@@ -106,44 +106,57 @@ namespace Healthcare.Client.UI.Admin
 
         private async Task LoadDashboardDataAsync()
         {
-            var client = SupabaseManager.Instance.Client;
-            
-            // 1. Doanh thu tháng này (Tổng amount của các Transaction có PaidAt trong tháng hiện tại)
-            var currentMonthStart = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            var transactionsResponse = await client.From<Transaction>()
-                .Where(t => t.Status == "Completed" || t.Status == "Paid")
-                .Get();
-            
-            decimal totalRevenue = 0;
-            if (transactionsResponse.Models != null)
+            try
             {
-                totalRevenue = transactionsResponse.Models
-                    .Where(t => t.PaidAt.HasValue && t.PaidAt.Value >= currentMonthStart)
-                    .Sum(t => t.Amount);
+                var client = SupabaseManager.Instance.Client;
+                var currentMonthStart = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                
+                // 1. Doanh thu tháng này
+                // Sử dụng Filter để tránh lỗi Unsupported method với LINQ Where phức tạp
+                var transactionsResponse = await client.From<Transaction>()
+                    .Filter("status", Postgrest.Constants.Operator.In, new List<string> { "Completed", "Paid" })
+                    .Get();
+                
+                decimal totalRevenue = 0;
+                if (transactionsResponse.Models != null)
+                {
+                    totalRevenue = transactionsResponse.Models
+                        .Where(t => t.PaidAt.HasValue && t.PaidAt.Value >= currentMonthStart)
+                        .Sum(t => t.Amount);
+                }
+                TxtMonthlyRevenue.Text = totalRevenue.ToString("N0") + " đ";
+
+                // 2. Lượt khám hôm nay
+                var today = DateTime.Today;
+                var appointmentsResponse = await client.From<Appointment>()
+                    .Filter("appointment_date", Postgrest.Constants.Operator.GreaterThanOrEqual, today)
+                    .Filter("appointment_date", Postgrest.Constants.Operator.LessThan, today.AddDays(1))
+                    .Get();
+                    
+                int todayAppts = appointmentsResponse.Models?.Count ?? 0;
+                TxtTodayAppointments.Text = todayAppts.ToString();
+
+                // 3. Bệnh nhân mới trong tháng
+                var usersResponse = await client.From<User>()
+                    .Filter("role", Postgrest.Constants.Operator.Equals, "Patient")
+                    .Get();
+                    
+                int newPatients = 0;
+                if (usersResponse.Models != null)
+                {
+                    newPatients = usersResponse.Models
+                        .Count(u => u.CreatedAt >= currentMonthStart);
+                }
+                TxtNewPatients.Text = newPatients.ToString();
             }
-            TxtMonthlyRevenue.Text = totalRevenue.ToString("N0") + " đ";
-
-            // 2. Lượt khám hôm nay
-            var today = DateTime.Today;
-            var appointmentsResponse = await client.From<Appointment>()
-                .Where(a => a.AppointmentDate >= today && a.AppointmentDate < today.AddDays(1))
-                .Get();
-                
-            int todayAppts = appointmentsResponse.Models?.Count ?? 0;
-            TxtTodayAppointments.Text = todayAppts.ToString();
-
-            // 3. Bệnh nhân mới trong tháng
-            var usersResponse = await client.From<User>()
-                .Where(u => u.Role == "Patient")
-                .Get();
-                
-            int newPatients = 0;
-            if (usersResponse.Models != null)
+            catch (Exception ex)
             {
-                newPatients = usersResponse.Models
-                    .Count(u => u.CreatedAt >= currentMonthStart);
+                System.Diagnostics.Debug.WriteLine("Dashboard Error: " + ex.Message);
+                // Hiển thị 0 thay vì báo lỗi làm gián đoạn trải nghiệm
+                TxtMonthlyRevenue.Text = "0 đ";
+                TxtTodayAppointments.Text = "0";
+                TxtNewPatients.Text = "0";
             }
-            TxtNewPatients.Text = newPatients.ToString();
         }
 
 
