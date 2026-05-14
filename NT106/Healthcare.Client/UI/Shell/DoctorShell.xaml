@@ -152,7 +152,7 @@
                 </NavigationViewItem>
 
 
-                <NavigationViewItem Tag="PatientHistoryPage" Content="Tiền sử bệnh">
+                <NavigationViewItem Tag="PatientHistoryPage" Content="Danh sách bệnh nhân">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE9F9;"/>
                     </NavigationViewItem.Icon>

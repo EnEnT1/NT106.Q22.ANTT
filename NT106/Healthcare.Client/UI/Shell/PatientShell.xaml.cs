@@ -3,9 +3,11 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Healthcare.Client.UI.Patient;
 using Healthcare.Client.UI.Auth;
+using Healthcare.Client.UI.Components;
 using Healthcare.Client.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Healthcare.Client.UI.Shell
 {
@@ -15,7 +17,6 @@ namespace Healthcare.Client.UI.Shell
     /// </summary>
     public sealed partial class PatientShell : Page
     {
-        // Danh sách tất cả nav buttons để reset active state
         private List<Button> _navButtons;
 
         public PatientShell()
@@ -24,15 +25,17 @@ namespace Healthcare.Client.UI.Shell
             LoadUserInfo();
             UpdateDateDisplay();
 
-            // Khởi tạo danh sách nav buttons
             _navButtons = new List<Button>
             {
-                NavHome, NavAppointment, NavRecords,
-                NavPayment, NavHealthMetrics, NavOnline,
+                NavHome,
+                NavAppointment,
+                NavRecords,
+                NavPayment,
+                NavHealthMetrics,
+                NavOnline,
                 NavUploadPrescription
             };
 
-            // Navigate tới trang chủ khi load
             ContentFrame.Navigate(typeof(PatientHomePage), this);
             SetActiveButton(NavHome);
         }
@@ -40,10 +43,17 @@ namespace Healthcare.Client.UI.Shell
         private void LoadUserInfo()
         {
             var user = SessionStorage.CurrentUser;
-            if (user == null) return;
+
+            if (user == null)
+                return;
 
             TxtPatientName.Text = user.FullName ?? "Bệnh nhân";
-            TxtPatientID.Text = "ID: " + (user.Id?.Length > 6 ? user.Id.Substring(0, 6).ToUpper() : user.Id?.ToUpper());
+
+            TxtPatientID.Text = "ID: " +
+                (user.Id?.Length > 6
+                    ? user.Id.Substring(0, 6).ToUpper()
+                    : user.Id?.ToUpper());
+
             PatientAvatar.DisplayName = user.FullName;
         }
 
@@ -93,30 +103,136 @@ namespace Healthcare.Client.UI.Shell
             SetActiveButton(NavUploadPrescription);
         }
 
+        // ──────────────────────────────────────────────
+        // TopBar / Floating Buttons
+        // ──────────────────────────────────────────────
+
+        private async void NotificationButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Thông báo",
+                Content = "Hiện chưa có thông báo mới.",
+                CloseButtonText = "Đóng",
+                XamlRoot = this.XamlRoot,
+                DefaultButton = ContentDialogButton.Close
+            };
+
+            await dialog.ShowAsync();
+        }
+
+        private async void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            await OpenSettingsDialogAsync();
+        }
+
+        private async void ChatbotFabButton_Click(object sender, RoutedEventArgs e)
+        {
+            await OpenChatbotDialogAsync();
+        }
+
+        private async Task OpenSettingsDialogAsync()
+        {
+            var profile = new ProfileControl
+            {
+                Width = 560,
+                Height = 600
+            };
+
+            var dialog = new ContentDialog
+            {
+                Title = "Cài đặt tài khoản",
+                Content = profile,
+                CloseButtonText = "Đóng",
+                XamlRoot = this.XamlRoot,
+                DefaultButton = ContentDialogButton.Close
+            };
+
+            await dialog.ShowAsync();
+        }
+
+        private async Task OpenChatbotDialogAsync()
+        {
+            var chatbot = new ChatbotAIControl
+            {
+                Width = 560,
+                Height = 620
+            };
+
+            var dialog = new ContentDialog
+            {
+                Title = "Tư vấn sức khỏe AI",
+                Content = chatbot,
+                CloseButtonText = "Đóng",
+                XamlRoot = this.XamlRoot,
+                DefaultButton = ContentDialogButton.Close
+            };
+
+            await dialog.ShowAsync();
+        }
 
         // ──────────────────────────────────────────────
-        // Public: Được gọi từ PatientHomePage (Quick Access)
+        // Public: Được gọi từ PatientHomePage
         // ──────────────────────────────────────────────
 
         public void NavigateToPage(Type pageType)
         {
             NavigateTo(pageType);
 
-            // Cập nhật active state tương ứng trang
-            if (pageType == typeof(PatientHomePage))       SetActiveButton(NavHome);
-            else if (pageType == typeof(BookAppointmentPage)) SetActiveButton(NavAppointment);
-            else if (pageType == typeof(MyRecordsPage))    SetActiveButton(NavRecords);
-            else if (pageType == typeof(PaymentCheckoutPage)) SetActiveButton(NavPayment);
-            else if (pageType == typeof(HealthMetricsPage)) SetActiveButton(NavHealthMetrics);
-            else if (pageType == typeof(OnlineConsultationPage))   SetActiveButton(NavOnline);
-            else if (pageType == typeof(UploadPrescriptionPage)) SetActiveButton(NavUploadPrescription);
+            if (pageType == typeof(PatientHomePage))
+                SetActiveButton(NavHome);
+            else if (pageType == typeof(BookAppointmentPage))
+                SetActiveButton(NavAppointment);
+            else if (pageType == typeof(MyRecordsPage))
+                SetActiveButton(NavRecords);
+            else if (pageType == typeof(PaymentCheckoutPage))
+                SetActiveButton(NavPayment);
+            else if (pageType == typeof(HealthMetricsPage))
+                SetActiveButton(NavHealthMetrics);
+            else if (pageType == typeof(OnlineConsultationPage))
+                SetActiveButton(NavOnline);
+            else if (pageType == typeof(UploadPrescriptionPage))
+                SetActiveButton(NavUploadPrescription);
         }
 
-        // ──────────────────────────────────────────────
-        // Helpers
-        // ──────────────────────────────────────────────
-        // Đăng xuất
-        // ──────────────────────────────────────────────
+        private void NavigateTo(Type pageType)
+        {
+            if (ContentFrame.CurrentSourcePageType != pageType)
+            {
+                ContentFrame.Navigate(pageType, this);
+            }
+        }
+
+        private void SetActiveButton(Button activeButton)
+        {
+            var activeStyle = (Style)Resources["NavItemActiveStyle"];
+            var inactiveStyle = (Style)Resources["NavItemButtonStyle"];
+
+            foreach (var btn in _navButtons)
+            {
+                btn.Style = btn == activeButton ? activeStyle : inactiveStyle;
+            }
+        }
+
+        private void UpdateDateDisplay()
+        {
+            var now = DateTime.Now;
+
+            string[] dayNames =
+            {
+                "Chủ Nhật",
+                "Thứ Hai",
+                "Thứ Ba",
+                "Thứ Tư",
+                "Thứ Năm",
+                "Thứ Sáu",
+                "Thứ Bảy"
+            };
+
+            string dayName = dayNames[(int)now.DayOfWeek];
+            DateTextBlock.Text = $"{dayName}, {now:dd/MM/yyyy}";
+        }
+
         private async void LogoutBtn_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new ContentDialog
@@ -130,44 +246,12 @@ namespace Healthcare.Client.UI.Shell
             };
 
             var result = await dialog.ShowAsync();
+
             if (result == ContentDialogResult.Primary)
             {
                 SessionStorage.ClearSession();
                 Frame.Navigate(typeof(LoginPage));
             }
-        }
-
-        // ──────────────────────────────────────────────
-
-        private void NavigateTo(Type pageType)
-        {
-            if (ContentFrame.CurrentSourcePageType != pageType)
-                ContentFrame.Navigate(pageType, this); // truyền shell để trang con có thể gọi lại
-        }
-
-        /// <summary>
-        /// Đặt button active, reset tất cả các button còn lại về inactive.
-        /// </summary>
-        private void SetActiveButton(Button activeButton)
-        {
-            var activeStyle   = (Style)Resources["NavItemActiveStyle"];
-            var inactiveStyle = (Style)Resources["NavItemButtonStyle"];
-
-            foreach (var btn in _navButtons)
-            {
-                btn.Style = (btn == activeButton) ? activeStyle : inactiveStyle;
-            }
-        }
-
-        /// <summary>
-        /// Cập nhật hiển thị ngày hiện tại trên TopBar.
-        /// </summary>
-        private void UpdateDateDisplay()
-        {
-            var now = DateTime.Now;
-            string[] dayNames = { "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy" };
-            string dayName = dayNames[(int)now.DayOfWeek];
-            DateTextBlock.Text = $"{dayName}, {now:dd/MM/yyyy}";
         }
     }
 }
