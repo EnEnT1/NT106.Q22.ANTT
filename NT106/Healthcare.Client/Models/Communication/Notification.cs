@@ -24,5 +24,11 @@ namespace Healthcare.Client.Models.Communication
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }
+
+        [Column("type")]
+        public string Type { get; set; }
+
+        [Column("related_entity_id")]
+        public string RelatedEntityId { get; set; }
     }
 }
