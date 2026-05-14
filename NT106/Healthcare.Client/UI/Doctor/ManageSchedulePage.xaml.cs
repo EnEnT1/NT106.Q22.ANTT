@@ -641,6 +641,10 @@ namespace Healthcare.Client.UI.Doctor
             try
             {
                 await _supabase.From<TimeSlot>().Insert(slotsToCreate);
+
+                // Đồng bộ bộ lọc ngày sang ngày vừa tạo để bác sĩ thấy ngay
+                FilterSlotDatePicker.Date = NewSlotDatePicker.Date;
+
                 await ShowMsg("Thành công", $"Đã tạo {slotsToCreate.Count} khung giờ cho ngày {date:dd/MM/yyyy}");
                 await LoadDoctorSlots();
             }
@@ -657,10 +661,26 @@ namespace Healthcare.Client.UI.Doctor
             if (string.IsNullOrEmpty(id))
                 return;
 
+            // Hỏi xác nhận trước khi xoá
+            var confirmDialog = new ContentDialog
+            {
+                Title = "Xác nhận xoá",
+                Content = "Bạn có chắc muốn xoá khung giờ này không?",
+                PrimaryButtonText = "Xoá",
+                CloseButtonText = "Huỷ",
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = this.XamlRoot
+            };
+
+            var result = await confirmDialog.ShowAsync();
+            if (result != ContentDialogResult.Primary)
+                return;
+
             try
             {
                 await _supabase.From<TimeSlot>().Where(x => x.Id == id).Delete();
                 await LoadDoctorSlots();
+                await ShowMsg("Thành công", "Đã xoá khung giờ thành công.");
             }
             catch (Exception ex)
             {
@@ -675,6 +695,21 @@ namespace Healthcare.Client.UI.Doctor
 
             var date = FilterSlotDatePicker.Date.DateTime.Date;
 
+            // Hỏi xác nhận trước khi xoá hàng loạt
+            var confirmDialog = new ContentDialog
+            {
+                Title = "Xác nhận xoá tất cả",
+                Content = $"Bạn có chắc muốn xoá tất cả khung giờ trống ngày {date:dd/MM/yyyy}?",
+                PrimaryButtonText = "Xoá tất cả",
+                CloseButtonText = "Huỷ",
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = this.XamlRoot
+            };
+
+            var result = await confirmDialog.ShowAsync();
+            if (result != ContentDialogResult.Primary)
+                return;
+
             try
             {
                 await _supabase.From<TimeSlot>()
@@ -684,6 +719,7 @@ namespace Healthcare.Client.UI.Doctor
                     .Delete();
 
                 await LoadDoctorSlots();
+                await ShowMsg("Thành công", $"Đã xoá tất cả khung giờ trống ngày {date:dd/MM/yyyy}.");
             }
             catch (Exception ex)
             {
