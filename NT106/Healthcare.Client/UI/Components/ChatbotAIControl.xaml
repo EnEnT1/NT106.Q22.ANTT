@@ -1,0 +1,94 @@
+<UserControl
+    x:Class="Healthcare.Client.UI.Components.ChatbotAIControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Background="White"
+                BorderBrush="#E5E7EB"
+                BorderThickness="0,0,0,1"
+                Padding="16">
+            <StackPanel Spacing="4">
+                <TextBlock Text="Chatbot AI"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           Foreground="#1E293B"/>
+
+                <TextBlock Text="Hỏi đáp sức khỏe cơ bản với ChatGPT"
+                           FontSize="12"
+                           Foreground="#64748B"/>
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer x:Name="ChatScrollViewer"
+                      Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      Padding="16">
+            <StackPanel x:Name="MessageList"
+                        Spacing="8"/>
+        </ScrollViewer>
+
+        <Border Grid.Row="2"
+                Background="White"
+                BorderBrush="#E5E7EB"
+                BorderThickness="1,1,1,0"
+                Padding="12">
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="ChatInput"
+                         Grid.Column="0"
+                         PlaceholderText="Nhập câu hỏi cho ChatGPT..."
+                         KeyDown="ChatInput_KeyDown"
+                         MinHeight="42"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="False"/>
+
+                <Button x:Name="BtnSend"
+                        Grid.Column="1"
+                        Click="BtnSend_Click"
+                        Background="#0059BB"
+                        Foreground="White"
+                        BorderThickness="0"
+                        CornerRadius="10"
+                        Padding="14,10">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon FontFamily="Segoe MDL2 Assets"
+                                  Glyph="&#xE724;"
+                                  FontSize="13"
+                                  Foreground="White"/>
+
+                        <TextBlock Text="Gửi"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="White"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="3"
+                Background="#F8FAFC"
+                BorderBrush="#E5E7EB"
+                BorderThickness="1,1,1,0"
+                Padding="12">
+            <TextBlock Text="ChatGPT chỉ hỗ trợ tư vấn cơ bản, không thay thế chẩn đoán của bác sĩ."
+                       FontSize="11"
+                       Foreground="#64748B"/>
+        </Border>
+    </Grid>
+</UserControl>
