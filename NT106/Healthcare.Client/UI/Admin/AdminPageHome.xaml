@@ -403,17 +403,12 @@
                             </Border>
                         </Grid>
                         
-                        <Grid ColumnSpacing="24">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1.8*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            
-                            <!-- Biểu đồ thu nhỏ -->
-                            <Border Grid.Column="0" Padding="28" Background="White" CornerRadius="24" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <Grid>
+                            <!-- Biểu đồ thu nhỏ (Bản rộng) -->
+                            <Border Padding="28" Background="White" CornerRadius="24" BorderBrush="#E2E8F0" BorderThickness="1">
                                 <StackPanel Spacing="24">
                                     <Grid>
-                                        <TextBlock Text="Xu hướng Tăng trưởng" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
+                                        <TextBlock Text="Xu hướng Tăng trưởng Hệ thống" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="16">
                                             <StackPanel Orientation="Horizontal" Spacing="6">
                                                 <Ellipse Width="8" Height="8" Fill="#2563EB"/>
@@ -426,50 +421,16 @@
                                         </StackPanel>
                                     </Grid>
                                     
-                                    <Grid Height="240" Background="#F1F5F9" CornerRadius="12">
+                                    <Grid Height="320" Background="#F1F5F9" CornerRadius="12">
                                         <!-- Visual Representation of a chart -->
                                         <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                            <Polyline Points="0,180 50,150 100,160 150,120 200,130 250,80 300,90 350,40" Stroke="#2563EB" StrokeThickness="3" Canvas.Left="40" Canvas.Top="20"/>
-                                            <Polyline Points="0,200 50,190 100,170 150,180 200,150 250,160 300,140 350,130" Stroke="#10B981" StrokeThickness="3" Canvas.Left="40" Canvas.Top="20"/>
+                                            <Polyline Points="0,240 100,180 200,200 300,140 400,160 500,80 600,100 700,40" Stroke="#2563EB" StrokeThickness="4" Canvas.Left="40" Canvas.Top="40"/>
+                                            <Polyline Points="0,280 100,260 200,220 300,240 400,180 500,200 600,150 700,130" Stroke="#10B981" StrokeThickness="4" Canvas.Left="40" Canvas.Top="40"/>
                                         </Canvas>
                                         <TextBlock Text="LiveCharts2 Engine Loading..." 
-                                                   HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,24"
                                                    FontSize="12" Foreground="#94A3B8" FontWeight="Medium"/>
                                     </Grid>
-                                </StackPanel>
-                            </Border>
-
-                            <!-- Nhật ký hệ thống -->
-                            <Border Grid.Column="1" Padding="28" Background="White" CornerRadius="24" BorderBrush="#E2E8F0" BorderThickness="1">
-                                <StackPanel Spacing="20">
-                                    <TextBlock Text="Hoạt động gần đây" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
-                                    <StackPanel Spacing="18">
-                                        <Grid ColumnSpacing="12">
-                                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                            <Border Width="10" Height="10" CornerRadius="5" Background="#2563EB" VerticalAlignment="Center"/>
-                                            <StackPanel Grid.Column="1">
-                                                <TextBlock Text="Tạo mới bác sĩ Nguyễn Văn T" FontSize="13" FontWeight="SemiBold" Foreground="#334155"/>
-                                                <TextBlock Text="10 phút trước" FontSize="11" Foreground="#94A3B8"/>
-                                            </StackPanel>
-                                        </Grid>
-                                        <Grid ColumnSpacing="12">
-                                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                            <Border Width="10" Height="10" CornerRadius="5" Background="#16A34A" VerticalAlignment="Center"/>
-                                            <StackPanel Grid.Column="1">
-                                                <TextBlock Text="Xác nhận thanh toán #INV-209" FontSize="13" FontWeight="SemiBold" Foreground="#334155"/>
-                                                <TextBlock Text="25 phút trước" FontSize="11" Foreground="#94A3B8"/>
-                                            </StackPanel>
-                                        </Grid>
-                                        <Grid ColumnSpacing="12">
-                                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                            <Border Width="10" Height="10" CornerRadius="5" Background="#EA580C" VerticalAlignment="Center"/>
-                                            <StackPanel Grid.Column="1">
-                                                <TextBlock Text="Hệ thống đã sao lưu dữ liệu" FontSize="13" FontWeight="SemiBold" Foreground="#334155"/>
-                                                <TextBlock Text="1 giờ trước" FontSize="11" Foreground="#94A3B8"/>
-                                            </StackPanel>
-                                        </Grid>
-                                    </StackPanel>
-                                    <Button Content="Xem tất cả" HorizontalAlignment="Stretch" Margin="0,10,0,0" Style="{StaticResource DefaultButtonStyle}" Padding="0,8"/>
                                 </StackPanel>
                             </Border>
                         </Grid>
