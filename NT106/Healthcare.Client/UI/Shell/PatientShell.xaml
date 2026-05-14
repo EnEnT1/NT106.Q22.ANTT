@@ -271,6 +271,17 @@
                                            VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
+
+                        <Button x:Name="NavUploadPrescription" Style="{StaticResource NavItemButtonStyle}"
+                                Click="NavUploadPrescription_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                <FontIcon Glyph="&#xE8E5;" FontSize="18"
+                                          FontFamily="Segoe Fluent Icons"/>
+                                <TextBlock Text="Nhập đơn thuốc AI" FontSize="14"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
                     </StackPanel>
                 </ScrollViewer>
 

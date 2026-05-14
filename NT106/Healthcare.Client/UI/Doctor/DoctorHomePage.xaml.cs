@@ -172,7 +172,8 @@ namespace Healthcare.Client.UI.Doctor
             return status switch
             {
                 "In Progress" => ("ĐANG KHÁM", new SolidColorBrush(Color.FromArgb(255, 219, 234, 254)), new SolidColorBrush(Color.FromArgb(255, 37, 99, 235))),
-                "Confirmed" => ("ĐANG ĐỢI", new SolidColorBrush(Color.FromArgb(255, 241, 245, 249)), new SolidColorBrush(Color.FromArgb(255, 100, 116, 139))),
+                "Arrived" => ("ĐÃ ĐẾN (SẴN SÀNG)", new SolidColorBrush(Color.FromArgb(255, 224, 242, 254)), new SolidColorBrush(Color.FromArgb(255, 14, 165, 233))),
+                "Confirmed" => ("CHƯA ĐẾN", new SolidColorBrush(Color.FromArgb(255, 241, 245, 249)), new SolidColorBrush(Color.FromArgb(255, 100, 116, 139))),
                 "Pending" => ("CHỜ DUYỆT", new SolidColorBrush(Color.FromArgb(255, 254, 243, 199)), new SolidColorBrush(Color.FromArgb(255, 180, 83, 9))),
                 _ => ("HOÀN TẤT", new SolidColorBrush(Color.FromArgb(255, 220, 252, 231)), new SolidColorBrush(Color.FromArgb(255, 22, 163, 74)))
             };

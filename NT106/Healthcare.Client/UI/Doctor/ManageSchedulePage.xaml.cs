@@ -758,8 +758,8 @@ namespace Healthcare.Client.UI.Doctor
         public string BaseStatus { get; set; }
 
         public Visibility IsPending => BaseStatus == "Pending" ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility IsConfirmed => BaseStatus == "Confirmed" ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility IsOnlineCallVisible => (BaseStatus == "Confirmed" && TypeText == "Online") ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility IsConfirmed => (BaseStatus == "Confirmed" || BaseStatus == "Arrived") ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility IsOnlineCallVisible => ((BaseStatus == "Confirmed" || BaseStatus == "Arrived") && TypeText == "Online") ? Visibility.Visible : Visibility.Collapsed;
 
         public SolidColorBrush BgBrush => new SolidColorBrush(
             BaseStatus == "Pending"
@@ -775,6 +775,7 @@ namespace Healthcare.Client.UI.Doctor
             {
                 "Pending" => Color.FromArgb(255, 255, 179, 0),    // Cam - Chờ duyệt
                 "Confirmed" => Color.FromArgb(255, 0, 89, 187),  // Lam - Sẵn sàng
+                "Arrived" => Color.FromArgb(255, 14, 165, 233),   // Xanh dương nhạt - Đã đến
                 "Completed" => Color.FromArgb(255, 5, 150, 105), // Xanh lá - Hoàn thành
                 "Cancelled" => Color.FromArgb(255, 220, 38, 38), // Đỏ - Đã hủy
                 _ => Color.FromArgb(255, 100, 116, 139)          // Xám - Khác
@@ -783,7 +784,8 @@ namespace Healthcare.Client.UI.Doctor
         public string StatusText => BaseStatus switch
         {
             "Pending" => "Chờ duyệt",
-            "Confirmed" => "Sẵn sàng",
+            "Confirmed" => "Chưa đến",
+            "Arrived" => "Đã đến",
             "Completed" => "Đã hoàn thành",
             "Cancelled" => "Đã hủy",
             _ => "Không rõ"

@@ -28,7 +28,8 @@ namespace Healthcare.Client.UI.Shell
             _navButtons = new List<Button>
             {
                 NavHome, NavAppointment, NavRecords,
-                NavPayment, NavHealthMetrics, NavOnline
+                NavPayment, NavHealthMetrics, NavOnline,
+                NavUploadPrescription
             };
 
             // Navigate tới trang chủ khi load
@@ -86,6 +87,12 @@ namespace Healthcare.Client.UI.Shell
             SetActiveButton(NavOnline);
         }
 
+        private void NavUploadPrescription_Click(object sender, RoutedEventArgs e)
+        {
+            NavigateTo(typeof(UploadPrescriptionPage));
+            SetActiveButton(NavUploadPrescription);
+        }
+
 
         // ──────────────────────────────────────────────
         // Public: Được gọi từ PatientHomePage (Quick Access)
@@ -102,6 +109,7 @@ namespace Healthcare.Client.UI.Shell
             else if (pageType == typeof(PaymentCheckoutPage)) SetActiveButton(NavPayment);
             else if (pageType == typeof(HealthMetricsPage)) SetActiveButton(NavHealthMetrics);
             else if (pageType == typeof(OnlineConsultationPage))   SetActiveButton(NavOnline);
+            else if (pageType == typeof(UploadPrescriptionPage)) SetActiveButton(NavUploadPrescription);
         }
 
         // ──────────────────────────────────────────────

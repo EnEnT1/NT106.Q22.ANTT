@@ -200,10 +200,13 @@ namespace Healthcare.Client.UI.Doctor
                 BtnTopCancel.Visibility = Visibility.Visible;
                 BtnTopVideoCall.Visibility = Visibility.Collapsed;
             }
-            else if (_appointment.Status == "Confirmed")
+            else if (_appointment.Status == "Confirmed" || _appointment.Status == "Arrived")
             {
-                StatusText.Text = "ĐÃ XÁC NHẬN";
-                StatusBadge.Background = new SolidColorBrush(Color.FromArgb(255, 2, 132, 199)); // Blue
+                StatusText.Text = _appointment.Status == "Arrived" ? "ĐÃ ĐẾN (SẴN SÀNG)" : "ĐÃ XÁC NHẬN";
+                StatusBadge.Background = _appointment.Status == "Arrived" ? 
+                    new SolidColorBrush(Color.FromArgb(255, 14, 165, 233)) : 
+                    new SolidColorBrush(Color.FromArgb(255, 2, 132, 199));
+                    
                 BtnTopApprove.Visibility = Visibility.Collapsed;
                 BtnTopCancel.Visibility = Visibility.Visible;
                 BtnTopVideoCall.Visibility = _appointment.ExaminationType == "Online" ? Visibility.Visible : Visibility.Collapsed;
@@ -261,13 +264,13 @@ namespace Healthcare.Client.UI.Doctor
                 TimelineEndReason.Visibility = Visibility.Visible;
                 TimelineEndReasonText.Text = "Lý do: Lịch hẹn không được thực hiện hoặc đã bị bác sĩ/bệnh nhân hủy.";
             }
-            else if (_appointment.Status == "Confirmed")
+            else if (_appointment.Status == "Confirmed" || _appointment.Status == "Arrived")
             {
-                TimelineEndTitle.Text = "ĐÃ XÁC NHẬN";
+                TimelineEndTitle.Text = _appointment.Status == "Arrived" ? "ĐÃ ĐẾN PHÒNG KHÁM" : "ĐÃ XÁC NHẬN";
                 TimelineEndTitle.Foreground = new SolidColorBrush(Color.FromArgb(255, 16, 185, 129));
                 TimelineEndIconBg.Fill = new SolidColorBrush(Color.FromArgb(255, 16, 185, 129));
                 TimelineEndIcon.Glyph = "\xE73E";
-                TimelineEndTime.Text = "Bác sĩ đã chấp nhận lịch hẹn";
+                TimelineEndTime.Text = _appointment.Status == "Arrived" ? "Bệnh nhân đã đến và sẵn sàng khám" : "Bác sĩ đã chấp nhận lịch hẹn";
                 TimelineEndReason.Visibility = Visibility.Collapsed;
             }
             else

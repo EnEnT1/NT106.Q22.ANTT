@@ -28,7 +28,10 @@ namespace Healthcare.Client.UI.Staff
             public string RoomCode { get; set; }
             public Brush StatusBrush => Status == "Confirmed" ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 22, 163, 74)) :
                                        Status == "Pending" ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 234, 88, 12)) :
+                                       Status == "Arrived" ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 14, 165, 233)) :
                                        new SolidColorBrush(Windows.UI.Color.FromArgb(255, 100, 116, 139));
+            
+            public Visibility IsCheckInVisible => Status == "Confirmed" ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public class StaffTransactionDisplay
@@ -206,8 +209,51 @@ namespace Healthcare.Client.UI.Staff
             }
             else if (_currentTab == "Appointment" && StaffDataGrid.SelectedItem is StaffAppointmentDisplay selectedApp)
             {
-                // Logic phụ: Có thể thêm xác nhận bệnh nhân đã tới khám tại đây
+                // Giữ lại fallback: hiện thông tin chi tiết nếu double click
                 await ShowDialogAsync("Lịch hẹn", $"Mã phòng khám cho {selectedApp.PatientName} là: {selectedApp.RoomCode}");
+            }
+        }
+
+        private async void BtnCheckIn_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string apptId)
+            {
+                var apptDisplay = _allAppointments.FirstOrDefault(a => a.Id == apptId);
+                if (apptDisplay == null) return;
+
+                ContentDialog confirmDialog = new ContentDialog
+                {
+                    Title = "Xác nhận Check-in",
+                    Content = $"Xác nhận bệnh nhân {apptDisplay.PatientName} đã đến phòng khám? (Mã phòng: {apptDisplay.RoomCode})",
+                    PrimaryButtonText = "Check-in",
+                    CloseButtonText = "Hủy",
+                    DefaultButton = ContentDialogButton.Primary,
+                    XamlRoot = this.XamlRoot
+                };
+
+                if (await confirmDialog.ShowAsync() == ContentDialogResult.Primary)
+                {
+                    try
+                    {
+                        var appt = (await SupabaseManager.Instance.Client
+                            .From<Appointment>()
+                            .Where(a => a.Id == apptId)
+                            .Get()).Models.FirstOrDefault();
+
+                        if (appt != null)
+                        {
+                            appt.Status = "Arrived";
+                            
+                            await appt.Update<Appointment>();
+                            await ShowDialogAsync("Check-in Thành công", $"Đã xác nhận bệnh nhân đến. Vui lòng hướng dẫn bệnh nhân đến Phòng: {apptDisplay.RoomCode}.");
+                            LoadDataAsync();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        await ShowDialogAsync("Lỗi", "Không thể cập nhật trạng thái: " + ex.Message);
+                    }
+                }
             }
         }
 

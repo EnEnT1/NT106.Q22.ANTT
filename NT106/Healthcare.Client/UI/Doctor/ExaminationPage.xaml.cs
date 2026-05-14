@@ -8,12 +8,14 @@ using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Windows.Media.SpeechRecognition;
 using Windows.UI;
 
 namespace Healthcare.Client.UI.Doctor
@@ -25,6 +27,11 @@ namespace Healthcare.Client.UI.Doctor
         private string _currentUserId = string.Empty;
         private string _activeNav = "video";
         private readonly System.Collections.Generic.List<string> _quickNotes = new();
+
+        // Speech-to-text
+        private SpeechRecognizer? _speechRecognizer;
+        private bool _isRecording = false;
+        private System.Threading.CancellationTokenSource? _toastCts;
 
         public ExaminationPage()
         {
@@ -49,6 +56,7 @@ namespace Healthcare.Client.UI.Doctor
             base.OnNavigatedFrom(e);
             VideoCall.Cleanup();
             Chat.Cleanup();
+            CleanupSpeechRecognizer();
         }
 
         private async Task InitializePageAsync()
@@ -267,6 +275,205 @@ namespace Healthcare.Client.UI.Doctor
         }
 
         private void BtnAddMedicine_Click(object sender, RoutedEventArgs e) { /* Picker DB Logic logic here */ }
+
+        // ─────────────────────────────────────────────────────────────
+        // SPEECH-TO-TEXT  (Windows.Media.SpeechRecognition)
+        // ─────────────────────────────────────────────────────────────
+
+        private async void BtnMic_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isRecording)
+                await StopRecordingAsync();
+            else
+                await StartRecordingAsync();
+        }
+
+        private async Task StartRecordingAsync()
+        {
+            try
+            {
+                _speechRecognizer = new SpeechRecognizer();
+
+                // Thêm ngữ pháp dictation (nhận dạng tự do, không giới hạn từ)
+                var dictationConstraint = new SpeechRecognitionTopicConstraint(
+                    SpeechRecognitionScenario.Dictation, "dictation");
+                _speechRecognizer.Constraints.Add(dictationConstraint);
+
+                var compileResult = await _speechRecognizer.CompileConstraintsAsync();
+                if (compileResult.Status != SpeechRecognitionResultStatus.Success)
+                {
+                    await ShowErrorAsync("Không thể khởi động nhận dạng giọng nói. Vui lòng kiểm tra micro.");
+                    return;
+                }
+
+                // Lắng nghe từng kết quả liên tục
+                _speechRecognizer.ContinuousRecognitionSession.ResultGenerated +=
+                    SpeechSession_ResultGenerated;
+                _speechRecognizer.ContinuousRecognitionSession.Completed +=
+                    SpeechSession_Completed;
+
+                await _speechRecognizer.ContinuousRecognitionSession.StartAsync();
+
+                _isRecording = true;
+                UpdateMicUI(isRecording: true);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[STT] StartRecording Error: {ex.Message}");
+                await ShowErrorAsync("Lỗi khởi động micro: " + ex.Message);
+                CleanupSpeechRecognizer();
+            }
+        }
+
+        private async Task StopRecordingAsync()
+        {
+            try
+            {
+                if (_speechRecognizer != null && _isRecording)
+                    await _speechRecognizer.ContinuousRecognitionSession.StopAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[STT] StopRecording Error: {ex.Message}");
+            }
+            finally
+            {
+                _isRecording = false;
+                CleanupSpeechRecognizer();
+                UpdateMicUI(isRecording: false);
+            }
+        }
+
+        private void SpeechSession_ResultGenerated(
+            SpeechContinuousRecognitionSession sender,
+            SpeechContinuousRecognitionResultGeneratedEventArgs args)
+        {
+            // Chỉ lấy kết quả đủ tin cậy (tránh nhận nhầm)
+            if (args.Result.Confidence == SpeechRecognitionConfidence.Low ||
+                string.IsNullOrWhiteSpace(args.Result.Text))
+                return;
+
+            string recognizedText = args.Result.Text;
+
+            // Marshal về UI thread để cập nhật TextBox + hiện toast
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                string current = DiagnosisBox.Text;
+                if (string.IsNullOrEmpty(current))
+                    DiagnosisBox.Text = recognizedText;
+                else
+                    DiagnosisBox.Text = current.TrimEnd() + " " + recognizedText;
+
+                // Di chuyển con trỏ về cuối
+                DiagnosisBox.SelectionStart = DiagnosisBox.Text.Length;
+
+                // Hiện toast trên màn hình video
+                ShowSttToastAsync(recognizedText);
+            });
+        }
+
+        private void SpeechSession_Completed(
+            SpeechContinuousRecognitionSession sender,
+            SpeechContinuousRecognitionCompletedEventArgs args)
+        {
+            // Session tự kết thúc (ví dụ: im lặng quá lâu)
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                _isRecording = false;
+                CleanupSpeechRecognizer();
+                UpdateMicUI(isRecording: false);
+            });
+        }
+
+        private void UpdateMicUI(bool isRecording)
+        {
+            if (isRecording)
+            {
+                // Floating button → Stop icon + nền đỏ
+                MicIconFloat.Glyph = "\uE71A";
+                BtnMicFloat.Background = new SolidColorBrush(HexToColor("#CC7F1D1D"));
+
+                // Vòng tròn đỏ nhấp nháy quanh floating button
+                var ringAnim = new DoubleAnimation
+                {
+                    From = 1.0, To = 0.0,
+                    Duration = new Duration(TimeSpan.FromSeconds(0.9)),
+                    AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever
+                };
+                var ringSb = new Storyboard();
+                ringSb.Children.Add(ringAnim);
+                Storyboard.SetTarget(ringAnim, RecordingRing);
+                Storyboard.SetTargetProperty(ringAnim, "Opacity");
+                RecordingRing.Opacity = 1.0;
+                ringSb.Begin();
+                RecordingRing.Tag = ringSb;
+            }
+            else
+            {
+                // Floating button → Mic icon + nền tối mờ
+                MicIconFloat.Glyph = "\uE720";
+                BtnMicFloat.Background = new SolidColorBrush(HexToColor("#CC0F172A"));
+                if (RecordingRing.Tag is Storyboard ringSb) ringSb.Stop();
+                RecordingRing.Opacity = 0;
+
+                // Ẩn toast nếu đang hiện
+                SttToast.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        /// <summary>
+        /// Hiện toast text trên video, tự động ẩn sau 4 giây.
+        /// Nếu text mới đến trước khi hết thời gian, timer reset.
+        /// </summary>
+        private async void ShowSttToastAsync(string text)
+        {
+            // Huỷ timer cũ nếu đang chạy
+            _toastCts?.Cancel();
+            _toastCts = new System.Threading.CancellationTokenSource();
+            var token = _toastCts.Token;
+
+            SttToastText.Text = $"🎙 {text}";
+            SttToast.Visibility = Visibility.Visible;
+
+            try
+            {
+                await Task.Delay(4000, token);
+                if (!token.IsCancellationRequested)
+                    SttToast.Visibility = Visibility.Collapsed;
+            }
+            catch (TaskCanceledException) { /* Có toast mới thay thế, bỏ qua */ }
+        }
+
+        private void CleanupSpeechRecognizer()
+        {
+            if (_speechRecognizer != null)
+            {
+                try
+                {
+                    _speechRecognizer.ContinuousRecognitionSession.ResultGenerated -=
+                        SpeechSession_ResultGenerated;
+                    _speechRecognizer.ContinuousRecognitionSession.Completed -=
+                        SpeechSession_Completed;
+                    _speechRecognizer.Dispose();
+                }
+                catch { /* Bỏ qua lỗi cleanup */ }
+                finally
+                {
+                    _speechRecognizer = null;
+                }
+            }
+        }
+
+        private async Task ShowErrorAsync(string message)
+        {
+            await new ContentDialog
+            {
+                Title = "Lỗi",
+                Content = message,
+                CloseButtonText = "Đóng",
+                XamlRoot = this.XamlRoot
+            }.ShowAsync();
+        }
 
         private async void BtnSaveNotes_Click(object sender, RoutedEventArgs e)
         {

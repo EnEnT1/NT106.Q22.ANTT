@@ -35,36 +35,6 @@
         <ScrollViewer Grid.Row="1" Padding="30" VerticalScrollBarVisibility="Auto">
             <StackPanel Spacing="30" MaxWidth="1000" HorizontalAlignment="Left">
                 
-                <!-- Active Appointments / Join Call Section -->
-                <StackPanel x:Name="ActiveApptsSection" Visibility="Collapsed" Spacing="15">
-                    <TextBlock Text="Tư Vấn Đang Diễn Ra" FontSize="18" FontWeight="SemiBold" Foreground="#0F172A"/>
-                    <ItemsControl x:Name="ActiveApptsList">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="#0284C7" CornerRadius="12" Padding="20" Margin="0,0,0,10">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <StackPanel Grid.Column="0">
-                                            <TextBlock Text="Lịch hẹn tư vấn trực tuyến" FontSize="16" FontWeight="Bold" Foreground="White"/>
-                                            <TextBlock Text="{Binding DoctorName}" FontSize="14" Foreground="#E0F2FE" Margin="0,4,0,0"/>
-                                        </StackPanel>
-                                        <Button Grid.Column="1" Click="BtnJoinCall_Click" Tag="{Binding Id}"
-                                                Background="White" Foreground="#0284C7" Padding="20,10" CornerRadius="8" FontWeight="Bold">
-                                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE714;"/>
-                                                <TextBlock Text="Vào phòng khám"/>
-                                            </StackPanel>
-                                        </Button>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-
                 <!-- Medical Records History -->
                 <StackPanel Spacing="15">
                     <TextBlock Text="Lịch Sử Khám Bệnh" FontSize="18" FontWeight="SemiBold" Foreground="#0F172A"/>
@@ -101,8 +71,17 @@
                                         <!-- Diagnosis and Notes -->
                                         <StackPanel Grid.Row="1" Spacing="10" Padding="0,15" BorderBrush="#F1F5F9" BorderThickness="0,1,0,1">
                                             <StackPanel>
-                                                <TextBlock Text="Chẩn đoán:" FontSize="13" Foreground="#64748B" FontWeight="SemiBold"/>
-                                                <TextBlock Text="{Binding Diagnosis}" FontSize="15" Foreground="#1E293B" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                                <Grid>
+                                                    <TextBlock Text="Chẩn đoán:" FontSize="13" Foreground="#64748B" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                    <Button HorizontalAlignment="Right" Click="BtnViewDiagnosis_Click" 
+                                                            Padding="8,4" Background="#F0F9FF" BorderThickness="0" CornerRadius="6">
+                                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE720;" FontSize="12" Foreground="#0284C7"/>
+                                                            <TextBlock Text="Xem chi tiết" FontSize="11" Foreground="#0284C7" FontWeight="Bold"/>
+                                                        </StackPanel>
+                                                    </Button>
+                                                </Grid>
+                                                <TextBlock Text="{Binding Diagnosis}" FontSize="15" Foreground="#1E293B" Margin="0,2,0,0" MaxLines="2" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
                                             </StackPanel>
                                             <StackPanel>
                                                 <TextBlock Text="Ghi chú &amp; Đơn thuốc:" FontSize="13" Foreground="#64748B" FontWeight="SemiBold"/>

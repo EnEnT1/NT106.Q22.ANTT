@@ -28,12 +28,60 @@
         </Grid.ColumnDefinitions>
 
         <!-- LEFT SIDE: DOMINANT VIDEO AREA -->
-        <Border Grid.Column="0" Margin="20" CornerRadius="20" Background="Black" Shadow="{StaticResource SharedShadow}">
-            <components:VideoCallControl x:Name="VideoCall"
-                                         CallStarted="VideoCall_CallStarted"
-                                         CallEnded="VideoCall_CallEnded"
-                                         Visibility="Visible"/>
-        </Border>
+        <Grid Grid.Column="0" Margin="20">
+            <!-- Video call control -->
+            <Border CornerRadius="20" Background="Black" Shadow="{StaticResource SharedShadow}">
+                <components:VideoCallControl x:Name="VideoCall"
+                                             CallStarted="VideoCall_CallStarted"
+                                             CallEnded="VideoCall_CallEnded"
+                                             Visibility="Visible"/>
+            </Border>
+
+            <!-- STT Toast: hiện text vừa nhận được, tự ẩn sau 4 giây -->
+            <Border x:Name="SttToast"
+                    Visibility="Collapsed"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Stretch"
+                    Margin="20,0,140,28"
+                    Background="#CC1E293B"
+                    CornerRadius="14"
+                    Padding="16,10">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <FontIcon Glyph="&#xE720;" FontSize="14" Foreground="#7DD3FC" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="SttToastText"
+                               Text=""
+                               FontSize="13"
+                               Foreground="White"
+                               TextWrapping="Wrap"
+                               MaxLines="3"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Floating Mic Button (bottom-right of video) -->
+            <Button x:Name="BtnMicFloat"
+                    Click="BtnMic_Click"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,20,20"
+                    Width="56" Height="56"
+                    Padding="0"
+                    Background="#CC0F172A"
+                    Foreground="White"
+                    BorderThickness="0"
+                    CornerRadius="28"
+                    ToolTipService.ToolTip="Nhấn để ghi âm chẩn đoán">
+                <Grid>
+                    <FontIcon x:Name="MicIconFloat" Glyph="&#xE720;" FontSize="22"/>
+                    <!-- Vòng tròn đỏ nhấp nháy khi đang ghi -->
+                    <Ellipse x:Name="RecordingRing"
+                             Width="56" Height="56"
+                             Stroke="#EF4444"
+                             StrokeThickness="3"
+                             Opacity="0"/>
+                </Grid>
+            </Button>
+        </Grid>
 
         <!-- RIGHT SIDE: INFORMATION & TOOLS PANEL (Stacked UI) -->
         <Grid Grid.Column="1" Margin="0,20,20,20">
@@ -115,9 +163,14 @@
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Spacing="20">
                             <TextBlock Text="Ghi chú &amp; Chẩn đoán" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
-                            
-                            <TextBox x:Name="DiagnosisBox" Header="Chẩn đoán xác định" PlaceholderText="Nhập chẩn đoán hoặc mã bệnh..." AcceptsReturn="True" TextWrapping="Wrap" MinHeight="100"/>
-                            
+
+                            <TextBox x:Name="DiagnosisBox"
+                                     Header="Chẩn đoán xác định"
+                                     PlaceholderText="Nhập hoặc đọc chẩn đoán bằng giọng nói..."
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     MinHeight="100"/>
+
                             <StackPanel Spacing="12">
                                 <Grid>
                                     <TextBlock Text="Ghi chú nhanh" FontWeight="Bold" VerticalAlignment="Center"/>

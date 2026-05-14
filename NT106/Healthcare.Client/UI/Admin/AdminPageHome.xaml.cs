@@ -15,7 +15,7 @@ namespace Healthcare.Client.UI.Admin
 {
     public sealed partial class AdminHomePage : Page
     {
-        private string _currentTab = "Patient";
+        private string _currentTab = "Dashboard";
         private readonly AdminApiClient _adminApiClient = new AdminApiClient();
 
         // Cấu trúc dữ liệu hiển thị (Display Models) để map tên từ ID
@@ -78,6 +78,9 @@ namespace Healthcare.Client.UI.Admin
 
                 switch (_currentTab)
                 {
+                    case "Dashboard":
+                        await LoadDashboardDataAsync();
+                        break;
                     case "Patient":
                         await LoadUsersByRoleAsync("Patient");
                         break;
@@ -99,6 +102,48 @@ namespace Healthcare.Client.UI.Admin
             {
                 await ShowDialogAsync("Lỗi hệ thống", $"Không thể tải dữ liệu: {ex.Message}");
             }
+        }
+
+        private async Task LoadDashboardDataAsync()
+        {
+            var client = SupabaseManager.Instance.Client;
+            
+            // 1. Doanh thu tháng này (Tổng amount của các Transaction có PaidAt trong tháng hiện tại)
+            var currentMonthStart = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var transactionsResponse = await client.From<Transaction>()
+                .Where(t => t.Status == "Completed" || t.Status == "Paid")
+                .Get();
+            
+            decimal totalRevenue = 0;
+            if (transactionsResponse.Models != null)
+            {
+                totalRevenue = transactionsResponse.Models
+                    .Where(t => t.PaidAt.HasValue && t.PaidAt.Value >= currentMonthStart)
+                    .Sum(t => t.Amount);
+            }
+            TxtMonthlyRevenue.Text = totalRevenue.ToString("N0") + " đ";
+
+            // 2. Lượt khám hôm nay
+            var today = DateTime.Today;
+            var appointmentsResponse = await client.From<Appointment>()
+                .Where(a => a.AppointmentDate >= today && a.AppointmentDate < today.AddDays(1))
+                .Get();
+                
+            int todayAppts = appointmentsResponse.Models?.Count ?? 0;
+            TxtTodayAppointments.Text = todayAppts.ToString();
+
+            // 3. Bệnh nhân mới trong tháng
+            var usersResponse = await client.From<User>()
+                .Where(u => u.Role == "Patient")
+                .Get();
+                
+            int newPatients = 0;
+            if (usersResponse.Models != null)
+            {
+                newPatients = usersResponse.Models
+                    .Count(u => u.CreatedAt >= currentMonthStart);
+            }
+            TxtNewPatients.Text = newPatients.ToString();
         }
 
 
@@ -182,7 +227,20 @@ namespace Healthcare.Client.UI.Admin
             if (args.InvokedItemContainer?.Tag != null)
             {
                 _currentTab = args.InvokedItemContainer.Tag.ToString();
-                HeaderTitle.Text = args.InvokedItem.ToString();
+                
+                if (_currentTab == "Dashboard")
+                {
+                    DashboardPanel.Visibility = Visibility.Visible;
+                    ListViewPanel.Visibility = Visibility.Collapsed;
+                    HeaderTitle.Text = "Dashboard";
+                }
+                else
+                {
+                    DashboardPanel.Visibility = Visibility.Collapsed;
+                    ListViewPanel.Visibility = Visibility.Visible;
+                    HeaderTitle.Text = args.InvokedItem.ToString();
+                }
+                
                 LoadDataAsync();
             }
         }

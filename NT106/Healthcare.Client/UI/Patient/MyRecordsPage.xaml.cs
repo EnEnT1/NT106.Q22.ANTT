@@ -23,23 +23,15 @@ namespace Healthcare.Client.UI.Patient
         public string AppointmentId { get; set; }
     }
 
-    public class ActiveApptViewModel
-    {
-        public string Id { get; set; }
-        public string DoctorName { get; set; }
-    }
-
     public sealed partial class MyRecordsPage : Page
     {
 
         private ObservableCollection<RecordViewModel> _records = new();
-        private ObservableCollection<ActiveApptViewModel> _activeAppts = new();
 
         public MyRecordsPage()
         {
             this.InitializeComponent();
             RecordsList.ItemsSource = _records;
-            ActiveApptsList.ItemsSource = _activeAppts;
             LoadDataAsync();
         }
 
@@ -52,9 +44,7 @@ namespace Healthcare.Client.UI.Patient
         {
             LoadingRing.IsActive = true;
             _records.Clear();
-            _activeAppts.Clear();
             EmptyStateText.Visibility = Visibility.Collapsed;
-            ActiveApptsSection.Visibility = Visibility.Collapsed;
 
             try
             {
@@ -63,30 +53,7 @@ namespace Healthcare.Client.UI.Patient
 
                 if (string.IsNullOrEmpty(currentUserId)) return;
 
-                // 1. Fetch active online appointments to join
-                var apptsResponse = await client.From<Appointment>()
-                    .Where(x => x.PatientId == currentUserId)
-                    .Where(x => x.Status == "Confirmed")
-                    .Where(x => x.ExaminationType == "Online")
-                    .Get();
-
-                // Simple check: if appointment is today, show it
-                var today = DateTime.Today;
-                var activeList = apptsResponse.Models
-                    .Where(a => a.AppointmentDate.Date == today)
-                    .ToList();
-
-                if (activeList.Any())
-                {
-                    ActiveApptsSection.Visibility = Visibility.Visible;
-                    foreach (var appt in activeList)
-                    {
-                        var doc = await GetDoctorName(appt.DoctorId);
-                        _activeAppts.Add(new ActiveApptViewModel { Id = appt.Id, DoctorName = "Bác sĩ: " + doc });
-                    }
-                }
-
-                // 2. Fetch Medical Records (History)
+                // 1. Fetch Medical Records (History)
                 var recordsResponse = await client.From<MedicalRecord>()
                     .Where(x => x.PatientId == currentUserId)
                     .Order(x => x.CreatedAt, Postgrest.Constants.Ordering.Descending)
@@ -142,11 +109,26 @@ namespace Healthcare.Client.UI.Patient
             catch { return "Bác sĩ"; }
         }
 
-        private void BtnJoinCall_Click(object sender, RoutedEventArgs e)
+
+
+        private async void BtnViewDiagnosis_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.Tag is string apptId)
+            if (sender is Button btn && btn.DataContext is RecordViewModel record)
             {
-                this.Frame.Navigate(typeof(OnlineConsultationPage), apptId);
+                var dialog = new ContentDialog
+                {
+                    Title = "Chi tiết chẩn đoán",
+                    Content = new TextBlock 
+                    { 
+                        Text = record.Diagnosis, 
+                        TextWrapping = TextWrapping.Wrap,
+                        FontSize = 16
+                    },
+                    CloseButtonText = "Đóng",
+                    XamlRoot = this.XamlRoot
+                };
+
+                await dialog.ShowAsync();
             }
         }
     }

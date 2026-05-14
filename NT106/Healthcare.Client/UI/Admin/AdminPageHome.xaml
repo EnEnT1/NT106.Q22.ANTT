@@ -154,6 +154,8 @@
             </NavigationView.PaneFooter>
 
             <NavigationView.MenuItems>
+                <NavigationViewItem Content="Dashboard" Tag="Dashboard" Icon="Home"/>
+                <NavigationViewItemSeparator/>
                 <NavigationViewItem Content="Quản lý Bệnh nhân" Tag="Patient" Icon="ContactInfo"/>
                 <NavigationViewItem Content="Quản lý Bác sĩ" Tag="Doctor" Icon="Contact"/>
                 <NavigationViewItem Content="Quản lý Nhân viên" Tag="Staff" Icon="People"/>
@@ -163,10 +165,11 @@
             </NavigationView.MenuItems>
 
             <Grid Padding="32,28,32,40">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+                <Grid x:Name="ListViewPanel" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
                 <!-- Header Area -->
                 <Grid Margin="0,0,0,24">
@@ -319,7 +322,76 @@
                             </ListView.ItemTemplate>
                         </ListView>
                     </Grid>
+                    </Grid>
                 </Border>
+                </Grid>
+
+                <ScrollViewer x:Name="DashboardPanel" Visibility="Visible">
+                    <StackPanel Spacing="24">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Tổng quan Hệ thống" FontSize="28" FontWeight="Bold"/>
+                            <TextBlock Text="Báo cáo nhanh các chỉ số quan trọng" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+                        
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Card 1: Doanh thu -->
+                            <Border Grid.Column="0" Margin="0,0,12,0" Padding="20" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,12">
+                                        <Border Width="32" Height="32" CornerRadius="8" Background="#FFF7ED">
+                                            <FontIcon Glyph="&#xE825;" FontSize="14" Foreground="#EA580C"/>
+                                        </Border>
+                                        <TextBlock Text="Doanh thu tháng này" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="#64748B"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="TxtMonthlyRevenue" Text="0 đ" FontSize="24" FontWeight="Bold"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <!-- Card 2: Lượt khám -->
+                            <Border Grid.Column="1" Margin="6,0,6,0" Padding="20" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,12">
+                                        <Border Width="32" Height="32" CornerRadius="8" Background="#F0FDF4">
+                                            <FontIcon Glyph="&#xE787;" FontSize="14" Foreground="#16A34A"/>
+                                        </Border>
+                                        <TextBlock Text="Lượt khám hôm nay" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="#64748B"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="TxtTodayAppointments" Text="0" FontSize="24" FontWeight="Bold"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 3: Bệnh nhân mới -->
+                            <Border Grid.Column="2" Margin="12,0,0,0" Padding="20" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,12">
+                                        <Border Width="32" Height="32" CornerRadius="8" Background="#EFF6FF">
+                                            <FontIcon Glyph="&#xEFA9;" FontSize="14" Foreground="#2563EB"/>
+                                        </Border>
+                                        <TextBlock Text="Bệnh nhân mới (tháng)" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="#64748B"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="TxtNewPatients" Text="0" FontSize="24" FontWeight="Bold"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                        
+                        <!-- Biểu đồ thu nhỏ -->
+                        <Border Padding="24" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12" MinHeight="300">
+                            <StackPanel>
+                                <TextBlock Text="Báo cáo Doanh thu (VND)" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,16"/>
+                                <Grid Height="200" Background="#F8FAFC" CornerRadius="8">
+                                    <TextBlock Text="Tính năng biểu đồ sẽ được cập nhật với LiveCharts2/WinUI Chart." 
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#94A3B8" FontWeight="Medium"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
             </Grid>
         </NavigationView>
     </Grid>
