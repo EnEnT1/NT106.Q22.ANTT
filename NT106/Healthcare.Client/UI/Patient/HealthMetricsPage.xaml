@@ -187,9 +187,26 @@
                 <StackPanel Spacing="20">
                     <Grid>
                         <TextBlock Text="Các chỉ số cần lưu ý" Style="{StaticResource TitleTextStyle}" VerticalAlignment="Center"/>
-                        <Button HorizontalAlignment="Right" Width="34" Height="34" CornerRadius="17" Padding="0" Background="#55FFFFFF" BorderBrush="#66FFFFFF">
-                            <FontIcon Glyph="&#xE8A7;" FontSize="13" Foreground="#475569"/>
-                        </Button>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                            <!-- Nút cập nhật chỉ số -->
+                            <Button x:Name="UpdateMetricsButton"
+                                    Click="UpdateMetricsButton_Click"
+                                    Height="34"
+                                    CornerRadius="8"
+                                    Padding="12,0"
+                                    Background="#2D6CDF"
+                                    BorderBrush="#1A56C4"
+                                    BorderThickness="1"
+                                    ToolTipService.ToolTip="Cập nhật chỉ số sức khỏe">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <FontIcon Glyph="&#xE8D3;" FontSize="13" Foreground="White"/>
+                                    <TextBlock Text="Cập nhật" FontSize="12" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button HorizontalAlignment="Right" Width="34" Height="34" CornerRadius="17" Padding="0" Background="#55FFFFFF" BorderBrush="#66FFFFFF">
+                                <FontIcon Glyph="&#xE8A7;" FontSize="13" Foreground="#475569"/>
+                            </Button>
+                        </StackPanel>
                     </Grid>
 
                     <Grid ColumnSpacing="16">
@@ -206,10 +223,10 @@
                                     <FontIcon Glyph="&#xE76C;" FontSize="13" Foreground="#94A3B8" HorizontalAlignment="Right"/>
                                 </Grid>
                                 <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <TextBlock Text="110/80" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock x:Name="BloodPressureValue" Text="110/80" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
                                     <TextBlock Text="mmHg" Style="{StaticResource CaptionTextStyle}" VerticalAlignment="Bottom" Margin="0,0,0,3"/>
                                 </StackPanel>
-                                <TextBlock Text="Bình thường" Style="{StaticResource CaptionTextStyle}" HorizontalAlignment="Right"/>
+                                <TextBlock x:Name="BloodPressureStatus" Text="Bình thường" Style="{StaticResource CaptionTextStyle}" HorizontalAlignment="Right"/>
                                 <Grid Height="6">
                                     <Border Background="{StaticResource TrackBrush}" CornerRadius="3"/>
                                     <Border Width="120" Background="#CC3B82F6" CornerRadius="3" HorizontalAlignment="Left"/>
@@ -228,10 +245,10 @@
                                     <FontIcon Glyph="&#xE76C;" FontSize="13" Foreground="#94A3B8" HorizontalAlignment="Right"/>
                                 </Grid>
                                 <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <TextBlock Text="5.1" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock x:Name="HbA1cValue" Text="5.1" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
                                     <TextBlock Text="%" Style="{StaticResource CaptionTextStyle}" VerticalAlignment="Bottom" Margin="0,0,0,3"/>
                                 </StackPanel>
-                                <TextBlock Text="Tối ưu" Style="{StaticResource CaptionTextStyle}" HorizontalAlignment="Right"/>
+                                <TextBlock x:Name="HbA1cStatus" Text="Tối ưu" Style="{StaticResource CaptionTextStyle}" HorizontalAlignment="Right"/>
                                 <Grid Height="6">
                                     <Border Background="{StaticResource TrackBrush}" CornerRadius="3"/>
                                     <Border Width="75" Background="#E63B82F6" CornerRadius="3" HorizontalAlignment="Left"/>
@@ -250,10 +267,10 @@
                                     <FontIcon Glyph="&#xE76C;" FontSize="13" Foreground="#94A3B8" HorizontalAlignment="Right"/>
                                 </Grid>
                                 <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <TextBlock Text="190" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock x:Name="CholesterolValue" Text="190" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
                                     <TextBlock Text="mg/dL" Style="{StaticResource CaptionTextStyle}" VerticalAlignment="Bottom" Margin="0,0,0,3"/>
                                 </StackPanel>
-                                <TextBlock Text="Cận cao" Foreground="{StaticResource WarningBrush}" FontSize="12" HorizontalAlignment="Right"/>
+                                <TextBlock x:Name="CholesterolStatus" Text="Cận cao" Foreground="{StaticResource WarningBrush}" FontSize="12" HorizontalAlignment="Right"/>
                                 <Grid Height="6">
                                     <Border Background="{StaticResource TrackBrush}" CornerRadius="3"/>
                                     <Border Width="230" Background="#CC38BDF8" CornerRadius="3" HorizontalAlignment="Left"/>
@@ -423,10 +440,10 @@
 
                             <StackPanel Grid.Row="1" Spacing="4" Margin="0,4,0,0">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
-                                    <TextBlock Text="54" FontSize="42" FontWeight="ExtraBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock x:Name="HeartRateValue" Text="54" FontSize="42" FontWeight="ExtraBold" Foreground="{StaticResource TextPrimaryBrush}"/>
                                     <TextBlock Text="bpm" FontSize="17" FontWeight="SemiBold" Foreground="#475569" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
                                 </StackPanel>
-                                <TextBlock Text="08:12 AM" Style="{StaticResource CaptionTextStyle}" HorizontalAlignment="Center" Opacity="0.9"/>
+                                <TextBlock x:Name="HeartRateTime" Text="08:12 AM" Style="{StaticResource CaptionTextStyle}" HorizontalAlignment="Center" Opacity="0.9"/>
                             </StackPanel>
                         </Grid>
 

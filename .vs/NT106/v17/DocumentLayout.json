@@ -88,7 +88,7 @@
               "RelativeDocumentMoniker": "NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml.cs",
               "ToolTip": "D:\\LTMangCB\\DoAn\\NT106.Q22.ANTT\\NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml.cs",
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Doctor\\ManageSchedulePage.xaml.cs",
-              "ViewState": "AgIAAMwBAAAAAAAAAAAkwOMBAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-14T07:27:23.363Z",
               "EditorCaption": ""
@@ -103,8 +103,7 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Doctor\\AppointmentDetailPage.xaml.cs",
               "ViewState": "AgIAAE8BAAAAAAAAAAAUwGQBAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-14T07:26:02.058Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-14T07:26:02.058Z"
             },
             {
               "$type": "Document",
@@ -129,8 +128,7 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Components\\VideoCallControl.xaml.cs",
               "ViewState": "AgIAACAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-14T07:25:18.887Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-14T07:25:18.887Z"
             },
             {
               "$type": "Document",
@@ -167,8 +165,7 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Patient\\PatientHomePage.xaml.cs",
               "ViewState": "AgIAAAYAAAAAAAAAAAAAADsAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-14T03:57:40.808Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-14T03:57:40.808Z"
             },
             {
               "$type": "Document",
@@ -192,7 +189,8 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Patient\\HealthMetricsPage.xaml",
               "ViewState": "AgIAAMoBAAAAAAAAAAAgwNsBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-14T03:56:49.355Z"
+              "WhenOpened": "2026-05-14T03:56:49.355Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -204,7 +202,8 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Doctor\\RevenuePage.xaml",
               "ViewState": "AgIAAEwAAAAAAAAAAAAQwBAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-14T03:51:43.468Z"
+              "WhenOpened": "2026-05-14T03:51:43.468Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -216,7 +215,8 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Doctor\\PatientHistoryPage.xaml",
               "ViewState": "AgIAAAwAAAAAAAAAAAAQwBUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-14T03:51:40.642Z"
+              "WhenOpened": "2026-05-14T03:51:40.642Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -253,7 +253,8 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Components\\NotificationPannel.xaml",
               "ViewState": "AgIAAC0BAAAAAAAAAAAcwDsBAAA1AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-14T02:31:39.703Z"
+              "WhenOpened": "2026-05-14T02:31:39.703Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -265,7 +266,8 @@
               "RelativeToolTip": "NT106\\Healthcare.Client\\UI\\Admin\\AdminPageHome.xaml",
               "ViewState": "AgIAAHUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-05-14T02:13:10.17Z"
+              "WhenOpened": "2026-05-14T02:13:10.17Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
