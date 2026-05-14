@@ -353,7 +353,7 @@ namespace Healthcare.Client.UI.Doctor
         private void BtnVideoCall_Click(object sender, RoutedEventArgs e) 
         {
             if (_patient != null)
-                Frame.Navigate(typeof(ExaminationPage), _patient.Id);
+                Frame.Navigate(typeof(ExaminationPage), _appointment.Id);
         }
 
         private void BtnExamine_Click(object sender, RoutedEventArgs e) => Frame.Navigate(typeof(ExaminationPage), _appointment.Id);
