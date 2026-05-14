@@ -5,11 +5,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="Transparent">
+    Background="{StaticResource AppBackdropGradientBrush}">
 
     <Page.Resources>
-        <ThemeShadow x:Name="SharedShadow"/>
-        
         <Style x:Key="ActionButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#2563EB"/>
             <Setter Property="Foreground" Value="White"/>
@@ -62,18 +60,7 @@
                     <TextBlock Text="Khám Trực Tuyến" FontSize="32" FontWeight="Bold" Foreground="#0F172A"/>
                     <TextBlock Text="Theo dõi và tham gia các buổi tư vấn y tế từ xa của bạn" FontSize="16" Foreground="#64748B"/>
                 </StackPanel>
-                <Button Grid.Column="1" 
-                        Content="Test Video Call UI" 
-                        Click="BtnTestUI_Click" 
-                        Background="#F1F5F9" 
-                        Foreground="#475569" 
-                        Padding="16,8" 
-                        CornerRadius="8" 
-                        VerticalAlignment="Top">
-                    <Button.Resources>
-                        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#E2E8F0"/>
-                    </Button.Resources>
-                </Button>
+
             </Grid>
 
             <!-- Upcoming Section -->
@@ -97,7 +84,7 @@
                     </ListView.ItemContainerStyle>
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource SharedShadow}">
+                            <Border Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource HealthcareThemeShadow}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
@@ -146,7 +133,7 @@
             <StackPanel Spacing="16">
                 <TextBlock Text="Lịch sử khám trực tuyến" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
                 
-                <Border Background="White" CornerRadius="20" Shadow="{StaticResource SharedShadow}">
+                <Border Background="White" CornerRadius="20" Shadow="{StaticResource HealthcareThemeShadow}">
                     <ListView x:Name="HistoryAppointmentsList" SelectionMode="None" ItemsSource="{x:Bind HistoryAppointments, Mode=OneWay}">
                         <ListView.HeaderTemplate>
                             <DataTemplate>

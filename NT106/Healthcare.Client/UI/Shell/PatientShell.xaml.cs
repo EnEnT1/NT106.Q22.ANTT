@@ -40,6 +40,28 @@ namespace Healthcare.Client.UI.Shell
             SetActiveButton(NavHome);
         }
 
+        // ──────────────────────────────────────────────
+        // Notification Panel Handlers
+        // ──────────────────────────────────────────────
+
+        private void NotifPanel_UnreadCountChanged(object sender, int count)
+        {
+            NotifBadgeText.Text = count.ToString();
+            NotifBadge.Visibility = count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void NotifPanel_NavigationRequested(object sender, NotificationNavigationRequestedEventArgs e)
+        {
+            // Close the flyout
+            NotificationBellButton.Flyout?.Hide();
+
+            // Navigate to the target page
+            if (e.TargetPageType != null)
+            {
+                NavigateToPage(e.TargetPageType);
+            }
+        }
+
         private void LoadUserInfo()
         {
             var user = SessionStorage.CurrentUser;

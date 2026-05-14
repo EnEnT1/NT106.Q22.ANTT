@@ -195,8 +195,8 @@ namespace Healthcare.Client.UI.Staff
                             tx.Status = "Paid";
                             tx.PaidAt = DateTime.Now;
                             tx.PaymentMethod = "Tiền mặt (tại quầy)";
-                            
                             await tx.Update<Transaction>();
+                            
                             await ShowDialogAsync("Thành công", "Đã xác nhận thanh toán thành công.");
                             LoadDataAsync();
                         }
@@ -245,6 +245,7 @@ namespace Healthcare.Client.UI.Staff
                             appt.Status = "Arrived";
                             
                             await appt.Update<Appointment>();
+                            
                             await ShowDialogAsync("Check-in Thành công", $"Đã xác nhận bệnh nhân đến. Vui lòng hướng dẫn bệnh nhân đến Phòng: {apptDisplay.RoomCode}.");
                             LoadDataAsync();
                         }

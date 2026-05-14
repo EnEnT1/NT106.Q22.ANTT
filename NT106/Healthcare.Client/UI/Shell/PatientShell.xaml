@@ -3,19 +3,11 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Healthcare.Client.UI.Shell"
+    xmlns:comp="using:Healthcare.Client.UI.Components"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
-
-    <Page.Background>
-        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#f0f9ff" Offset="0"/>
-            <GradientStop Color="#e0e7ff" Offset="0.25"/>
-            <GradientStop Color="#faf5ff" Offset="0.50"/>
-            <GradientStop Color="#fdf4ff" Offset="0.75"/>
-            <GradientStop Color="#ffffff" Offset="1"/>
-        </LinearGradientBrush>
-    </Page.Background>
+    mc:Ignorable="d"
+    Background="{StaticResource AppBackdropGradientBrush}">
 
     <Page.Resources>
         <SolidColorBrush x:Key="PrimaryBrush" Color="#2D6CDF"/>
@@ -141,6 +133,7 @@
 
         <!-- SIDEBAR -->
         <Border Grid.Column="0"
+                Background="{StaticResource ShellSidebarAcrylicBrush}"
                 BorderBrush="#D0E4FF"
                 BorderThickness="0,0,1,0">
             <Border.Background>
@@ -180,8 +173,10 @@
 
                 <!-- Patient Profile Card -->
                 <Border Grid.Row="1" Margin="16,0,16,32"
-                        Background="{StaticResource SlateGray50}"
-                        CornerRadius="16">
+                        Background="{StaticResource GlassCardAcrylicBrush}"
+                        CornerRadius="16"
+                        Translation="0,0,4"
+                        Shadow="{StaticResource HealthcareThemeShadow}">
                     <StackPanel Orientation="Horizontal" Spacing="16" Padding="16">
                         <PersonPicture x:Name="PatientAvatar" Width="44" Height="44"
                                        Initials="BA"/>
@@ -240,7 +235,7 @@
                             <StackPanel Orientation="Horizontal" Spacing="14">
                                 <FontIcon Glyph="&#xE8A1;" FontSize="18"
                                           FontFamily="Segoe Fluent Icons"/>
-                                <TextBlock Text="Thanh toán" FontSize="14"
+                                <TextBlock Text="Lịch sử giao dịch" FontSize="14"
                                            VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -270,7 +265,7 @@
                             <StackPanel Orientation="Horizontal" Spacing="14">
                                 <FontIcon Glyph="&#xE8E5;" FontSize="18"
                                           FontFamily="Segoe Fluent Icons"/>
-                                <TextBlock Text="Nhập đơn thuốc AI" FontSize="14"
+                                <TextBlock Text="Nhập đơn thuốc" FontSize="14"
                                            VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -310,7 +305,7 @@
 
             <!-- TOP BAR -->
             <Border Grid.Row="0"
-                    Background="#EEF6FF"
+                    Background="{StaticResource ShellTopBarAcrylicBrush}"
                     BorderBrush="#D0E4FF"
                     BorderThickness="0,0,0,1">
                 <Grid Margin="40,0">
@@ -334,7 +329,9 @@
                             CornerRadius="16"
                             Padding="16,8"
                             BorderBrush="{StaticResource BorderSubtleBrush}"
-                            BorderThickness="1">
+                            BorderThickness="1"
+                            Translation="0,0,2"
+                            Shadow="{StaticResource HealthcareThemeShadow}">
                         <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                             <FontIcon Glyph="&#xE787;" FontSize="16"
                                       Foreground="{StaticResource PrimaryBrush}"

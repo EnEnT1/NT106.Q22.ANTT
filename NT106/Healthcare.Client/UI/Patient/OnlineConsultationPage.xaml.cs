@@ -132,11 +132,7 @@ namespace Healthcare.Client.UI.Patient
             };
         }
 
-        private void BtnTestUI_Click(object sender, RoutedEventArgs e)
-        {
-            // Điều hướng thẳng sang trang khám với ID ảo để test UI
-            Frame.Navigate(typeof(PatientExaminationPage), "test-appointment-id");
-        }
+
 
         private async void BtnJoin_Click(object sender, RoutedEventArgs e)
         {
