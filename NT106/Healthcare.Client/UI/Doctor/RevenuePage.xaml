@@ -9,60 +9,44 @@
 
     <Page.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#f0f9ff" Offset="0"/>
-            <GradientStop Color="#e0e7ff" Offset="0.25"/>
-            <GradientStop Color="#faf5ff" Offset="0.50"/>
-            <GradientStop Color="#fdf4ff" Offset="0.75"/>
-            <GradientStop Color="#ffffff" Offset="1"/>
+            <GradientStop Color="#F0F9FF" Offset="0"/>
+            <GradientStop Color="#EEF2FF" Offset="0.45"/>
+            <GradientStop Color="#FFFFFF" Offset="1"/>
         </LinearGradientBrush>
     </Page.Background>
 
     <Page.Resources>
+        <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="BorderBrushSoft" Color="#E2E8F0"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1E293B"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#64748B"/>
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#0059BB"/>
+
         <Style x:Key="CardStyle" TargetType="Border">
-            <Setter Property="Background"      Value="#FFFFFF"/>
-            <Setter Property="CornerRadius"    Value="12"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding"         Value="28"/>
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="CornerRadius" Value="18"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="Padding" Value="22"/>
         </Style>
+
         <Style x:Key="StatLabelStyle" TargetType="TextBlock">
-            <Setter Property="FontSize"         Value="10"/>
-            <Setter Property="FontWeight"       Value="Bold"/>
-            <Setter Property="Foreground"       Value="#94A3B8"/>
-            <Setter Property="CharacterSpacing" Value="150"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#64748B"/>
+            <Setter Property="CharacterSpacing" Value="80"/>
         </Style>
+
         <Style x:Key="StatValueStyle" TargetType="TextBlock">
-            <Setter Property="FontSize"   Value="22"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="32"/>
+            <Setter Property="FontWeight" Value="ExtraBold"/>
             <Setter Property="Foreground" Value="#1E293B"/>
         </Style>
+
         <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
-            <Setter Property="FontSize"   Value="15"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="ExtraBold"/>
             <Setter Property="Foreground" Value="#1E293B"/>
-        </Style>
-        <Style x:Key="ThStyle" TargetType="TextBlock">
-            <Setter Property="FontSize"         Value="10"/>
-            <Setter Property="FontWeight"       Value="Bold"/>
-            <Setter Property="Foreground"       Value="#94A3B8"/>
-            <Setter Property="CharacterSpacing" Value="150"/>
-        </Style>
-        <Style x:Key="FilterActiveStyle" TargetType="Button">
-            <Setter Property="Background"      Value="#0059BB"/>
-            <Setter Property="Foreground"      Value="White"/>
-            <Setter Property="CornerRadius"    Value="20"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding"         Value="18,8"/>
-            <Setter Property="FontSize"        Value="13"/>
-            <Setter Property="FontWeight"      Value="SemiBold"/>
-        </Style>
-        <Style x:Key="FilterInactiveStyle" TargetType="Button">
-            <Setter Property="Background"      Value="Transparent"/>
-            <Setter Property="Foreground"      Value="#475569"/>
-            <Setter Property="CornerRadius"    Value="20"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding"         Value="18,8"/>
-            <Setter Property="FontSize"        Value="13"/>
-            <Setter Property="FontWeight"      Value="SemiBold"/>
         </Style>
     </Page.Resources>
 
@@ -71,84 +55,111 @@
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled"
                       Padding="32,24,32,48">
-            <StackPanel Spacing="28">
 
-                <!-- ══════════════════════════════════════
-                     FILTERS ROW
-                ══════════════════════════════════════ -->
-                <!-- Filter bar with white card background -->
-                <Border Background="White" CornerRadius="12" Padding="8,8">
-                    <Grid>
+            <StackPanel Spacing="24">
+
+                <!-- HEADER -->
+                <Border Style="{StaticResource CardStyle}">
+                    <Grid ColumnSpacing="20">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Period pill tabs -->
-                        <Border Grid.Column="0" Background="#F1F5F9" CornerRadius="20" Padding="4,4">
-                            <StackPanel Orientation="Horizontal" Spacing="2">
-                                <Button x:Name="BtnThisMonth"   Content="Tháng này"
-                                        Style="{StaticResource FilterActiveStyle}"
-                                        Click="BtnPeriod_Click" Tag="month"/>
-                                <Button x:Name="BtnThisQuarter" Content="Quý này"
-                                        Style="{StaticResource FilterInactiveStyle}"
-                                        Click="BtnPeriod_Click" Tag="quarter"/>
-                                <Button x:Name="BtnThisYear"    Content="Năm nay"
-                                        Style="{StaticResource FilterInactiveStyle}"
-                                        Click="BtnPeriod_Click" Tag="year"/>
-                            </StackPanel>
-                        </Border>
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Kết quả khám chi tiết sức khỏe"
+                                       FontSize="30"
+                                       FontWeight="ExtraBold"
+                                       Foreground="{StaticResource TextPrimaryBrush}"/>
 
-                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
-                            <!--
-                            ┌─────────────────────────────────────────────────────┐
-                            │ TODO — Bind bác sĩ từ DB                           │
-                            │                                                     │
-                            │ Bước 1: Trong LoadDataAsync() gọi:                 │
-                            │   var doctors = await _db.GetAsync<DoctorProfile>();│
-                            │   DoctorFilter.ItemsSource = doctors;               │
-                            │   DoctorFilter.DisplayMemberPath = "FullName";      │
-                            │                                                     │
-                            │ Bước 2: SelectionChanged → ReloadTransactions()    │
-                            └─────────────────────────────────────────────────────┘
-                            -->
-                            <ComboBox x:Name="DoctorFilter"
-                                      PlaceholderText="Tất cả bác sĩ"
-                                      Width="180" CornerRadius="8" FontSize="13"
-                                      SelectionChanged="DoctorFilter_SelectionChanged"/>
-
-                            <ComboBox x:Name="ServiceFilter"
-                                 PlaceholderText="Tất cả dịch vụ"
-                                 Width="180"
-                                 CornerRadius="8"
-                                 FontSize="13"
-                                 SelectionChanged="ServiceFilter_SelectionChanged">         
-                                <ComboBoxItem Content="Tất cả dịch vụ"/>
-                                <ComboBoxItem Content="Khám trực tuyến"/>
-                                <ComboBoxItem Content="Khám tại phòng mạch"/>
-                                <ComboBoxItem Content="Xét nghiệm"/>
-                                <ComboBoxItem Content="Đơn thuốc"/>
-                            </ComboBox>
-                            <!-- Solid blue Export button matching screenshot -->
-                            <Button x:Name="ExportButton" Click="ExportButton_Click"
-                                    Background="#0059BB" BorderThickness="0"
-                                    CornerRadius="8" Padding="16,8">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE898;"
-                                              FontSize="14" Foreground="White"/>
-                                    <TextBlock Text="Xuất báo cáo" FontSize="13"
-                                               FontWeight="SemiBold" Foreground="White"
-                                               VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </Button>
+                            <TextBlock Text="Theo dõi danh sách kết quả khám, chẩn đoán, thuốc AI nhận diện và trạng thái thanh toán."
+                                       FontSize="14"
+                                       Foreground="{StaticResource TextSecondaryBrush}"/>
                         </StackPanel>
+
+                        <Button Grid.Column="1"
+                                x:Name="RefreshButton"
+                                Background="#0059BB"
+                                BorderThickness="0"
+                                CornerRadius="10"
+                                Padding="16,10"
+                                Click="RefreshButton_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE72C;"
+                                          FontFamily="Segoe MDL2 Assets"
+                                          FontSize="14"
+                                          Foreground="White"/>
+                                <TextBlock Text="Làm mới"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"/>
+                            </StackPanel>
+                        </Button>
                     </Grid>
                 </Border>
 
-                <!-- ══════════════════════════════════════
-                     KPI CARDS
-                ══════════════════════════════════════ -->
+                <!-- FILTERS -->
+                <Border Background="White"
+                        BorderBrush="#E2E8F0"
+                        BorderThickness="1"
+                        CornerRadius="18"
+                        Padding="18">
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="180"/>
+                            <ColumnDefinition Width="180"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox x:Name="SearchBox"
+                                 Grid.Column="0"
+                                 PlaceholderText="Tìm theo tên bệnh nhân, chẩn đoán, mã kết quả..."
+                                 TextChanged="SearchBox_TextChanged"/>
+
+                        <ComboBox x:Name="StatusFilter"
+                                  Grid.Column="1"
+                                  SelectedIndex="0"
+                                  SelectionChanged="StatusFilter_SelectionChanged">
+                            <ComboBoxItem Content="Tất cả trạng thái"/>
+                            <ComboBoxItem Content="Đã thanh toán"/>
+                            <ComboBoxItem Content="Đang xử lý"/>
+                            <ComboBoxItem Content="Chưa thanh toán"/>
+                        </ComboBox>
+
+                        <ComboBox x:Name="DateFilter"
+                                  Grid.Column="2"
+                                  SelectedIndex="0"
+                                  SelectionChanged="DateFilter_SelectionChanged">
+                            <ComboBoxItem Content="Tất cả thời gian"/>
+                            <ComboBoxItem Content="Hôm nay"/>
+                            <ComboBoxItem Content="Tháng này"/>
+                            <ComboBoxItem Content="Năm nay"/>
+                        </ComboBox>
+
+                        <Button Grid.Column="3"
+                                x:Name="ExportButton"
+                                Background="#F8FAFC"
+                                BorderBrush="#E2E8F0"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Padding="16,8"
+                                Click="ExportButton_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE898;"
+                                          FontFamily="Segoe MDL2 Assets"
+                                          FontSize="14"
+                                          Foreground="#0059BB"/>
+                                <TextBlock Text="Xuất báo cáo"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="#0059BB"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- KPI CARDS -->
                 <Grid ColumnSpacing="16">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -157,414 +168,298 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- KPI 1: Tổng doanh thu -->
-                    <Border Grid.Column="0" Style="{StaticResource CardStyle}" Background="#F0F7FF">
-                        <StackPanel>
-                            <Grid Margin="0,0,0,14">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <Border Grid.Column="0" Background="#7db2f8ff"
-                                        CornerRadius="10" Width="44" Height="44">
-                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE719;"
-                                              FontSize="20" Foreground="#0059BB"
-                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                                <Border Grid.Column="2" x:Name="Badge_TotalGrowth"
-                                        Background="#F0FDF4" CornerRadius="20"
-                                        Padding="8,3" VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal" Spacing="3">
-                                        <FontIcon x:Name="Icon_TotalGrowth"
-                                                  FontFamily="Segoe MDL2 Assets" Glyph="&#xE96D;"
-                                                  FontSize="10" Foreground="#16A34A"/>
-                                        <!--
-                                        ┌──────────────────────────────────────┐
-                                        │ Nối DB: set từ code-behind           │
-                                        │ TxtTotalGrowth.Text =                │
-                                        │   $"+{growth:F1}%"                   │
-                                        └──────────────────────────────────────┘
-                                        -->
-                                        <TextBlock x:Name="TxtTotalGrowth" Text="–"
-                                                   FontSize="10" FontWeight="Bold"
-                                                   Foreground="#16A34A"/>
-                                    </StackPanel>
-                                </Border>
-                            </Grid>
-                            <TextBlock Text="TỔNG DOANH THU"
-                                       Style="{StaticResource StatLabelStyle}" Margin="0,0,0,4"/>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                                <!--
-                                ┌──────────────────────────────────────────────┐
-                                │ Nối DB: TxtTotalRevenue.Text =               │
-                                │   transactions.Sum(t => t.Amount)            │
-                                │   .ToString("N0")  → "1.250.000.000"         │
-                                │                                              │
-                                │ Query Supabase:                              │
-                                │   _db.GetAsync<Transaction>(q =>             │
-                                │     q.Gte("created_at", fromDate)            │
-                                │      .Lte("created_at", toDate)              │
-                                │      .Eq("status", "completed"))             │
-                                └──────────────────────────────────────────────┘
-                                -->
-                                <TextBlock x:Name="TxtTotalRevenue" Text="Đang tải..."
-                                           Style="{StaticResource StatValueStyle}"/>
-                                <TextBlock Text=" VNĐ" FontSize="11" Foreground="#94A3B8"
-                                           VerticalAlignment="Bottom" Margin="0,0,0,3"/>
-                            </StackPanel>
+                    <Border Grid.Column="0" Style="{StaticResource CardStyle}" Background="#EFF6FF">
+                        <StackPanel Spacing="12">
+                            <Border Width="46" Height="46" CornerRadius="14" Background="#DBEAFE" HorizontalAlignment="Left">
+                                <FontIcon Glyph="&#xE9D2;"
+                                          FontFamily="Segoe MDL2 Assets"
+                                          FontSize="22"
+                                          Foreground="#2563EB"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                            </Border>
+
+                            <TextBlock Text="TỔNG KẾT QUẢ" Style="{StaticResource StatLabelStyle}"/>
+                            <TextBlock x:Name="TxtTotalResults" Text="0" Style="{StaticResource StatValueStyle}"/>
+                            <TextBlock Text="Hồ sơ khám đã ghi nhận"
+                                       FontSize="12"
+                                       Foreground="#64748B"/>
                         </StackPanel>
                     </Border>
 
-                    <!-- KPI 2: Ca khám hoàn thành -->
-                    <Border Grid.Column="1" Style="{StaticResource CardStyle}" Background="#F4EBFF">
-                        <StackPanel>
-                            <Grid Margin="0,0,0,14">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <Border Grid.Column="0" Background="#7C3AED"
-                                        CornerRadius="10" Width="44" Height="44">
-                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE73E;"
-                                              FontSize="20" Foreground="#e7e0f3ff"
-                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                                <Border Grid.Column="2" Background="#F0FDF4"
-                                        CornerRadius="20" Padding="8,3" VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal" Spacing="3">
-                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE96D;"
-                                                  FontSize="10" Foreground="#16A34A"/>
-                                        <!--
-                                        ┌──────────────────────────────────────┐
-                                        │ Nối DB: TxtVisitsGrowth.Text =       │
-                                        │   Count Appointment status=completed  │
-                                        │   so với kỳ trước                    │
-                                        └──────────────────────────────────────┘
-                                        -->
-                                        <TextBlock x:Name="TxtVisitsGrowth" Text="–"
-                                                   FontSize="10" FontWeight="Bold"
-                                                   Foreground="#16A34A"/>
-                                    </StackPanel>
-                                </Border>
-                            </Grid>
-                            <TextBlock Text="CA KHÁM HOÀN THÀNH"
-                                       Style="{StaticResource StatLabelStyle}" Margin="0,0,0,4"/>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                                <!--
-                                ┌──────────────────────────────────────────────┐
-                                │ Nối DB: TxtCompletedVisits.Text =            │
-                                │   appointments.Count(a =>                    │
-                                │     a.Status == "completed").ToString()      │
-                                └──────────────────────────────────────────────┘
-                                -->
-                                <TextBlock x:Name="TxtCompletedVisits" Text="–"
-                                           Style="{StaticResource StatValueStyle}" Foreground="#7C3AED"/>
-                                <TextBlock Text=" ca" FontSize="11" Foreground="#94A3B8"
-                                           VerticalAlignment="Bottom" Margin="0,0,0,3"/>
-                            </StackPanel>
+                    <Border Grid.Column="1" Style="{StaticResource CardStyle}" Background="#ECFDF5">
+                        <StackPanel Spacing="12">
+                            <Border Width="46" Height="46" CornerRadius="14" Background="#D1FAE5" HorizontalAlignment="Left">
+                                <FontIcon Glyph="&#xE77B;"
+                                          FontFamily="Segoe MDL2 Assets"
+                                          FontSize="22"
+                                          Foreground="#059669"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                            </Border>
+
+                            <TextBlock Text="BỆNH NHÂN" Style="{StaticResource StatLabelStyle}"/>
+                            <TextBlock x:Name="TxtPatientCount" Text="0" Style="{StaticResource StatValueStyle}"/>
+                            <TextBlock Text="Bệnh nhân có kết quả khám"
+                                       FontSize="12"
+                                       Foreground="#64748B"/>
                         </StackPanel>
                     </Border>
 
-                    <!-- KPI 3: DT trung bình / ca -->
-                    <Border Grid.Column="2" Style="{StaticResource CardStyle}" Background="#FFE8D9">
-                        <StackPanel>
-                            <Grid Margin="0,0,0,14">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <Border Grid.Column="0" Background="#f6f0e1ff"
-                                        CornerRadius="10" Width="44" Height="44">
-                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE9D9;"
-                                              FontSize="20" Foreground="#EA580C"
-                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                                <Border Grid.Column="2" x:Name="Badge_AvgGrowth"
-                                        Background="#FEF2F2" CornerRadius="20"
-                                        Padding="8,3" VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal" Spacing="3">
-                                        <FontIcon x:Name="Icon_AvgGrowth"
-                                                  FontFamily="Segoe MDL2 Assets" Glyph="&#xE96E;"
-                                                  FontSize="10" Foreground="#DC2626"/>
-                                        <!--
-                                        ┌──────────────────────────────────────┐
-                                        │ Nối DB: TxtAvgRevenue.Text =         │
-                                        │   (totalRevenue / completedVisits)   │
-                                        │   .ToString("N0")                    │
-                                        └──────────────────────────────────────┘
-                                        -->
-                                        <TextBlock x:Name="TxtAvgGrowth" Text="–"
-                                                   FontSize="10" FontWeight="Bold"
-                                                   Foreground="#DC2626"/>
-                                    </StackPanel>
-                                </Border>
-                            </Grid>
-                            <TextBlock Text="DT TRUNG BÌNH / CA"
-                                       Style="{StaticResource StatLabelStyle}" Margin="0,0,0,4"/>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                                <TextBlock x:Name="TxtAvgRevenue" Text="–"
-                                           Style="{StaticResource StatValueStyle}"/>
-                                <TextBlock Text=" VNĐ" FontSize="11" Foreground="#94A3B8"
-                                           VerticalAlignment="Bottom" Margin="0,0,0,3"/>
-                            </StackPanel>
+                    <Border Grid.Column="2" Style="{StaticResource CardStyle}" Background="#FFF7ED">
+                        <StackPanel Spacing="12">
+                            <Border Width="46" Height="46" CornerRadius="14" Background="#FED7AA" HorizontalAlignment="Left">
+                                <FontIcon Glyph="&#xE70F;"
+                                          FontFamily="Segoe MDL2 Assets"
+                                          FontSize="22"
+                                          Foreground="#EA580C"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                            </Border>
+
+                            <TextBlock Text="ĐƠN THUỐC AI" Style="{StaticResource StatLabelStyle}"/>
+                            <TextBlock x:Name="TxtMedicineCount" Text="0" Style="{StaticResource StatValueStyle}"/>
+                            <TextBlock Text="Kết quả có thuốc nhận diện"
+                                       FontSize="12"
+                                       Foreground="#64748B"/>
                         </StackPanel>
                     </Border>
 
-                    <!-- KPI 4: Tăng trưởng tháng -->
-                    <Border Grid.Column="3" Style="{StaticResource CardStyle}" Background="#E8F7EE">
-                        <StackPanel>
-                            <Grid Margin="0,0,0,14">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Border Grid.Column="0" Background="#D1FAE5"
-                                        CornerRadius="10" Width="44" Height="44">
-                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE9F9;"
-                                              FontSize="20" Foreground="#059669"
-                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                            </Grid>
-                            <TextBlock Text="TĂNG TRƯỞNG THÁNG"
-                                       Style="{StaticResource StatLabelStyle}" Margin="0,0,0,4"/>
-                            <!--
-                            ┌──────────────────────────────────────────────────┐
-                            │ Nối DB: TxtMonthlyGrowth.Text =                  │
-                            │   $"+{growthRate:F1}%"                           │
-                            │ GrowthProgressBar.Value = growthRate (0-100)     │
-                            │                                                  │
-                            │ growthRate = (thisMonth - lastMonth)             │
-                            │             / lastMonth * 100                   │
-                            └──────────────────────────────────────────────────┘
-                            -->
-                            <TextBlock x:Name="TxtMonthlyGrowth" Text="–"
-                                       Style="{StaticResource StatValueStyle}" Foreground="#059669" Margin="0,0,0,8"/>
-                            <ProgressBar x:Name="GrowthProgressBar"
-                                         Value="0" Maximum="100"
-                                         Height="6" CornerRadius="3"
-                                         Foreground="#10B981" Background="#F1F5F9"/>
+                    <Border Grid.Column="3" Style="{StaticResource CardStyle}" Background="#F5F3FF">
+                        <StackPanel Spacing="12">
+                            <Border Width="46" Height="46" CornerRadius="14" Background="#EDE9FE" HorizontalAlignment="Left">
+                                <FontIcon Glyph="&#xE8C7;"
+                                          FontFamily="Segoe MDL2 Assets"
+                                          FontSize="22"
+                                          Foreground="#7C3AED"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                            </Border>
+
+                            <TextBlock Text="TỔNG CHI PHÍ" Style="{StaticResource StatLabelStyle}"/>
+                            <TextBlock x:Name="TxtTotalPaidAmount" Text="0 VNĐ" Style="{StaticResource StatValueStyle}" FontSize="24"/>
+                            <TextBlock Text="Tổng chi phí đã ghi nhận"
+                                       FontSize="12"
+                                       Foreground="#64748B"/>
                         </StackPanel>
                     </Border>
                 </Grid>
 
-                <!-- ══════════════════════════════════════
-                     CHARTS ROW
-                ══════════════════════════════════════ -->
-                <Grid ColumnSpacing="20">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
+                <!-- RESULT LIST -->
+                <Border Background="White"
+                        BorderBrush="#E2E8F0"
+                        BorderThickness="1"
+                        CornerRadius="18">
+                    <Grid RowSpacing="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                    <!-- Bar Chart -->
-                    <Border Grid.Column="0" Style="{StaticResource CardStyle}">
-                        <StackPanel>
-                            <Grid Margin="0,0,0,24">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0">
-                                    <TextBlock Text="Xu hướng doanh thu"
-                                               Style="{StaticResource SectionTitleStyle}"/>
-                                    <!--
-                                    ┌──────────────────────────────────────────┐
-                                    │ Nối DB: TxtChartSubtitle.Text =          │
-                                    │   "Th 1 – Th 6, 2024" (tự tính range)   │
-                                    └──────────────────────────────────────────┘
-                                    -->
-                                    <TextBlock x:Name="TxtChartSubtitle"
-                                               Text="Đang tải dữ liệu..."
-                                               FontSize="12" Foreground="#64748B" Margin="0,2,0,0"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Orientation="Horizontal"
-                                            Spacing="16" VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <Ellipse Width="10" Height="10" Fill="#0059BB" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Trực tiếp" FontSize="12"
-                                                   Foreground="#64748B" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <Ellipse Width="10" Height="10" Fill="#BFD9FD" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Trực tuyến" FontSize="12"
-                                                   Foreground="#64748B" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Grid>
-
-                            <!--
-                            ┌────────────────────────────────────────────────────────┐
-                            │ Canvas bar chart — được vẽ lại trong DrawBarChart()    │
-                            │ mỗi khi _chartData thay đổi (sau LoadDataAsync).       │
-                            │                                                        │
-                            │ Dữ liệu đến từ:                                        │
-                            │   Transaction.cs → group by Month, ServiceType         │
-                            │   Direct  = ServiceType IN ("clinic", "lab", "rx")     │
-                            │   Online  = ServiceType == "online"                    │
-                            │                                                        │
-                            │ SizeChanged → vẽ lại để responsive                    │
-                            └────────────────────────────────────────────────────────┘
-                            -->
-                            <Canvas x:Name="RevenueBarChart" Height="220"
-                                    HorizontalAlignment="Stretch"
-                                    SizeChanged="RevenueBarChart_SizeChanged"/>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- Donut Chart -->
-                    <Border Grid.Column="1" Style="{StaticResource CardStyle}">
-                        <StackPanel>
-                            <TextBlock Text="Phân tích nguồn thu"
-                                       Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,20"/>
-
-                            <!--
-                            ┌────────────────────────────────────────────────────┐
-                            │ Donut Canvas — vẽ lại trong DrawDonutChart()       │
-                            │                                                    │
-                            │ Dữ liệu: group Transaction by ServiceType          │
-                            │   → tính % từng loại / tổng                       │
-                            │   → truyền vào _donutSegments list                │
-                            └────────────────────────────────────────────────────┘
-                            -->
-                            <Canvas x:Name="DonutChart" Width="160" Height="160"
-                                    HorizontalAlignment="Center" Margin="0,0,0,24"/>
-
-                            <!--
-                            ┌────────────────────────────────────────────────────┐
-                            │ BreakdownList — render động từ code-behind         │
-                            │ Gọi RenderBreakdownList(_serviceBreakdown)         │
-                            │ sau khi có data từ Supabase                        │
-                            └────────────────────────────────────────────────────┘
-                            -->
-                            <StackPanel x:Name="BreakdownList" Spacing="14"/>
-                        </StackPanel>
-                    </Border>
-                </Grid>
-
-                <!-- ══════════════════════════════════════
-                     TRANSACTIONS TABLE
-                ══════════════════════════════════════ -->
-                <Border Background="White" CornerRadius="12" BorderThickness="0">
-                    <StackPanel>
-                        <Grid Padding="28,20,28,20">
+                        <Grid Padding="24,20">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Giao dịch gần đây"
-                                       Style="{StaticResource SectionTitleStyle}"/>
-                            <HyperlinkButton Grid.Column="1" Content="Xem tất cả"
-                                             FontSize="13" FontWeight="Bold" Foreground="#0059BB"
-                                             Click="ViewAllTransactions_Click"/>
+
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Danh sách kết quả khám"
+                                           Style="{StaticResource SectionTitleStyle}"/>
+                                <TextBlock x:Name="TxtResultSubtitle"
+                                           Text="Đang tải dữ liệu..."
+                                           FontSize="13"
+                                           Foreground="#64748B"/>
+                            </StackPanel>
+
+                            <TextBlock Grid.Column="1"
+                                       x:Name="TxtPaginationInfoTop"
+                                       Text="0 kết quả"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       Foreground="#64748B"
+                                       VerticalAlignment="Center"/>
                         </Grid>
 
-                        <!-- Column headers -->
-                        <Border Background="#F8FAFC" BorderThickness="0,1,0,1"
-                                BorderBrush="#F1F5F9" Padding="28,12">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="1.4*"/>
-                                    <ColumnDefinition Width="1.6*"/>
-                                    <ColumnDefinition Width="1.4*"/>
-                                    <ColumnDefinition Width="1.4*"/>
-                                    <ColumnDefinition Width="1.2*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="NGÀY GIAO DỊCH" Style="{StaticResource ThStyle}"/>
-                                <TextBlock Grid.Column="1" Text="BỆNH NHÂN"      Style="{StaticResource ThStyle}"/>
-                                <TextBlock Grid.Column="2" Text="LOẠI DỊCH VỤ"   Style="{StaticResource ThStyle}"/>
-                                <TextBlock Grid.Column="3" Text="SỐ TIỀN (VNĐ)"  Style="{StaticResource ThStyle}"
-                                           TextAlignment="Right"/>
-                                <TextBlock Grid.Column="4" Text="TRẠNG THÁI"     Style="{StaticResource ThStyle}"
-                                           TextAlignment="Center"/>
-                            </Grid>
-                        </Border>
+                        <ListView Grid.Row="1"
+                                  x:Name="ResultListView"
+                                  SelectionMode="None"
+                                  IsItemClickEnabled="True"
+                                  ItemClick="ResultListView_ItemClick">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Margin" Value="0"/>
+                                </Style>
+                            </ListView.ItemContainerStyle>
 
-                        <!--
-                        ┌──────────────────────────────────────────────────────────────┐
-                        │ TransactionRows — render động từ code-behind                 │
-                        │                                                              │
-                        │ Khi DB sẵn sàng, thay bằng ItemsRepeater:                   │
-                        │                                                              │
-                        │   <ItemsRepeater x:Name="TransactionList"                   │
-                        │                  ItemsSource="{x:Bind _transactions}">      │
-                        │     <ItemsRepeater.ItemTemplate>                             │
-                        │       <DataTemplate x:DataType="models:Transaction">        │
-                        │         ... (BuildTransactionRow template) ...              │
-                        │       </DataTemplate>                                        │
-                        │     </ItemsRepeater.ItemTemplate>                            │
-                        │   </ItemsRepeater>                                           │
-                        │                                                              │
-                        │ Query Supabase:                                              │
-                        │   await _db.GetAsync<Transaction>(q => q                    │
-                        │     .Gte("created_at", _fromDate)                            │
-                        │     .Lte("created_at", _toDate)                              │
-                        │     .Order("created_at", ascending: false)                  │
-                        │     .Range(_page * PageSize, (_page+1) * PageSize - 1))     │
-                        └──────────────────────────────────────────────────────────────┘
-                        -->
-                        <StackPanel x:Name="TransactionRows"/>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="#F1F5F9"
+                                            BorderThickness="0,1,0,0"
+                                            Padding="24,18">
+                                        <Grid ColumnSpacing="18">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="1.5*"/>
+                                                <ColumnDefinition Width="2*"/>
+                                                <ColumnDefinition Width="1.2*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
 
-                        <!-- Empty state — hiện khi không có dữ liệu -->
-                        <Border x:Name="EmptyState" Visibility="Collapsed" Padding="28,40">
-                            <StackPanel HorizontalAlignment="Center" Spacing="8">
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE9F9;"
-                                          FontSize="40" Foreground="#CBD5E1"
+                                            <Border Grid.Column="0"
+                                                    Width="48"
+                                                    Height="48"
+                                                    CornerRadius="24"
+                                                    Background="{Binding AvatarBackground}">
+                                                <TextBlock Text="{Binding Initials}"
+                                                           FontSize="14"
+                                                           FontWeight="ExtraBold"
+                                                           Foreground="{Binding AvatarForeground}"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"/>
+                                            </Border>
+
+                                            <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding PatientName}"
+                                                           FontSize="15"
+                                                           FontWeight="ExtraBold"
+                                                           Foreground="#1E293B"/>
+                                                <TextBlock Text="{Binding ExamDateText}"
+                                                           FontSize="12"
+                                                           Foreground="#64748B"/>
+                                                <TextBlock Text="{Binding DoctorNameText}"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#0059BB"/>
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="2" Spacing="5" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding DiagnosisText}"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#1E293B"
+                                                           TextWrapping="Wrap"/>
+                                                <TextBlock Text="{Binding MedicineText}"
+                                                           FontSize="12"
+                                                           Foreground="#64748B"
+                                                           TextWrapping="Wrap"
+                                                           MaxLines="2"/>
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="3" Spacing="6" VerticalAlignment="Center">
+                                                <Border Background="{Binding StatusBackground}"
+                                                        CornerRadius="16"
+                                                        Padding="10,4"
+                                                        HorizontalAlignment="Left">
+                                                    <TextBlock Text="{Binding PaymentStatusText}"
+                                                               FontSize="11"
+                                                               FontWeight="Bold"
+                                                               Foreground="{Binding StatusForeground}"/>
+                                                </Border>
+
+                                                <TextBlock Text="{Binding AmountText}"
+                                                           FontSize="13"
+                                                           FontWeight="ExtraBold"
+                                                           Foreground="#1E293B"/>
+                                            </StackPanel>
+
+                                            <FontIcon Grid.Column="4"
+                                                      Glyph="&#xE76C;"
+                                                      FontFamily="Segoe MDL2 Assets"
+                                                      FontSize="14"
+                                                      Foreground="#94A3B8"
+                                                      VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+
+                        <Border x:Name="EmptyState"
+                                Grid.Row="1"
+                                Visibility="Collapsed"
+                                Padding="28,52">
+                            <StackPanel HorizontalAlignment="Center" Spacing="10">
+                                <FontIcon Glyph="&#xE9F9;"
+                                          FontFamily="Segoe MDL2 Assets"
+                                          FontSize="44"
+                                          Foreground="#CBD5E1"
                                           HorizontalAlignment="Center"/>
-                                <TextBlock Text="Chưa có giao dịch nào trong kỳ này"
-                                           FontSize="13" Foreground="#94A3B8"
+                                <TextBlock Text="Chưa có kết quả khám phù hợp"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           Foreground="#64748B"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="Thử thay đổi bộ lọc hoặc làm mới dữ liệu."
+                                           FontSize="12"
+                                           Foreground="#94A3B8"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Border>
 
-                        <!-- Pagination -->
-                        <Border Background="#F8FAFC" BorderThickness="0,1,0,0"
-                                BorderBrush="#F1F5F9" Padding="28,12">
+                        <Border Grid.Row="2"
+                                Background="#F8FAFC"
+                                BorderBrush="#F1F5F9"
+                                BorderThickness="0,1,0,0"
+                                Padding="24,14">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <!--
-                                ┌──────────────────────────────────────┐
-                                │ Nối DB: TxtPaginationInfo.Text =     │
-                                │   $"Hiển thị {shown} / {total}"     │
-                                └──────────────────────────────────────┘
-                                -->
-                                <TextBlock x:Name="TxtPaginationInfo" Grid.Column="0"
-                                           Text="–" FontSize="12" Foreground="#94A3B8"
+
+                                <TextBlock x:Name="TxtPaginationInfo"
+                                           Text="Hiển thị 0 / 0 kết quả"
+                                           FontSize="12"
+                                           Foreground="#64748B"
                                            VerticalAlignment="Center"/>
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-                                    <Button x:Name="PrevPageButton" Click="PrevPage_Click"
-                                            Background="Transparent" BorderThickness="0" Padding="4">
-                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76B;"
-                                                  FontSize="14" Foreground="#94A3B8"/>
-                                    </Button>
-                                    <!-- Page number buttons — render động từ RenderPageButtons() -->
-                                    <StackPanel x:Name="PageButtons" Orientation="Horizontal" Spacing="4"/>
-                                    <Button x:Name="NextPageButton" Click="NextPage_Click"
-                                            Background="Transparent" BorderThickness="0" Padding="4">
-                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76C;"
-                                                  FontSize="14" Foreground="#94A3B8"/>
-                                    </Button>
+
+                                <StackPanel Grid.Column="1"
+                                            Orientation="Horizontal"
+                                            Spacing="8">
+                                    <Button x:Name="PrevPageButton"
+                                            Content="Trước"
+                                            CornerRadius="8"
+                                            Padding="12,6"
+                                            Click="PrevPage_Click"/>
+
+                                    <TextBlock x:Name="TxtPageNumber"
+                                               Text="1 / 1"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="#64748B"
+                                               VerticalAlignment="Center"/>
+
+                                    <Button x:Name="NextPageButton"
+                                            Content="Sau"
+                                            CornerRadius="8"
+                                            Padding="12,6"
+                                            Click="NextPage_Click"/>
                                 </StackPanel>
                             </Grid>
                         </Border>
-                    </StackPanel>
+                    </Grid>
                 </Border>
-
             </StackPanel>
         </ScrollViewer>
 
-        <!-- Loading Overlay -->
-        <Border x:Name="LoadingOverlay" Background="#80FFFFFF"
+        <!-- LOADING -->
+        <Border x:Name="LoadingOverlay"
+                Background="#80FFFFFF"
                 Visibility="Collapsed">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
-                <ProgressRing IsActive="True" Width="40" Height="40" Foreground="#0059BB"/>
-                <TextBlock Text="Đang tải dữ liệu..." FontSize="13"
-                           Foreground="#64748B" HorizontalAlignment="Center"/>
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="12">
+                <ProgressRing IsActive="True"
+                              Width="44"
+                              Height="44"
+                              Foreground="#0059BB"/>
+                <TextBlock Text="Đang tải kết quả khám..."
+                           FontSize="13"
+                           Foreground="#64748B"
+                           HorizontalAlignment="Center"/>
             </StackPanel>
         </Border>
     </Grid>
