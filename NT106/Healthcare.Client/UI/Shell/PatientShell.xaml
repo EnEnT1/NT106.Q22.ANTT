@@ -133,7 +133,6 @@
 
         <!-- SIDEBAR -->
         <Border Grid.Column="0"
-                Background="{StaticResource ShellSidebarAcrylicBrush}"
                 BorderBrush="#D0E4FF"
                 BorderThickness="0,0,1,0">
             <Border.Background>
@@ -346,31 +345,54 @@
                     </Border>
 
                     <!-- Action Buttons -->
-                    <StackPanel Grid.Column="2"
-                                Orientation="Horizontal"
-                                Spacing="4"
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4"
                                 VerticalAlignment="Center">
-
-                        <Button x:Name="NotificationButton"
-                                Style="{StaticResource IconButtonStyle}"
-                                ToolTipService.ToolTip="Thông báo"
-                                Click="NotificationButton_Click">
-                            <FontIcon Glyph="&#xEA8F;"
-                                      FontSize="20"
+                        <!-- Notification Bell Button with Flyout -->
+                        <Button x:Name="NotificationBellButton" Style="{StaticResource IconButtonStyle}">
+                            <Button.Flyout>
+                                <Flyout Placement="BottomEdgeAlignedRight">
+                                    <Flyout.FlyoutPresenterStyle>
+                                        <Style TargetType="FlyoutPresenter">
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="CornerRadius" Value="14"/>
+                                            <Setter Property="MinWidth" Value="0"/>
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                        </Style>
+                                    </Flyout.FlyoutPresenterStyle>
+                                    <comp:NotificationPanel x:Name="NotifPanel"
+                                                             UnreadCountChanged="NotifPanel_UnreadCountChanged"
+                                                             NavigationRequested="NotifPanel_NavigationRequested"/>
+                                </Flyout>
+                            </Button.Flyout>
+                            <Grid>
+                                <FontIcon Glyph="&#xEA8F;" FontSize="20"
+                                          Foreground="{StaticResource SlateGray500}"
+                                          FontFamily="Segoe Fluent Icons"/>
+                                <!-- Unread badge -->
+                                <Border x:Name="NotifBadge"
+                                        Background="#EF4444"
+                                        CornerRadius="8"
+                                        MinWidth="16" Height="16"
+                                        Padding="4,0"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Margin="0,-4,-4,0"
+                                        Visibility="Collapsed">
+                                    <TextBlock x:Name="NotifBadgeText"
+                                               Text="0" FontSize="9" FontWeight="Bold"
+                                               Foreground="White"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                        </Button>
+                        <!-- Settings Button -->
+                        <Button x:Name="SettingsButton" Style="{StaticResource IconButtonStyle}" Click="SettingsButton_Click">
+                            <FontIcon Glyph="&#xE713;" FontSize="20"
                                       Foreground="{StaticResource SlateGray500}"
                                       FontFamily="Segoe Fluent Icons"/>
                         </Button>
-
-                        <Button x:Name="SettingsButton"
-                                Style="{StaticResource IconButtonStyle}"
-                                ToolTipService.ToolTip="Cài đặt tài khoản"
-                                Click="SettingsButton_Click">
-                            <FontIcon Glyph="&#xE713;"
-                                      FontSize="20"
-                                      Foreground="{StaticResource SlateGray500}"
-                                      FontFamily="Segoe Fluent Icons"/>
-                        </Button>
-
                     </StackPanel>
                 </Grid>
             </Border>
