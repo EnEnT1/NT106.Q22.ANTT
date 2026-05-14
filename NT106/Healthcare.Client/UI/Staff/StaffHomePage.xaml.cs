@@ -197,8 +197,6 @@ namespace Healthcare.Client.UI.Staff
                             tx.PaymentMethod = "Tiền mặt (tại quầy)";
                             await tx.Update<Transaction>();
                             
-                            await Healthcare.Client.Helpers.AuditLogHelper.LogActionAsync("Payment", $"Thu tiền {tx.Amount:N0} VNĐ cho lịch hẹn {tx.AppointmentId} (Bệnh nhân: {selectedTx.PatientName})");
-                            
                             await ShowDialogAsync("Thành công", "Đã xác nhận thanh toán thành công.");
                             LoadDataAsync();
                         }
@@ -247,8 +245,6 @@ namespace Healthcare.Client.UI.Staff
                             appt.Status = "Arrived";
                             
                             await appt.Update<Appointment>();
-                            
-                            await Healthcare.Client.Helpers.AuditLogHelper.LogActionAsync("CheckIn", $"Check-in bệnh nhân {apptDisplay.PatientName} (Lịch hẹn: {appt.Id})");
                             
                             await ShowDialogAsync("Check-in Thành công", $"Đã xác nhận bệnh nhân đến. Vui lòng hướng dẫn bệnh nhân đến Phòng: {apptDisplay.RoomCode}.");
                             LoadDataAsync();
