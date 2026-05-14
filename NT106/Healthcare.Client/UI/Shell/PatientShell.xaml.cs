@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Healthcare.Client.UI.Patient;
 using Healthcare.Client.UI.Auth;
+using Healthcare.Client.UI.Components;
 using Healthcare.Client.Helpers;
 using System;
 using System.Collections.Generic;
@@ -32,9 +33,35 @@ namespace Healthcare.Client.UI.Shell
                 NavUploadPrescription
             };
 
+            // Subscribe notification panel events
+            NotifPanel.UnreadCountChanged += NotifPanel_UnreadCountChanged;
+            NotifPanel.NavigationRequested += NotifPanel_NavigationRequested;
+
             // Navigate tới trang chủ khi load
             ContentFrame.Navigate(typeof(PatientHomePage), this);
             SetActiveButton(NavHome);
+        }
+
+        // ──────────────────────────────────────────────
+        // Notification Panel Handlers
+        // ──────────────────────────────────────────────
+
+        private void NotifPanel_UnreadCountChanged(object sender, int count)
+        {
+            NotifBadgeText.Text = count.ToString();
+            NotifBadge.Visibility = count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void NotifPanel_NavigationRequested(object sender, NotificationNavigationRequestedEventArgs e)
+        {
+            // Close the flyout
+            NotificationBellButton.Flyout?.Hide();
+
+            // Navigate to the target page
+            if (e.TargetPageType != null)
+            {
+                NavigateToPage(e.TargetPageType);
+            }
         }
 
         private void LoadUserInfo()
