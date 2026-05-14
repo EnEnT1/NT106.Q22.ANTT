@@ -52,6 +52,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="UI\Components\NotificationPannel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
     <Page Update="UI\Patient\LabResultsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
