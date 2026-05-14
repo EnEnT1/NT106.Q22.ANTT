@@ -60,18 +60,7 @@
                     <TextBlock Text="Khám Trực Tuyến" FontSize="32" FontWeight="Bold" Foreground="#0F172A"/>
                     <TextBlock Text="Theo dõi và tham gia các buổi tư vấn y tế từ xa của bạn" FontSize="16" Foreground="#64748B"/>
                 </StackPanel>
-                <Button Grid.Column="1" 
-                        Content="Test Video Call UI" 
-                        Click="BtnTestUI_Click" 
-                        Background="#F1F5F9" 
-                        Foreground="#475569" 
-                        Padding="16,8" 
-                        CornerRadius="8" 
-                        VerticalAlignment="Top">
-                    <Button.Resources>
-                        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#E2E8F0"/>
-                    </Button.Resources>
-                </Button>
+
             </Grid>
 
             <!-- Upcoming Section -->

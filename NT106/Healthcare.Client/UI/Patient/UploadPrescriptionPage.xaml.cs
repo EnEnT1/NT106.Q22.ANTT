@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Windows.Storage.Pickers;
+using Healthcare.Client.APIClient;
 
 namespace Healthcare.Client.UI.Patient
 {

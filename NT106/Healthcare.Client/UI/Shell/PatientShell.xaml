@@ -10,7 +10,6 @@
     Background="{StaticResource AppBackdropGradientBrush}">
 
     <Page.Resources>
-        <!-- Color Resources -->
         <SolidColorBrush x:Key="PrimaryBrush" Color="#2D6CDF"/>
         <SolidColorBrush x:Key="PrimaryLightBrush" Color="#EFF4FD"/>
         <SolidColorBrush x:Key="SurfaceBrush" Color="#FCFDFE"/>
@@ -25,7 +24,6 @@
         <SolidColorBrush x:Key="ErrorBrush" Color="#EF4444"/>
         <SolidColorBrush x:Key="BorderSubtleBrush" Color="#F1F5F9"/>
 
-        <!-- NavItem Style (Inactive) -->
         <Style x:Key="NavItemButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="#64748B"/>
@@ -64,13 +62,11 @@
             </Setter>
         </Style>
 
-        <!-- NavItem Style (Active) -->
         <Style x:Key="NavItemActiveStyle" TargetType="Button" BasedOn="{StaticResource NavItemButtonStyle}">
             <Setter Property="Background" Value="#EFF4FD"/>
             <Setter Property="Foreground" Value="#2D6CDF"/>
         </Style>
 
-        <!-- Icon Button Style -->
         <Style x:Key="IconButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -80,7 +76,6 @@
             <Setter Property="Padding" Value="0"/>
         </Style>
 
-        <!-- FAB Button Style: giữ màu xanh khi hover/pressed -->
         <Style x:Key="FABButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#2D6CDF"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -107,7 +102,6 @@
                                 <VisualStateGroup x:Name="CommonStates">
                                     <VisualState x:Name="Normal"/>
                                     <VisualState x:Name="PointerOver">
-                                        <!-- Giữ màu xanh, chỉ tối nhẹ -->
                                         <VisualState.Setters>
                                             <Setter Target="RootBorder.Background" Value="#2563C9"/>
                                         </VisualState.Setters>
@@ -133,25 +127,28 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <!-- Sidebar: 288px -->
             <ColumnDefinition Width="288"/>
-            <!-- Main area -->
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- ══════════════════════════════════════════ -->
-        <!--                  SIDEBAR                  -->
-        <!-- ══════════════════════════════════════════ -->
+        <!-- SIDEBAR -->
         <Border Grid.Column="0"
-                Background="{StaticResource ShellSidebarAcrylicBrush}"
                 BorderBrush="#D0E4FF"
                 BorderThickness="0,0,1,0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#EEF6FF" Offset="0"/>
+                    <GradientStop Color="#E8EEFF" Offset="0.5"/>
+                    <GradientStop Color="#F0EEFF" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>  <!-- Logo -->
-                    <RowDefinition Height="Auto"/>  <!-- Profile -->
-                    <RowDefinition Height="*"/>     <!-- Nav Items -->
-                    <RowDefinition Height="Auto"/>  <!-- Logout -->
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- Logo -->
@@ -162,6 +159,7 @@
                         <FontIcon Glyph="&#xE95E;" Foreground="White" FontSize="20"
                                   FontFamily="Segoe Fluent Icons"/>
                     </Border>
+
                     <StackPanel VerticalAlignment="Center" Spacing="0">
                         <TextBlock Text="Clinical" FontSize="16" FontWeight="ExtraBold"
                                    Foreground="{StaticResource SlateGray900}"
@@ -182,9 +180,15 @@
                         <PersonPicture x:Name="PatientAvatar" Width="44" Height="44"
                                        Initials="BA"/>
                         <StackPanel VerticalAlignment="Center" Spacing="2">
-                            <TextBlock x:Name="TxtPatientName" Text="Bệnh Nhân A" FontSize="13" FontWeight="Bold"
+                            <TextBlock x:Name="TxtPatientName"
+                                       Text="Bệnh Nhân A"
+                                       FontSize="13"
+                                       FontWeight="Bold"
                                        Foreground="{StaticResource SlateGray800}"/>
-                            <TextBlock x:Name="TxtPatientID" Text="ID: 12345678" FontSize="11" FontWeight="SemiBold"
+                            <TextBlock x:Name="TxtPatientID"
+                                       Text="ID: 12345678"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
                                        Foreground="{StaticResource SlateGray400}"
                                        CharacterSpacing="50"/>
                         </StackPanel>
@@ -194,18 +198,17 @@
                 <!-- Navigation Items -->
                 <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">
                     <StackPanel Spacing="4" Margin="16,0">
-                        <!-- Home (Active) -->
+
                         <Button x:Name="NavHome" Style="{StaticResource NavItemActiveStyle}"
                                 Click="NavHome_Click">
                             <StackPanel Orientation="Horizontal" Spacing="14">
-                                <FontIcon x:Name="NavHomeIcon" Glyph="&#xE80F;" FontSize="18" Foreground="#2D6CDF"
+                                <FontIcon Glyph="&#xE80F;" FontSize="18" Foreground="#2D6CDF"
                                           FontFamily="Segoe Fluent Icons"/>
-                                <TextBlock x:Name="NavHomeText" Text="Trang chủ" FontSize="14" FontWeight="Bold"
+                                <TextBlock Text="Trang chủ" FontSize="14" FontWeight="Bold"
                                            Foreground="#2D6CDF" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 
-                        <!-- Appointment -->
                         <Button x:Name="NavAppointment" Style="{StaticResource NavItemButtonStyle}"
                                 Click="NavAppointment_Click">
                             <StackPanel Orientation="Horizontal" Spacing="14">
@@ -216,7 +219,6 @@
                             </StackPanel>
                         </Button>
 
-                        <!-- Records -->
                         <Button x:Name="NavRecords" Style="{StaticResource NavItemButtonStyle}"
                                 Click="NavRecords_Click">
                             <StackPanel Orientation="Horizontal" Spacing="14">
@@ -227,7 +229,6 @@
                             </StackPanel>
                         </Button>
 
-                        <!-- Payment -->
                         <Button x:Name="NavPayment" Style="{StaticResource NavItemButtonStyle}"
                                 Click="NavPayment_Click">
                             <StackPanel Orientation="Horizontal" Spacing="14">
@@ -238,7 +239,6 @@
                             </StackPanel>
                         </Button>
 
-                        <!-- Health Metrics -->
                         <Button x:Name="NavHealthMetrics" Style="{StaticResource NavItemButtonStyle}"
                                 Click="NavHealthMetrics_Click">
                             <StackPanel Orientation="Horizontal" Spacing="14">
@@ -249,7 +249,6 @@
                             </StackPanel>
                         </Button>
 
-                        <!-- Online Consultation -->
                         <Button x:Name="NavOnline" Style="{StaticResource NavItemButtonStyle}"
                                 Click="NavOnline_Click">
                             <StackPanel Orientation="Horizontal" Spacing="14">
@@ -275,10 +274,13 @@
 
                 <!-- Logout -->
                 <Border Grid.Row="3" Margin="0,0,0,16">
-                    <Button Margin="16,0" HorizontalAlignment="Stretch"
+                    <Button Margin="16,0"
+                            HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Left"
-                            Background="Transparent" BorderThickness="0"
-                            Padding="16,14" CornerRadius="16"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="16,14"
+                            CornerRadius="16"
                             Click="LogoutBtn_Click">
                         <StackPanel Orientation="Horizontal" Spacing="14">
                             <FontIcon Glyph="&#xF3B1;" FontSize="18"
@@ -293,18 +295,14 @@
             </Grid>
         </Border>
 
-        <!-- ══════════════════════════════════════════ -->
-        <!--             RIGHT SIDE (TopBar + Content) -->
-        <!-- ══════════════════════════════════════════ -->
+        <!-- RIGHT SIDE -->
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="80"/>   <!-- TopBar -->
-                <RowDefinition Height="*"/>    <!-- Page Content -->
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- ══════════════════════════════════════ -->
-            <!--                 TOP BAR               -->
-            <!-- ══════════════════════════════════════ -->
+            <!-- TOP BAR -->
             <Border Grid.Row="0"
                     Background="{StaticResource ShellTopBarAcrylicBrush}"
                     BorderBrush="#D0E4FF"
@@ -316,7 +314,6 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Search Box -->
                     <AutoSuggestBox Grid.Column="0"
                                     PlaceholderText="Tìm kiếm bác sĩ, chuyên khoa..."
                                     VerticalAlignment="Center"
@@ -324,9 +321,11 @@
                                     CornerRadius="16"
                                     Background="{StaticResource SlateGray100}"/>
 
-                    <!-- Date Badge -->
-                    <Border Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,24,0"
-                            Background="{StaticResource GlassCardAcrylicBrush}" CornerRadius="16"
+                    <Border Grid.Column="1"
+                            HorizontalAlignment="Right"
+                            Margin="0,0,24,0"
+                            Background="White"
+                            CornerRadius="16"
                             Padding="16,8"
                             BorderBrush="{StaticResource BorderSubtleBrush}"
                             BorderThickness="1"
@@ -338,7 +337,8 @@
                                       FontFamily="Segoe Fluent Icons"/>
                             <TextBlock x:Name="DateTextBlock"
                                        Text="Thứ Hai, 24/05/2024"
-                                       FontSize="13" FontWeight="SemiBold"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
                                        Foreground="{StaticResource SlateGray500}"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
@@ -360,7 +360,9 @@
                                             <Setter Property="BorderThickness" Value="0"/>
                                         </Style>
                                     </Flyout.FlyoutPresenterStyle>
-                                    <comp:NotificationPanel x:Name="NotifPanel"/>
+                                    <comp:NotificationPanel x:Name="NotifPanel"
+                                                             UnreadCountChanged="NotifPanel_UnreadCountChanged"
+                                                             NavigationRequested="NotifPanel_NavigationRequested"/>
                                 </Flyout>
                             </Button.Flyout>
                             <Grid>
@@ -375,9 +377,10 @@
                                         Padding="4,0"
                                         HorizontalAlignment="Right"
                                         VerticalAlignment="Top"
-                                        Margin="0,-4,-4,0">
+                                        Margin="0,-4,-4,0"
+                                        Visibility="Collapsed">
                                     <TextBlock x:Name="NotifBadgeText"
-                                               Text="3" FontSize="9" FontWeight="Bold"
+                                               Text="0" FontSize="9" FontWeight="Bold"
                                                Foreground="White"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"/>
@@ -385,7 +388,7 @@
                             </Grid>
                         </Button>
                         <!-- Settings Button -->
-                        <Button Style="{StaticResource IconButtonStyle}">
+                        <Button x:Name="SettingsButton" Style="{StaticResource IconButtonStyle}" Click="SettingsButton_Click">
                             <FontIcon Glyph="&#xE713;" FontSize="20"
                                       Foreground="{StaticResource SlateGray500}"
                                       FontFamily="Segoe Fluent Icons"/>
@@ -394,21 +397,21 @@
                 </Grid>
             </Border>
 
-            <!-- ══════════════════════════════════════ -->
-            <!--         PAGE CONTENT (Frame)          -->
-            <!-- ══════════════════════════════════════ -->
-            <Frame x:Name="ContentFrame" Grid.Row="1" Background="Transparent"/>
+            <Frame x:Name="ContentFrame" Grid.Row="1"/>
         </Grid>
 
-        <!-- Floating Action Button (Chat) -->
-        <Button Grid.Column="1"
+        <!-- Floating Action Button Chatbot AI -->
+        <Button x:Name="ChatbotFabButton"
+                Grid.Column="1"
                 Style="{StaticResource FABButtonStyle}"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
                 Margin="0,0,40,40"
-                Translation="0,0,8"
-                Shadow="{StaticResource HealthcareThemeShadow}">
-            <FontIcon Glyph="&#xE8BD;" FontSize="26" Foreground="White"
+                ToolTipService.ToolTip="Tư vấn sức khỏe AI"
+                Click="ChatbotFabButton_Click">
+            <FontIcon Glyph="&#xE8BD;"
+                      FontSize="26"
+                      Foreground="White"
                       FontFamily="Segoe Fluent Icons"/>
         </Button>
     </Grid>

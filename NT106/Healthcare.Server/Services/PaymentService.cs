@@ -31,6 +31,11 @@ namespace Healthcare.Server.Services
                 ipAddress = "113.160.92.202";
             }
             long amountInVnPayFormat = (long)(amount * 100);
+
+            // VNPay yêu cầu vnp_TxnRef chỉ chứa alphanumeric, không chấp nhận UUID có dấu '-'
+            // Tạo mã tham chiếu ngắn gọn, lưu appointmentId vào OrderInfo để tra cứu khi VNPay trả về
+            string txnRef = DateTime.Now.ToString("yyyyMMddHHmmss") + new Random().Next(1000, 9999).ToString();
+
             var vnp_Params = new SortedList<string, string>
             {
                 { "vnp_Version", "2.1.0" },
@@ -41,10 +46,10 @@ namespace Healthcare.Server.Services
                 { "vnp_CurrCode", "VND" },
                 { "vnp_IpAddr", ipAddress },
                 { "vnp_Locale", "vn" },
-                { "vnp_OrderInfo", $"Thanh_toan_vien_phi_cho_lich_{appointmentId}" },
+                { "vnp_OrderInfo", appointmentId },
                 { "vnp_OrderType", "other" },
                 { "vnp_ReturnUrl", _vnpayReturnUrl },
-                { "vnp_TxnRef", appointmentId }
+                { "vnp_TxnRef", txnRef }
             };
             var signData = string.Join("&", vnp_Params.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));
             var vnp_SecureHash = HmacSHA512(_vnpayHashSecret, signData);

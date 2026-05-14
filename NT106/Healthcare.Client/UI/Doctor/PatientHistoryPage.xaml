@@ -4,14 +4,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{StaticResource AppBackdropGradientBrush}">
+    mc:Ignorable="d">
 
     <Page.Resources>
         <SolidColorBrush x:Key="PrimaryBrush" Color="#0059BB"/>
-        <SolidColorBrush x:Key="SlateBorderBrush" Color="#E2E8F0"/>
-        <SolidColorBrush x:Key="SlateTextBrush" Color="#1E293B"/>
-        <SolidColorBrush x:Key="SlateSubtextBrush" Color="#64748B"/>
+        <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="BorderBrushSoft" Color="#E2E8F0"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1E293B"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#64748B"/>
 
         <Style x:Key="CardStyle" TargetType="Border">
             <Setter Property="Background" Value="#FFFFFF"/>
@@ -22,7 +22,7 @@
         </Style>
 
         <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontSize" Value="15"/>
             <Setter Property="FontWeight" Value="ExtraBold"/>
             <Setter Property="Foreground" Value="#1E293B"/>
         </Style>
@@ -39,30 +39,165 @@
             <Setter Property="FontWeight" Value="ExtraBold"/>
             <Setter Property="Foreground" Value="#1E293B"/>
         </Style>
-
-        <Style x:Key="EditButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#DBEAFE"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="10,6"/>
-            <Setter Property="FontSize" Value="11"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-        </Style>
     </Page.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="320"/>
-            </Grid.ColumnDefinitions>
+    <Page.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#F0F9FF" Offset="0"/>
+            <GradientStop Color="#EEF2FF" Offset="0.45"/>
+            <GradientStop Color="#FFFFFF" Offset="1"/>
+        </LinearGradientBrush>
+    </Page.Background>
 
-            <!-- MAIN -->
-            <ScrollViewer Grid.Column="0"
+    <Grid Padding="24" ColumnSpacing="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="340"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="320"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- LEFT: PATIENT LIST -->
+        <Border Grid.Column="0"
+                Background="White"
+                BorderBrush="#E2E8F0"
+                BorderThickness="1"
+                CornerRadius="18"
+                Padding="18">
+
+            <Grid RowSpacing="14">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Spacing="4">
+                    <TextBlock Text="DANH SÁCH BỆNH NHÂN"
+                               FontSize="11"
+                               FontWeight="ExtraBold"
+                               CharacterSpacing="140"
+                               Foreground="#64748B"/>
+
+                    <TextBlock x:Name="TxtPatientCount"
+                               Text="Đang tải..."
+                               FontSize="22"
+                               FontWeight="ExtraBold"
+                               Foreground="#1E293B"/>
+                </StackPanel>
+
+                <TextBox Grid.Row="1"
+                         x:Name="SearchPatientBox"
+                         PlaceholderText="Tìm theo tên, mã bệnh nhân..."
+                         TextChanged="SearchPatientBox_TextChanged"/>
+
+                <ListView Grid.Row="2"
+                          x:Name="PatientListView"
+                          SelectionMode="Single"
+                          IsItemClickEnabled="True"
+                          ItemClick="PatientListView_ItemClick">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0,0,0,10"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#F8FAFC"
+                                    BorderBrush="#E2E8F0"
+                                    BorderThickness="1"
+                                    CornerRadius="14"
+                                    Padding="14">
+                                <Grid ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Width="44"
+                                            Height="44"
+                                            CornerRadius="22"
+                                            Background="{Binding AvatarBackground}">
+                                        <TextBlock Text="{Binding Initials}"
+                                                   FontSize="14"
+                                                   FontWeight="ExtraBold"
+                                                   Foreground="{Binding AvatarForeground}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <StackPanel Grid.Column="1" Spacing="4">
+                                        <TextBlock Text="{Binding FullName}"
+                                                   FontSize="14"
+                                                   FontWeight="ExtraBold"
+                                                   Foreground="#1E293B"/>
+
+                                        <TextBlock Text="{Binding PatientCode}"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#64748B"/>
+
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <Border Background="{Binding StatusBackground}"
+                                                    CornerRadius="10"
+                                                    Padding="8,3">
+                                                <TextBlock Text="{Binding StatusText}"
+                                                           FontSize="10"
+                                                           FontWeight="Bold"
+                                                           Foreground="{Binding StatusForeground}"/>
+                                            </Border>
+
+                                            <TextBlock Text="{Binding VisitCountText}"
+                                                       FontSize="11"
+                                                       VerticalAlignment="Center"
+                                                       Foreground="#64748B"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </Border>
+
+        <!-- CENTER: PATIENT DETAIL -->
+        <Grid Grid.Column="1">
+            <Border x:Name="EmptyStatePanel"
+                    Background="White"
+                    BorderBrush="#E2E8F0"
+                    BorderThickness="1"
+                    CornerRadius="18"
+                    Padding="32"
+                    Visibility="Visible">
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="12">
+                    <FontIcon Glyph="&#xE77B;"
+                              FontSize="52"
+                              Foreground="#94A3B8"
+                              HorizontalAlignment="Center"/>
+
+                    <TextBlock Text="Chọn một bệnh nhân"
+                               FontSize="24"
+                               FontWeight="ExtraBold"
+                               Foreground="#1E293B"
+                               HorizontalAlignment="Center"/>
+
+                    <TextBlock Text="Bấm vào bệnh nhân ở danh sách bên trái để xem hồ sơ, dấu hiệu sinh tồn, dị ứng, tiền sử bệnh và lịch sử thăm khám."
+                               FontSize="13"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"
+                               Foreground="#64748B"
+                               MaxWidth="480"/>
+                </StackPanel>
+            </Border>
+
+            <ScrollViewer x:Name="PatientDetailScrollViewer"
                           VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled"
-                          Padding="24,24,12,24">
+                          Visibility="Collapsed">
                 <StackPanel Spacing="20">
 
                     <!-- HEADER -->
@@ -92,7 +227,7 @@
                                                Foreground="#94A3B8"
                                                CharacterSpacing="150"/>
                                     <TextBlock x:Name="TxtHeaderPatientName"
-                                               Text="Đang tải..."
+                                               Text="Chưa chọn bệnh nhân"
                                                FontSize="22"
                                                FontWeight="ExtraBold"
                                                Foreground="#1E293B"/>
@@ -164,22 +299,8 @@
 
                         <Border Grid.Column="0" Style="{StaticResource CardStyle}">
                             <StackPanel Spacing="16">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <TextBlock Text="1. DẤU HIỆU SINH TỒN"
-                                               Style="{StaticResource SectionTitleStyle}"/>
-
-                                    <Button Grid.Column="1"
-                                            x:Name="BtnEditVitals"
-                                            Content="+ Sửa"
-                                            Style="{StaticResource EditButtonStyle}"
-                                            Foreground="#0059BB"
-                                            Click="BtnEditVitals_Click"/>
-                                </Grid>
+                                <TextBlock Text="1. DẤU HIỆU SINH TỒN"
+                                           Style="{StaticResource SectionTitleStyle}"/>
 
                                 <Grid RowSpacing="16" ColumnSpacing="16">
                                     <Grid.RowDefinitions>
@@ -227,24 +348,8 @@
 
                         <Border Grid.Column="1" Style="{StaticResource CardStyle}">
                             <StackPanel Spacing="16">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <TextBlock Text="2. TIỀN SỬ DỊ ỨNG"
-                                               Style="{StaticResource SectionTitleStyle}"/>
-
-                                    <Button Grid.Column="1"
-                                            x:Name="BtnAddAllergy"
-                                            Content="+ Thêm"
-                                            Style="{StaticResource EditButtonStyle}"
-                                            Foreground="#DC2626"
-                                            BorderBrush="#FECACA"
-                                            Click="BtnAddAllergy_Click"/>
-                                </Grid>
-
+                                <TextBlock Text="2. TIỀN SỬ DỊ ỨNG"
+                                           Style="{StaticResource SectionTitleStyle}"/>
                                 <StackPanel x:Name="AllergyList" Spacing="10"/>
                             </StackPanel>
                         </Border>
@@ -253,23 +358,8 @@
                     <!-- MEDICAL HISTORY -->
                     <Border Style="{StaticResource CardStyle}">
                         <StackPanel Spacing="16">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="3. TIỀN SỬ BỆNH LÝ CÁ NHÂN"
-                                           Style="{StaticResource SectionTitleStyle}"/>
-
-                                <Button Grid.Column="1"
-                                        x:Name="BtnEditMedHistory"
-                                        Content="+ Sửa"
-                                        Style="{StaticResource EditButtonStyle}"
-                                        Foreground="#64748B"
-                                        BorderBrush="#E2E8F0"
-                                        Click="BtnEditMedHistory_Click"/>
-                            </Grid>
+                            <TextBlock Text="3. TIỀN SỬ BỆNH LÝ CÁ NHÂN"
+                                       Style="{StaticResource SectionTitleStyle}"/>
 
                             <Grid ColumnSpacing="16">
                                 <Grid.ColumnDefinitions>
@@ -361,23 +451,8 @@
                     <!-- MEDICATION -->
                     <Border Style="{StaticResource CardStyle}">
                         <StackPanel Spacing="16">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="4. TIỀN SỬ DÙNG THUỐC"
-                                           Style="{StaticResource SectionTitleStyle}"/>
-
-                                <Button Grid.Column="1"
-                                        x:Name="BtnEditMedication"
-                                        Content="+ Sửa"
-                                        Style="{StaticResource EditButtonStyle}"
-                                        Foreground="#64748B"
-                                        BorderBrush="#E2E8F0"
-                                        Click="BtnEditMedication_Click"/>
-                            </Grid>
+                            <TextBlock Text="4. TIỀN SỬ DÙNG THUỐC"
+                                       Style="{StaticResource SectionTitleStyle}"/>
 
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -413,23 +488,8 @@
 
                         <Border Grid.Column="0" Style="{StaticResource CardStyle}">
                             <StackPanel Spacing="16">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <TextBlock Text="5. TIỀN SỬ GIA ĐÌNH"
-                                               Style="{StaticResource SectionTitleStyle}"/>
-
-                                    <Button Grid.Column="1"
-                                            x:Name="BtnEditFamily"
-                                            Content="+ Sửa"
-                                            Style="{StaticResource EditButtonStyle}"
-                                            Foreground="#64748B"
-                                            BorderBrush="#E2E8F0"
-                                            Click="BtnEditFamily_Click"/>
-                                </Grid>
+                                <TextBlock Text="5. TIỀN SỬ GIA ĐÌNH"
+                                           Style="{StaticResource SectionTitleStyle}"/>
 
                                 <StackPanel Spacing="12">
                                     <Border Background="#EFF6FF" CornerRadius="12" Padding="14">
@@ -457,23 +517,8 @@
 
                         <Border Grid.Column="1" Style="{StaticResource CardStyle}">
                             <StackPanel Spacing="16">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <TextBlock Text="6. LỐI SỐNG"
-                                               Style="{StaticResource SectionTitleStyle}"/>
-
-                                    <Button Grid.Column="1"
-                                            x:Name="BtnEditLifestyle"
-                                            Content="+ Sửa"
-                                            Style="{StaticResource EditButtonStyle}"
-                                            Foreground="#059669"
-                                            BorderBrush="#A7F3D0"
-                                            Click="BtnEditLifestyle_Click"/>
-                                </Grid>
+                                <TextBlock Text="6. LỐI SỐNG"
+                                           Style="{StaticResource SectionTitleStyle}"/>
 
                                 <Grid RowSpacing="8" ColumnSpacing="8">
                                     <Grid.RowDefinitions>
@@ -516,65 +561,66 @@
                             </StackPanel>
                         </Border>
                     </Grid>
-
-                    <StackPanel HorizontalAlignment="Right" Margin="0,8,0,32">
-                        <Button x:Name="SaveButton"
-                                Content="Lưu thông tin hồ sơ"
-                                Click="SaveButton_Click"
-                                Background="#0059BB"
-                                Foreground="White"
-                                CornerRadius="10"
-                                Padding="48,12"
-                                FontSize="13"
-                                FontWeight="ExtraBold"/>
-                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
-
-            <!-- SIDEBAR -->
-            <Border Grid.Column="1"
-                    Background="White"
-                    BorderThickness="1,0,0,0"
-                    BorderBrush="#E2E8F0">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24">
-                    <StackPanel Spacing="24">
-                        <TextBlock Text="LỊCH SỬ THĂM KHÁM"
-                                   FontSize="10"
-                                   FontWeight="ExtraBold"
-                                   Foreground="#1E293B"
-                                   CharacterSpacing="180"/>
-
-                        <StackPanel Spacing="14">
-                            <Border Background="#EFF6FF" CornerRadius="12" Padding="12">
-                                <StackPanel Spacing="4">
-                                    <TextBlock x:Name="TxtVisit1Type" Text="Chưa có dữ liệu" FontSize="13" FontWeight="ExtraBold"/>
-                                    <TextBlock x:Name="TxtVisit1Date" Text="--" FontSize="10" Foreground="#94A3B8"/>
-                                    <TextBlock x:Name="TxtVisit1Doctor" Text="--" FontSize="11" FontWeight="Bold" Foreground="#334155"/>
-                                    <TextBlock x:Name="TxtVisit1Summary" Text="--" FontSize="10" Foreground="#64748B" TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </Border>
-
-                            <Border Background="#F8FAFC" CornerRadius="12" Padding="12">
-                                <StackPanel Spacing="4">
-                                    <TextBlock x:Name="TxtVisit2Type" Text="Chưa có dữ liệu" FontSize="13" FontWeight="ExtraBold"/>
-                                    <TextBlock x:Name="TxtVisit2Date" Text="--" FontSize="10" Foreground="#94A3B8"/>
-                                    <TextBlock x:Name="TxtVisit2Doctor" Text="--" FontSize="11" FontWeight="Bold" Foreground="#334155"/>
-                                    <TextBlock x:Name="TxtVisit2Summary" Text="--" FontSize="10" Foreground="#64748B" TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </Border>
-
-                            <Border Background="#F8FAFC" CornerRadius="12" Padding="12">
-                                <StackPanel Spacing="4">
-                                    <TextBlock x:Name="TxtVisit3Type" Text="Chưa có dữ liệu" FontSize="13" FontWeight="ExtraBold"/>
-                                    <TextBlock x:Name="TxtVisit3Date" Text="--" FontSize="10" Foreground="#94A3B8"/>
-                                    <TextBlock x:Name="TxtVisit3Doctor" Text="--" FontSize="11" FontWeight="Bold" Foreground="#334155"/>
-                                    <TextBlock x:Name="TxtVisit3Summary" Text="--" FontSize="10" Foreground="#64748B" TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
-                    </StackPanel>
-                </ScrollViewer>
-            </Border>
         </Grid>
-    </ScrollViewer>
+
+        <!-- RIGHT: VISIT HISTORY -->
+        <Border Grid.Column="2"
+                Background="White"
+                BorderBrush="#E2E8F0"
+                BorderThickness="1"
+                CornerRadius="18"
+                Padding="20">
+            <Grid RowSpacing="14">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Spacing="4">
+                    <TextBlock Text="LỊCH SỬ THĂM KHÁM"
+                               FontSize="10"
+                               FontWeight="ExtraBold"
+                               Foreground="#1E293B"
+                               CharacterSpacing="180"/>
+                    <TextBlock x:Name="TxtVisitSubtitle"
+                               Text="Chưa chọn bệnh nhân"
+                               FontSize="12"
+                               Foreground="#64748B"/>
+                </StackPanel>
+
+                <ListView Grid.Row="1"
+                          x:Name="VisitHistoryListView"
+                          SelectionMode="None">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{Binding Background}"
+                                    CornerRadius="12"
+                                    Padding="12"
+                                    Margin="0,0,0,12">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="{Binding Title}"
+                                               FontSize="13"
+                                               FontWeight="ExtraBold"
+                                               Foreground="#1E293B"/>
+                                    <TextBlock Text="{Binding DateText}"
+                                               FontSize="10"
+                                               Foreground="#94A3B8"/>
+                                    <TextBlock Text="{Binding DoctorText}"
+                                               FontSize="11"
+                                               FontWeight="Bold"
+                                               Foreground="#334155"/>
+                                    <TextBlock Text="{Binding Summary}"
+                                               FontSize="10"
+                                               Foreground="#64748B"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </Border>
+    </Grid>
 </Page>

@@ -4,31 +4,98 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{StaticResource AppBackdropGradientBrush}">
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <SolidColorBrush x:Key="PrimaryBlueBrush" Color="#0059BB"/>
+        <SolidColorBrush x:Key="SoftBlueBrush" Color="#EFF6FF"/>
+        <SolidColorBrush x:Key="SoftGreenBrush" Color="#ECFDF5"/>
+        <SolidColorBrush x:Key="SoftOrangeBrush" Color="#FFF7ED"/>
+        <SolidColorBrush x:Key="SoftPurpleBrush" Color="#F5F3FF"/>
+        <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="BorderBrushSoft" Color="#E5E7EB"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#0F172A"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#64748B"/>
+    </Page.Resources>
+
+    <Page.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#F0F9FF" Offset="0"/>
+            <GradientStop Color="#EEF2FF" Offset="0.45"/>
+            <GradientStop Color="#FFFFFF" Offset="1"/>
+        </LinearGradientBrush>
+    </Page.Background>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Padding="32,28,32,40" Spacing="24">
 
-            <StackPanel Spacing="4">
-                <TextBlock x:Name="TxtWelcome"
-                           Text="Chào buổi sáng, Bác sĩ Tâm"
-                           FontSize="28"
-                           FontWeight="Bold"/>
-                <TextBlock x:Name="TxtSubtitle"
-                           Text="Hôm nay bạn có 12 ca khám và 2 cuộc hội chẩn trực tuyến."
-                           FontSize="13"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-            </StackPanel>
+            <!-- HEADER -->
+            <Border Background="#FFFFFF"
+                    BorderBrush="#E5E7EB"
+                    BorderThickness="1"
+                    CornerRadius="20"
+                    Padding="24">
+                <Grid ColumnSpacing="20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
+                    <StackPanel Spacing="6">
+                        <TextBlock x:Name="TxtWelcome"
+                                   Text="Chào buổi sáng, Bác sĩ"
+                                   FontSize="30"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                        <TextBlock x:Name="TxtSubtitle"
+                                   Text="Đang tải dữ liệu lịch khám hôm nay..."
+                                   FontSize="14"
+                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                    </StackPanel>
+
+                    <Border Grid.Column="1"
+                            Background="#EFF6FF"
+                            CornerRadius="18"
+                            Padding="16"
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Border Width="42"
+                                    Height="42"
+                                    CornerRadius="21"
+                                    Background="#0059BB">
+                                <FontIcon Glyph="&#xE77B;"
+                                          FontSize="20"
+                                          Foreground="White"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                            </Border>
+
+                            <StackPanel Spacing="2" VerticalAlignment="Center">
+                                <TextBlock Text="Dashboard bác sĩ"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="#0059BB"/>
+                                <TextBlock Text="Theo dõi lịch khám nhanh"
+                                           FontSize="11"
+                                           Foreground="#475569"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- MAIN LAYOUT -->
             <Grid ColumnSpacing="24">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
 
+                <!-- LEFT COLUMN -->
                 <StackPanel Grid.Column="0" Spacing="20">
 
+                    <!-- STATS -->
                     <Grid ColumnSpacing="16">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -36,123 +103,149 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
+                        <!-- ĐÃ KHÁM -->
                         <Border Grid.Column="0"
-                                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                Background="{StaticResource CardBrush}"
+                                BorderBrush="{StaticResource BorderBrushSoft}"
                                 BorderThickness="1"
-                                CornerRadius="12"
+                                CornerRadius="18"
                                 Padding="20">
-                            <StackPanel Spacing="14">
-                                <Border Width="44" Height="44" CornerRadius="8"
-                                        Background="#EFF6FF"
-                                        HorizontalAlignment="Left">
-                                    <FontIcon Glyph="&#xE77B;" FontSize="22"
-                                              Foreground="#2563EB"
-                                              HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
-                                </Border>
-                                <StackPanel Spacing="2">
+                            <StackPanel Spacing="16">
+                                <Grid>
+                                    <Border Width="48"
+                                            Height="48"
+                                            CornerRadius="14"
+                                            Background="#EFF6FF"
+                                            HorizontalAlignment="Left">
+                                        <FontIcon Glyph="&#xE8D4;"
+                                                  FontSize="22"
+                                                  Foreground="#2563EB"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"/>
+                                    </Border>
+                                </Grid>
+
+                                <StackPanel Spacing="4">
                                     <TextBlock Text="ĐÃ KHÁM"
-                                               FontSize="10" FontWeight="SemiBold"
-                                               CharacterSpacing="50"
-                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Bottom">
-                                        <TextBlock x:Name="TxtExamined"
-                                                   Text="24"
-                                                   FontSize="30" FontWeight="Bold"/>
-                                        <TextBlock Text="+15%"
-                                                   FontSize="11" FontWeight="SemiBold"
-                                                   Foreground="#16A34A"
-                                                   VerticalAlignment="Bottom"
-                                                   Margin="0,0,0,4"/>
-                                    </StackPanel>
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               CharacterSpacing="60"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+
+                                    <TextBlock x:Name="TxtExamined"
+                                               Text="00"
+                                               FontSize="34"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                    <TextBlock Text="Tổng số ca đã hoàn thành"
+                                               FontSize="12"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
 
+                        <!-- CẦN CHÚ Ý -->
                         <Border Grid.Column="1"
-                                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                Background="{StaticResource CardBrush}"
+                                BorderBrush="{StaticResource BorderBrushSoft}"
                                 BorderThickness="1"
-                                CornerRadius="12"
+                                CornerRadius="18"
                                 Padding="20">
-                            <StackPanel Spacing="14">
-                                <Border Width="44" Height="44" CornerRadius="8"
+                            <StackPanel Spacing="16">
+                                <Border Width="48"
+                                        Height="48"
+                                        CornerRadius="14"
                                         Background="#FEF2F2"
                                         HorizontalAlignment="Left">
-                                    <FontIcon Glyph="&#xE7BA;" FontSize="22"
+                                    <FontIcon Glyph="&#xE7BA;"
+                                              FontSize="22"
                                               Foreground="#DC2626"
                                               HorizontalAlignment="Center"
                                               VerticalAlignment="Center"/>
                                 </Border>
-                                <StackPanel Spacing="2">
-                                <!-- <TextBlock Text="CẤP CỨU"
-                                           FontSize="10" FontWeight="SemiBold"
-                                           CharacterSpacing="50"
-                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/> -->
-                                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Bottom">
-                                        <TextBlock x:Name="TxtEmergency"
-                                                   Text="03"
-                                                   FontSize="30" FontWeight="Bold"/>
-                                        <TextBlock Text="Hôm nay"
-                                                   FontSize="11"
-                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                   VerticalAlignment="Bottom"
-                                                   Margin="0,0,0,4"/>
-                                    </StackPanel>
+
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="CẦN CHÚ Ý"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               CharacterSpacing="60"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+
+                                    <TextBlock x:Name="TxtEmergency"
+                                               Text="00"
+                                               FontSize="34"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                    <TextBlock Text="Ca đã đến hoặc đang khám"
+                                               FontSize="12"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
 
+                        <!-- LỊCH HẸN -->
                         <Border Grid.Column="2"
-                                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                Background="{StaticResource CardBrush}"
+                                BorderBrush="{StaticResource BorderBrushSoft}"
                                 BorderThickness="1"
-                                CornerRadius="12"
+                                CornerRadius="18"
                                 Padding="20">
-                            <StackPanel Spacing="14">
-                                <Border Width="44" Height="44" CornerRadius="8"
+                            <StackPanel Spacing="16">
+                                <Border Width="48"
+                                        Height="48"
+                                        CornerRadius="14"
                                         Background="#FFF7ED"
                                         HorizontalAlignment="Left">
-                                    <FontIcon Glyph="&#xE787;" FontSize="22"
+                                    <FontIcon Glyph="&#xE787;"
+                                              FontSize="22"
                                               Foreground="#EA580C"
                                               HorizontalAlignment="Center"
                                               VerticalAlignment="Center"/>
                                 </Border>
-                                <StackPanel Spacing="2">
+
+                                <StackPanel Spacing="4">
                                     <TextBlock Text="LỊCH HẸN"
-                                               FontSize="10" FontWeight="SemiBold"
-                                               CharacterSpacing="50"
-                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Bottom">
-                                        <TextBlock x:Name="TxtAppointments"
-                                                   Text="08"
-                                                   FontSize="30" FontWeight="Bold"/>
-                                        <TextBlock Text="Sắp tới"
-                                                   FontSize="11"
-                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                   VerticalAlignment="Bottom"
-                                                   Margin="0,0,0,4"/>
-                                    </StackPanel>
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               CharacterSpacing="60"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+
+                                    <TextBlock x:Name="TxtAppointments"
+                                               Text="00"
+                                               FontSize="34"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                    <TextBlock Text="Tổng lịch hẹn hôm nay"
+                                               FontSize="12"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
                     </Grid>
 
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    <!-- QUICK ACCESS -->
+                    <Border Background="{StaticResource CardBrush}"
+                            BorderBrush="{StaticResource BorderBrushSoft}"
                             BorderThickness="1"
-                            CornerRadius="12"
-                            Padding="20">
-                        <StackPanel Spacing="20">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE945;" FontSize="18"
-                                          Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
-                                <TextBlock Text="Truy cập nhanh"
-                                           FontSize="14" FontWeight="SemiBold"/>
-                            </StackPanel>
+                            CornerRadius="18"
+                            Padding="22">
+                        <StackPanel Spacing="18">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <FontIcon Glyph="&#xE945;"
+                                              FontSize="18"
+                                              Foreground="#0059BB"/>
+                                    <TextBlock Text="Truy cập nhanh"
+                                               FontSize="17"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                </StackPanel>
+                            </Grid>
 
-                            <Grid ColumnSpacing="8">
+                            <Grid ColumnSpacing="12">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
@@ -161,63 +254,81 @@
 
                                 <Button Grid.Column="0"
                                         HorizontalAlignment="Stretch"
-                                        Style="{StaticResource DefaultButtonStyle}"
-                                        CornerRadius="12"
-                                        Padding="8,16"
+                                        Background="#EFF6FF"
+                                        BorderBrush="#BFDBFE"
+                                        BorderThickness="1"
+                                        CornerRadius="16"
+                                        Padding="14"
                                         Click="QuickAccess_ManageSchedule">
                                     <StackPanel Spacing="10" HorizontalAlignment="Center">
-                                        <Border Width="52" Height="52" CornerRadius="12"
-                                                Background="#DBEAFE"
-                                                HorizontalAlignment="Center">
-                                            <FontIcon Glyph="&#xE787;" FontSize="26"
+                                        <Border Width="54"
+                                                Height="54"
+                                                CornerRadius="16"
+                                                Background="#DBEAFE">
+                                            <FontIcon Glyph="&#xE787;"
+                                                      FontSize="26"
                                                       Foreground="#2563EB"
                                                       HorizontalAlignment="Center"
                                                       VerticalAlignment="Center"/>
                                         </Border>
                                         <TextBlock Text="Quản lý lịch khám"
-                                                   FontSize="11" FontWeight="SemiBold"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#1E3A8A"
                                                    HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
 
                                 <Button Grid.Column="1"
                                         HorizontalAlignment="Stretch"
-                                        Style="{StaticResource DefaultButtonStyle}"
-                                        CornerRadius="12"
-                                        Padding="8,16"
+                                        Background="#ECFDF5"
+                                        BorderBrush="#A7F3D0"
+                                        BorderThickness="1"
+                                        CornerRadius="16"
+                                        Padding="14"
                                         Click="QuickAccess_PatientHistory">
                                     <StackPanel Spacing="10" HorizontalAlignment="Center">
-                                        <Border Width="52" Height="52" CornerRadius="12"
-                                                Background="#CCFBF1"
-                                                HorizontalAlignment="Center">
-                                            <FontIcon Glyph="&#xE9F9;" FontSize="26"
+                                        <Border Width="54"
+                                                Height="54"
+                                                CornerRadius="16"
+                                                Background="#CCFBF1">
+                                            <FontIcon Glyph="&#xE9F9;"
+                                                      FontSize="26"
                                                       Foreground="#0F766E"
                                                       HorizontalAlignment="Center"
                                                       VerticalAlignment="Center"/>
                                         </Border>
-                                        <TextBlock Text="Tiền sử bệnh"
-                                                   FontSize="11" FontWeight="SemiBold"
+                                        <TextBlock Text="Danh sách bệnh nhân"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#115E59"
                                                    HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
 
                                 <Button Grid.Column="2"
                                         HorizontalAlignment="Stretch"
-                                        Style="{StaticResource DefaultButtonStyle}"
-                                        CornerRadius="12"
-                                        Padding="8,16"
+                                        Background="#F5F3FF"
+                                        BorderBrush="#DDD6FE"
+                                        BorderThickness="1"
+                                        CornerRadius="16"
+                                        Padding="14"
                                         Click="QuickAccess_Revenue">
                                     <StackPanel Spacing="10" HorizontalAlignment="Center">
-                                        <Border Width="52" Height="52" CornerRadius="12"
-                                                Background="#F3E8FF"
-                                                HorizontalAlignment="Center">
-                                            <FontIcon Glyph="&#xE9D2;" FontSize="26"
+                                        <Border Width="54"
+                                                Height="54"
+                                                CornerRadius="16"
+                                                Background="#EDE9FE">
+                                            <FontIcon Glyph="&#xE9D2;"
+                                                      FontSize="26"
                                                       Foreground="#7C3AED"
                                                       HorizontalAlignment="Center"
                                                       VerticalAlignment="Center"/>
                                         </Border>
-                                        <TextBlock Text="Báo cáo"
-                                                   FontSize="11" FontWeight="SemiBold"
+                                        <TextBlock Text="Kết quả khám"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#5B21B6"
                                                    HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
@@ -225,33 +336,51 @@
                         </StackPanel>
                     </Border>
 
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    <!-- QUEUE -->
+                    <Border Background="{StaticResource CardBrush}"
+                            BorderBrush="{StaticResource BorderBrushSoft}"
                             BorderThickness="1"
-                            CornerRadius="12">
+                            CornerRadius="18">
                         <StackPanel>
-                            <Grid Padding="20,16">
+                            <Grid Padding="22,18">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Hàng chờ khám"
-                                           FontSize="16" FontWeight="SemiBold"
-                                           VerticalAlignment="Center"/>
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="Hàng chờ khám"
+                                               FontSize="18"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="Danh sách bệnh nhân có lịch khám trong hôm nay"
+                                               FontSize="12"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1"
+                                            Orientation="Horizontal"
+                                            Spacing="8"
+                                            VerticalAlignment="Center">
                                     <Button x:Name="BtnQueueAll"
-                                            Content="Tất cả (12)"
-                                            Style="{StaticResource AccentButtonStyle}"
-                                            CornerRadius="20"
-                                            FontSize="11"
-                                            Padding="12,4"
+                                            Content="Tất cả (0)"
+                                            Background="#0059BB"
+                                            Foreground="White"
+                                            BorderThickness="0"
+                                            CornerRadius="18"
+                                            FontSize="12"
+                                            Padding="14,6"
                                             Click="BtnQueueAll_Click"/>
+
                                     <Button x:Name="BtnQueuePriority"
-                                            Content="Ưu tiên (2)"
-                                            Style="{StaticResource DefaultButtonStyle}"
-                                            CornerRadius="20"
-                                            FontSize="11"
-                                            Padding="12,4"
+                                            Content="Ưu tiên (0)"
+                                            Background="#F1F5F9"
+                                            Foreground="#334155"
+                                            BorderBrush="#CBD5E1"
+                                            BorderThickness="1"
+                                            CornerRadius="18"
+                                            FontSize="12"
+                                            Padding="14,6"
                                             Click="BtnQueuePriority_Click"/>
                                 </StackPanel>
                             </Grid>
@@ -263,71 +392,79 @@
                                 <ListView.ItemContainerStyle>
                                     <Style TargetType="ListViewItem">
                                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                        <Setter Property="Padding" Value="20,12"/>
-                                        <Setter Property="BorderBrush" Value="{ThemeResource DividerStrokeColorDefaultBrush}"/>
+                                        <Setter Property="Padding" Value="18,12"/>
+                                        <Setter Property="BorderBrush" Value="#F1F5F9"/>
                                         <Setter Property="BorderThickness" Value="0,1,0,0"/>
                                     </Style>
                                 </ListView.ItemContainerStyle>
+
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
-                                        <Grid>
+                                        <Grid ColumnSpacing="14">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="32"/>
                                             </Grid.ColumnDefinitions>
 
                                             <Border Grid.Column="0"
-                                                    Width="40" Height="40"
-                                                    CornerRadius="20"
-                                                    Background="{Binding NumberBackground}"
-                                                    Margin="0,0,14,0">
+                                                    Width="42"
+                                                    Height="42"
+                                                    CornerRadius="21"
+                                                    Background="{Binding NumberBackground}">
                                                 <TextBlock Text="{Binding QueueNumber}"
-                                                           FontSize="13" FontWeight="Bold"
+                                                           FontSize="13"
+                                                           FontWeight="Bold"
                                                            Foreground="{Binding NumberForeground}"
                                                            HorizontalAlignment="Center"
                                                            VerticalAlignment="Center"/>
                                             </Border>
 
-                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                                            <StackPanel Grid.Column="1"
+                                                        VerticalAlignment="Center"
+                                                        Spacing="4">
                                                 <TextBlock Text="{Binding PatientName}"
-                                                           FontSize="13" FontWeight="SemiBold"/>
+                                                           FontSize="14"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{StaticResource TextPrimaryBrush}"/>
                                                 <TextBlock Text="{Binding Symptom}"
                                                            FontSize="12"
-                                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                           Foreground="{StaticResource TextSecondaryBrush}"/>
                                             </StackPanel>
 
                                             <StackPanel Grid.Column="2"
                                                         VerticalAlignment="Center"
                                                         HorizontalAlignment="Right"
-                                                        Margin="0,0,16,0"
+                                                        Margin="0,0,12,0"
                                                         Spacing="2">
                                                 <TextBlock Text="{Binding TimeLabel}"
                                                            FontSize="10"
-                                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                           Foreground="{StaticResource TextSecondaryBrush}"
                                                            HorizontalAlignment="Right"/>
                                                 <TextBlock Text="{Binding TimeValue}"
-                                                           FontSize="12" FontWeight="SemiBold"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{StaticResource TextPrimaryBrush}"
                                                            HorizontalAlignment="Right"/>
                                             </StackPanel>
 
                                             <Border Grid.Column="3"
                                                     Background="{Binding BadgeBackground}"
-                                                    CornerRadius="20"
-                                                    Padding="10,4"
-                                                    VerticalAlignment="Center"
-                                                    HorizontalAlignment="Center">
+                                                    CornerRadius="16"
+                                                    Padding="12,5"
+                                                    VerticalAlignment="Center">
                                                 <TextBlock Text="{Binding StatusText}"
-                                                           FontSize="10" FontWeight="Bold"
+                                                           FontSize="10"
+                                                           FontWeight="Bold"
                                                            Foreground="{Binding BadgeForeground}"/>
                                             </Border>
 
                                             <FontIcon Grid.Column="4"
                                                       Glyph="&#xE76C;"
                                                       FontSize="14"
-                                                      Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                                      Foreground="#94A3B8"
                                                       VerticalAlignment="Center"
                                                       HorizontalAlignment="Center"/>
                                         </Grid>
@@ -336,40 +473,56 @@
                             </ListView>
 
                             <Button HorizontalAlignment="Stretch"
-                                    Style="{StaticResource DefaultButtonStyle}"
-                                    Padding="0,14"
-                                    CornerRadius="0,0,12,12"
+                                    Background="#F8FAFC"
+                                    BorderBrush="#E5E7EB"
+                                    BorderThickness="0,1,0,0"
+                                    Padding="0,16"
+                                    CornerRadius="0,0,18,18"
                                     Click="BtnViewAllQueue_Click">
                                 <TextBlock Text="Xem toàn bộ danh sách hàng chờ"
-                                           FontSize="12" FontWeight="SemiBold"
-                                           Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="#0059BB"
                                            HorizontalAlignment="Center"/>
                             </Button>
                         </StackPanel>
                     </Border>
-
                 </StackPanel>
 
+                <!-- RIGHT COLUMN -->
                 <StackPanel Grid.Column="1" Spacing="20">
 
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    <!-- TODAY SCHEDULE -->
+                    <Border Background="{StaticResource CardBrush}"
+                            BorderBrush="{StaticResource BorderBrushSoft}"
                             BorderThickness="1"
-                            CornerRadius="12"
+                            CornerRadius="18"
                             Padding="20">
-                        <StackPanel Spacing="0">
-                            <Grid Margin="0,0,0,20">
-                                <TextBlock Text="Lịch biểu hôm nay"
-                                           FontSize="16" FontWeight="SemiBold"
-                                           VerticalAlignment="Center"/>
+                        <StackPanel Spacing="18">
+                            <Grid>
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="Lịch biểu hôm nay"
+                                               FontSize="18"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="Các mốc lịch khám trong ngày"
+                                               FontSize="12"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                </StackPanel>
+
                                 <Button HorizontalAlignment="Right"
-                                        Style="{StaticResource DefaultButtonStyle}"
-                                        Width="32" Height="32"
+                                        Background="#EFF6FF"
+                                        BorderBrush="#BFDBFE"
+                                        BorderThickness="1"
+                                        Width="36"
+                                        Height="36"
                                         Padding="0"
-                                        CornerRadius="16"
+                                        CornerRadius="18"
                                         ToolTipService.ToolTip="Thêm sự kiện"
                                         Click="BtnAddSchedule_Click">
-                                    <FontIcon Glyph="&#xE710;" FontSize="16"/>
+                                    <FontIcon Glyph="&#xE710;"
+                                              FontSize="16"
+                                              Foreground="#0059BB"/>
                                 </Button>
                             </Grid>
 
@@ -378,7 +531,7 @@
                                 <ListView.ItemContainerStyle>
                                     <Style TargetType="ListViewItem">
                                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                        <Setter Property="Padding" Value="0,0,0,20"/>
+                                        <Setter Property="Padding" Value="0,0,0,18"/>
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="ListViewItem">
@@ -388,6 +541,7 @@
                                         </Setter>
                                     </Style>
                                 </ListView.ItemContainerStyle>
+
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <Grid ColumnSpacing="12">
@@ -397,21 +551,25 @@
                                             </Grid.ColumnDefinitions>
 
                                             <Border Grid.Column="0"
-                                                    Width="22" Height="22"
-                                                    CornerRadius="11"
+                                                    Width="14"
+                                                    Height="14"
+                                                    CornerRadius="7"
                                                     Background="{Binding DotColor}"
                                                     VerticalAlignment="Top"
-                                                    Margin="0,2,0,0"/>
+                                                    Margin="0,4,0,0"/>
 
-                                            <StackPanel Grid.Column="1" Spacing="3">
+                                            <StackPanel Grid.Column="1" Spacing="4">
                                                 <TextBlock Text="{Binding TimeRange}"
-                                                           FontSize="10" FontWeight="Bold"
+                                                           FontSize="11"
+                                                           FontWeight="Bold"
                                                            Foreground="{Binding TimeColor}"/>
                                                 <TextBlock Text="{Binding Title}"
-                                                           FontSize="13" FontWeight="SemiBold"/>
+                                                           FontSize="14"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{StaticResource TextPrimaryBrush}"/>
                                                 <TextBlock Text="{Binding Description}"
                                                            FontSize="12"
-                                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                           Foreground="{StaticResource TextSecondaryBrush}"
                                                            TextWrapping="Wrap"/>
                                             </StackPanel>
                                         </Grid>
@@ -420,61 +578,95 @@
                             </ListView>
 
                             <Button HorizontalAlignment="Stretch"
-                                    Style="{StaticResource DefaultButtonStyle}"
+                                    Background="#F8FAFC"
+                                    BorderBrush="#E5E7EB"
+                                    BorderThickness="1"
                                     Content="Xem lịch đầy đủ"
-                                    FontSize="12" FontWeight="SemiBold"
+                                    FontSize="13"
+                                    FontWeight="SemiBold"
+                                    Foreground="#0059BB"
                                     Padding="0,12"
-                                    CornerRadius="8"
-                                    Margin="0,8,0,0"
+                                    CornerRadius="12"
                                     Click="BtnViewFullSchedule_Click"/>
                         </StackPanel>
                     </Border>
 
+                    <!-- CLINICAL REMINDER -->
                     <Border Background="#0059BB"
-                            CornerRadius="12"
-                            Padding="20">
-                        <StackPanel Spacing="12">
-                            <TextBlock Text="Lời nhắc lâm sàng"
-                                       FontSize="14" FontWeight="SemiBold"
-                                       Foreground="White"/>
+                            CornerRadius="18"
+                            Padding="22">
+                        <StackPanel Spacing="14">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <FontIcon Glyph="&#xE946;"
+                                          Foreground="White"
+                                          FontSize="18"/>
+                                <TextBlock Text="Lời nhắc lâm sàng"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"/>
+                            </StackPanel>
+
                             <TextBlock x:Name="TxtClinicalReminder"
-                                       Text="Đã có kết quả xét nghiệm mới cho bệnh nhân Nguyễn Văn An. Chỉ số Creatinine tăng nhẹ (1.3 mg/dL). Vui lòng kiểm tra lại đơn thuốc."
-                                       FontSize="12"
+                                       Text="Theo dõi các kết quả xét nghiệm mới, bệnh nhân ưu tiên và các lịch khám cần xử lý trong hôm nay."
+                                       FontSize="13"
                                        Foreground="White"
                                        Opacity="0.9"
                                        TextWrapping="Wrap"/>
+
                             <Button Content="Xem kết quả"
                                     Background="White"
                                     Foreground="#0059BB"
-                                    FontSize="12" FontWeight="SemiBold"
-                                    CornerRadius="8"
-                                    Padding="16,8"
+                                    BorderThickness="0"
+                                    FontSize="13"
+                                    FontWeight="SemiBold"
+                                    CornerRadius="10"
+                                    Padding="16,9"
                                     HorizontalAlignment="Left"
                                     Click="BtnViewLabResult_Click"/>
                         </StackPanel>
                     </Border>
 
-                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    <!-- AREA STATUS -->
+                    <Border Background="{StaticResource CardBrush}"
+                            BorderBrush="{StaticResource BorderBrushSoft}"
                             BorderThickness="1"
-                            CornerRadius="12"
-                            Padding="16">
-                        <StackPanel Spacing="10">
-                            <TextBlock Text="TÌNH HÌNH KHU VỰC KHÁM"
-                                       FontSize="10" FontWeight="SemiBold"
-                                       CharacterSpacing="50"
-                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                            <Border Height="120" CornerRadius="8"
-                                    Background="{ThemeResource SystemFillColorNeutralBackground}">
+                            CornerRadius="18"
+                            Padding="18">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="KHU VỰC KHÁM"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       CharacterSpacing="60"
+                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+
+                            <Border Height="128"
+                                    CornerRadius="14"
+                                    Background="#F8FAFC"
+                                    BorderBrush="#E5E7EB"
+                                    BorderThickness="1">
                                 <StackPanel VerticalAlignment="Center"
                                             HorizontalAlignment="Center"
-                                            Spacing="6">
-                                    <FontIcon Glyph="&#xE707;" FontSize="28"
-                                              Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                              HorizontalAlignment="Center"/>
+                                            Spacing="8">
+                                    <Border Width="50"
+                                            Height="50"
+                                            CornerRadius="25"
+                                            Background="#EFF6FF">
+                                        <FontIcon Glyph="&#xE707;"
+                                                  FontSize="26"
+                                                  Foreground="#0059BB"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"/>
+                                    </Border>
+
                                     <TextBlock Text="Khu Nội trú - Tầng 2"
-                                               FontSize="12" FontWeight="SemiBold"
-                                               Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               Foreground="#0059BB"
+                                               HorizontalAlignment="Center"/>
+
+                                    <TextBlock Text="Trạng thái: Đang hoạt động"
+                                               FontSize="11"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
                                                HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Border>

@@ -1,4 +1,4 @@
-﻿using Healthcare.Server.Services;
+using Healthcare.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using Postgrest.Attributes;
 using Postgrest.Models;
@@ -45,18 +45,22 @@ namespace Healthcare.Server.Controllers
         public async Task<IActionResult> VNPayReturn()
         {
             var query = HttpContext.Request.Query;
-            var vnp_TxnRef = query["vnp_TxnRef"].ToString(); // Đây chính là AppointmentId (dạng string)
+            var vnp_TxnRef = query["vnp_TxnRef"].ToString();
             var vnp_ResponseCode = query["vnp_ResponseCode"].ToString();
+            // AppointmentId được lưu trong vnp_OrderInfo khi tạo URL
+            var vnp_OrderInfo = query["vnp_OrderInfo"].ToString();
 
             if (!_paymentService.ValidateVnPaySignature(query))
             {
                 return BadRequest(new { message = "Chữ ký không hợp lệ!" });
             }
 
-            // Kiểm tra xem ID trả về từ VNPay có phải UUID hợp lệ không
-            if (!Guid.TryParse(vnp_TxnRef, out _))
+            // appointmentId nằm trong OrderInfo
+            string appointmentId = vnp_OrderInfo;
+
+            if (string.IsNullOrEmpty(appointmentId) || !Guid.TryParse(appointmentId, out _))
             {
-                return BadRequest(new { message = "Mã giao dịch trả về từ VNPay không phải UUID hợp lệ." });
+                return BadRequest(new { message = "Không tìm thấy AppointmentId hợp lệ trong giao dịch." });
             }
 
             try
@@ -65,7 +69,7 @@ namespace Healthcare.Server.Controllers
                 {
                     // 1. Cập nhật transaction
                     var transaction = await _supabaseClient.From<TransactionModel>()
-                        .Where(x => x.AppointmentId == vnp_TxnRef)
+                        .Where(x => x.AppointmentId == appointmentId)
                         .Single();
 
                     if (transaction != null)
@@ -76,7 +80,7 @@ namespace Healthcare.Server.Controllers
 
                     // 2. Cập nhật appointment
                     var appointment = await _supabaseClient.From<AppointmentModel>()
-                        .Where(x => x.Id == vnp_TxnRef)
+                        .Where(x => x.Id == appointmentId)
                         .Single();
 
                     if (appointment != null)
@@ -85,7 +89,7 @@ namespace Healthcare.Server.Controllers
                         await appointment.Update<AppointmentModel>();
                     }
 
-                    return Ok(new { message = "Thanh toán thành công!", appointmentId = vnp_TxnRef });
+                    return Ok(new { message = "Thanh toán thành công!", appointmentId = appointmentId });
                 }
 
                 return BadRequest(new { message = "Giao dịch không thành công tại VNPay." });

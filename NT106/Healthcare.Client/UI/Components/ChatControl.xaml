@@ -19,30 +19,25 @@
                 BorderBrush="#E5E7EB"
                 BorderThickness="0,0,0,1"
                 Padding="16">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Spacing="4">
-                    <TextBlock Text="Trao đổi khám bệnh"
-                               FontSize="18"
-                               FontWeight="Bold"
-                               Foreground="#1E293B"/>
-                    <TextBlock Text="Chat và ghi chú trong quá trình khám"
-                               FontSize="12"
-                               Foreground="#64748B"/>
-                </StackPanel>
-            </Grid>
+            <StackPanel Spacing="4">
+                <TextBlock Text="Chatbot AI hỗ trợ sức khỏe"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           Foreground="#1E293B"/>
+                <TextBlock Text="Nhập câu hỏi để nhận tư vấn sức khỏe cơ bản"
+                           FontSize="12"
+                           Foreground="#64748B"/>
+            </StackPanel>
         </Border>
 
-            <StackPanel Orientation="Horizontal" Padding="16,8">
-                <TextBlock Text="Cửa sổ Chat"
-                           FontSize="13"
-                           FontWeight="Bold"
-                           Foreground="#0059BB"/>
-            </StackPanel>
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    Padding="16,8">
+            <TextBlock Text="Cửa sổ Chat"
+                       FontSize="13"
+                       FontWeight="Bold"
+                       Foreground="#0059BB"/>
+        </StackPanel>
 
         <Grid Grid.Row="2">
             <Grid x:Name="PanelChat" Visibility="Visible">
@@ -55,7 +50,7 @@
                               Grid.Row="0"
                               VerticalScrollBarVisibility="Auto"
                               Padding="16">
-                    <StackPanel x:Name="MessageList" Spacing="4"/>
+                    <StackPanel x:Name="MessageList" Spacing="6"/>
                 </ScrollViewer>
 
                 <Border Grid.Row="1"
@@ -71,7 +66,7 @@
 
                         <TextBox x:Name="ChatInput"
                                  Grid.Column="0"
-                                 PlaceholderText="Nhập tin nhắn..."
+                                 PlaceholderText="Nhập câu hỏi sức khỏe..."
                                  KeyDown="ChatInput_KeyDown"
                                  MinHeight="42"
                                  TextWrapping="Wrap"
@@ -99,7 +94,6 @@
                     </Grid>
                 </Border>
             </Grid>
-
         </Grid>
 
         <Border Grid.Row="3"
@@ -107,7 +101,7 @@
                 BorderBrush="#E5E7EB"
                 BorderThickness="1,1,1,0"
                 Padding="12">
-            <TextBlock Text="Mọi nội dung trao đổi và ghi chú sẽ được lưu cùng phiên khám."
+            <TextBlock Text="Chatbot chỉ hỗ trợ tư vấn cơ bản, không thay thế chẩn đoán của bác sĩ."
                        FontSize="11"
                        Foreground="#64748B"/>
         </Border>

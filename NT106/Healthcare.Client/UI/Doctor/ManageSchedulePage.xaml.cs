@@ -54,11 +54,10 @@ namespace Healthcare.Client.UI.Doctor
             _realtimeTimer.Start();
             RealtimeTimer_Tick(null, null);
 
-            // Set default date for filters
             FilterSlotDatePicker.Date = DateTimeOffset.Now;
         }
 
-        private void RealtimeTimer_Tick(object sender, object e)
+        private void RealtimeTimer_Tick(object? sender, object? e)
         {
             CurrentTimeText.Text = DateTime.Now.ToString("HH:mm:ss");
             CurrentDateText.Text = DateTime.Now.ToString("dddd, dd/MM/yyyy");
@@ -85,14 +84,12 @@ namespace Healthcare.Client.UI.Doctor
                     return true;
                 }
 
-                // TH1: được truyền thẳng User
                 if (parameter is User navUser)
                 {
                     SessionStorage.CurrentUser = navUser;
                     return true;
                 }
 
-                // TH2: được truyền doctorId
                 if (parameter is string doctorIdFromNav && !string.IsNullOrWhiteSpace(doctorIdFromNav))
                 {
                     var userResponse = await _supabase.From<User>().Get();
@@ -105,8 +102,6 @@ namespace Healthcare.Client.UI.Doctor
                     }
                 }
 
-                // TH3: fallback tạm để test nhanh
-                // Lấy bác sĩ đầu tiên trong bảng users
                 var response = await _supabase.From<User>().Get();
                 var firstDoctor = response.Models
                     .FirstOrDefault(u => !string.IsNullOrWhiteSpace(u.Role)
@@ -167,19 +162,20 @@ namespace Healthcare.Client.UI.Doctor
 
                 _allAppointments = response.Models ?? new List<Appointment>();
 
-                // Fetch Patients (Users) - Sử dụng Filter thay vì Where để tránh lỗi scope
                 var pIds = _allAppointments.Select(a => a.PatientId).Distinct().ToList();
                 if (pIds.Any())
                 {
                     var uRes = await _supabase.From<User>()
                         .Filter("id", Postgrest.Constants.Operator.In, pIds)
                         .Get();
+
                     _allPatients = uRes.Models ?? new List<User>();
                 }
 
                 var transResponse = await _supabase
                     .From<Transaction>()
                     .Get();
+
                 _allTransactions = transResponse.Models ?? new List<Transaction>();
 
                 RefreshWeekView();
@@ -203,25 +199,27 @@ namespace Healthcare.Client.UI.Doctor
         {
             AllAppointmentsListVM.Clear();
             var query = _allAppointments.AsEnumerable();
-            
+
             if (_filteredDate.HasValue)
             {
                 query = query.Where(a => a.AppointmentDate.Date == _filteredDate.Value.Date);
             }
 
-            // SẮP XẾP: Cuộc hẹn GẦN NHẤT đến XA NHẤT (Giảm dần)
             var fullList = query
                 .OrderByDescending(a => a.AppointmentDate)
                 .ThenByDescending(a => a.StartTime)
                 .ToList();
 
-            // LOGIC PHÂN TRANG
             int totalItems = fullList.Count;
             int totalPages = (int)Math.Ceiling((double)totalItems / PageSize);
-            if (totalPages == 0) totalPages = 1;
+            if (totalPages == 0)
+                totalPages = 1;
 
-            if (_currentPage > totalPages) _currentPage = totalPages;
-            if (_currentPage < 1) _currentPage = 1;
+            if (_currentPage > totalPages)
+                _currentPage = totalPages;
+
+            if (_currentPage < 1)
+                _currentPage = 1;
 
             var paged = fullList
                 .Skip((_currentPage - 1) * PageSize)
@@ -232,15 +230,23 @@ namespace Healthcare.Client.UI.Doctor
             {
                 var patient = _allPatients.FirstOrDefault(u => u.Id == appt.PatientId);
                 var trans = _allTransactions.FirstOrDefault(t => t.AppointmentId == appt.Id);
-                AllAppointmentsListVM.Add(new AppointmentViewModel(appt, patient?.FullName ?? "Bệnh nhân (ẩn danh)", trans?.PaymentMethod));
+
+                AllAppointmentsListVM.Add(
+                    new AppointmentViewModel(
+                        appt,
+                        patient?.FullName ?? "Bệnh nhân (ẩn danh)",
+                        trans?.PaymentMethod
+                    )
+                );
             }
 
-            // Cập nhật UI phân trang
-            if (PageInfoText != null) 
+            if (PageInfoText != null)
                 PageInfoText.Text = $"Trang {_currentPage} / {totalPages}";
-            if (BtnPrevPage != null) 
+
+            if (BtnPrevPage != null)
                 BtnPrevPage.IsEnabled = _currentPage > 1;
-            if (BtnNextPage != null) 
+
+            if (BtnNextPage != null)
                 BtnNextPage.IsEnabled = _currentPage < totalPages;
         }
 
@@ -261,38 +267,49 @@ namespace Healthcare.Client.UI.Doctor
 
         private void HighlightTodayColumn()
         {
-            var accentBrush      = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(255, 91, 108, 246));  // #5B6CF6
-            var accentLightBrush = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(255, 238, 240, 254)); // #EEF0FE
+            var accentBrush = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(255, 91, 108, 246));
+            var accentLightBrush = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(255, 238, 240, 254));
             var transparentBrush = new SolidColorBrush(Microsoft.UI.Colors.Transparent);
-            var whiteBrush       = new SolidColorBrush(Microsoft.UI.Colors.White);
-            var textPrimaryBrush = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(255, 30, 41, 59));     // TextPrimary
-            var outlineBrush     = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(255, 148, 163, 184)); // #94A3B8
+            var whiteBrush = new SolidColorBrush(Microsoft.UI.Colors.White);
+            var textPrimaryBrush = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(255, 30, 41, 59));
+            var outlineBrush = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(255, 148, 163, 184));
 
-            // Array of all elements to reset
             var headers = new[] { SundayHeader, MondayHeader, TuesdayHeader, WednesdayHeader, ThursdayHeader, FridayHeader, SaturdayHeader };
             var circles = new[] { SundayCircle, MondayCircle, TuesdayCircle, WednesdayCircle, ThursdayCircle, FridayCircle, SaturdayCircle };
-            var dates   = new[] { SundayDate,   MondayDate,   TuesdayDate,   WednesdayDate,   ThursdayDate,   FridayDate,   SaturdayDate   };
-            var labels  = new[] { SundayLabel,  MondayLabel,  TuesdayLabel,  WednesdayLabel,  ThursdayLabel,  FridayLabel,  SaturdayLabel  };
+            var dates = new[] { SundayDate, MondayDate, TuesdayDate, WednesdayDate, ThursdayDate, FridayDate, SaturdayDate };
+            var labels = new[] { SundayLabel, MondayLabel, TuesdayLabel, WednesdayLabel, ThursdayLabel, FridayLabel, SaturdayLabel };
 
-            // Reset all to default
             for (int i = 0; i < 7; i++)
             {
-                if (headers[i] != null) headers[i].Background = transparentBrush;
-                if (circles[i] != null) circles[i].Background = transparentBrush;
-                if (dates[i]   != null) dates[i].Foreground   = textPrimaryBrush;
-                if (labels[i]  != null) labels[i].Foreground  = outlineBrush;
+                if (headers[i] != null)
+                    headers[i].Background = transparentBrush;
+
+                if (circles[i] != null)
+                    circles[i].Background = transparentBrush;
+
+                if (dates[i] != null)
+                    dates[i].Foreground = textPrimaryBrush;
+
+                if (labels[i] != null)
+                    labels[i].Foreground = outlineBrush;
             }
 
-            // Only highlight if today falls within the currently displayed week
-            int todayDow = (int)DateTime.Today.DayOfWeek; // 0=Sun, 1=Mon, ..., 6=Sat
+            int todayDow = (int)DateTime.Today.DayOfWeek;
             DateTime colDate = _currentWeekSunday.AddDays(todayDow);
-            
+
             if (colDate.Date == DateTime.Today)
             {
-                if (headers[todayDow] != null) headers[todayDow].Background = accentLightBrush;
-                if (circles[todayDow] != null) circles[todayDow].Background = accentBrush;
-                if (dates[todayDow]   != null) dates[todayDow].Foreground   = whiteBrush;
-                if (labels[todayDow]  != null) labels[todayDow].Foreground  = accentBrush;
+                if (headers[todayDow] != null)
+                    headers[todayDow].Background = accentLightBrush;
+
+                if (circles[todayDow] != null)
+                    circles[todayDow].Background = accentBrush;
+
+                if (dates[todayDow] != null)
+                    dates[todayDow].Foreground = whiteBrush;
+
+                if (labels[todayDow] != null)
+                    labels[todayDow].Foreground = accentBrush;
             }
         }
 
@@ -317,13 +334,12 @@ namespace Healthcare.Client.UI.Doctor
             FridayDate.Text = _currentWeekSunday.AddDays(5).Day.ToString();
             SaturdayDate.Text = _currentWeekSunday.AddDays(6).Day.ToString();
 
-            // Highlight current day's column header
             HighlightTodayColumn();
 
             var weekAppts = _allAppointments
                 .Where(a => a.AppointmentDate.Date >= _currentWeekSunday.Date
                          && a.AppointmentDate.Date <= endOfWeek.Date)
-                .OrderBy(a => a.StartTime) // Đảm bảo sắp xếp theo giờ khám
+                .OrderBy(a => a.StartTime)
                 .ToList();
 
             foreach (var appt in weekAppts)
@@ -358,7 +374,7 @@ namespace Healthcare.Client.UI.Doctor
                 DateTime cellDate = new DateTime(_currentMonthDate.Year, _currentMonthDate.Month, i);
 
                 int apptCount = _allAppointments.Count(a => a.AppointmentDate.Date == cellDate.Date);
-                bool isToday = (cellDate.Date == DateTime.Today);
+                bool isToday = cellDate.Date == DateTime.Today;
 
                 Border cell = new Border
                 {
@@ -387,6 +403,7 @@ namespace Healthcare.Client.UI.Doctor
                         ? new SolidColorBrush(Color.FromArgb(255, 0, 89, 187))
                         : new SolidColorBrush(Color.FromArgb(255, 0, 0, 0))
                 };
+
                 sp.Children.Add(txtDay);
 
                 if (apptCount > 0)
@@ -411,11 +428,11 @@ namespace Healthcare.Client.UI.Doctor
                 }
 
                 cell.Child = sp;
-                
-                // Sự kiện khi nhấn vào ô ngày
-                cell.Tapped += (s, e) => {
+
+                cell.Tapped += (s, e) =>
+                {
                     _filteredDate = cellDate;
-                    _currentPage = 1; // Reset trang khi chọn ngày mới
+                    _currentPage = 1;
                     ListViewPanel.Visibility = Visibility.Visible;
                     WeekViewPanel.Visibility = Visibility.Collapsed;
                     MonthViewPanel.Visibility = Visibility.Collapsed;
@@ -428,23 +445,24 @@ namespace Healthcare.Client.UI.Doctor
                 Grid.SetColumn(cell, col);
                 MonthCalendarGrid.Children.Add(cell);
 
-                if (col == 6) row++;
+                if (col == 6)
+                    row++;
             }
         }
 
         private async void BtnApprove_Click(object sender, RoutedEventArgs e)
         {
-            string id = (sender as Button)?.CommandParameter?.ToString();
+            string? id = (sender as Button)?.CommandParameter?.ToString();
             await UpdateStatus(id, "Confirmed");
         }
 
         private async void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
-            string id = (sender as Button)?.CommandParameter?.ToString();
+            string? id = (sender as Button)?.CommandParameter?.ToString();
             await UpdateStatus(id, "Cancelled");
         }
 
-        private async Task UpdateStatus(string id, string status)
+        private async Task UpdateStatus(string? id, string status)
         {
             if (string.IsNullOrWhiteSpace(id))
                 return;
@@ -484,13 +502,14 @@ namespace Healthcare.Client.UI.Doctor
 
         private void BtnExamine_Click(object sender, RoutedEventArgs e)
         {
-            string apptId = (sender as Button)?.CommandParameter?.ToString();
+            string? apptId = (sender as Button)?.CommandParameter?.ToString();
             this.Frame.Navigate(typeof(ExaminationPage), apptId);
         }
 
         private void AppointmentCard_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
             var vm = (sender as FrameworkElement)?.DataContext as AppointmentViewModel;
+
             if (vm != null)
             {
                 this.Frame.Navigate(typeof(AppointmentDetailPage), vm.Id);
@@ -504,8 +523,8 @@ namespace Healthcare.Client.UI.Doctor
 
         private void ListTab_Click(object sender, RoutedEventArgs e)
         {
-            _filteredDate = null; // Bấm trực tiếp vào tab Danh sách thì xóa lọc
-            _currentPage = 1;     // Reset về trang đầu
+            _filteredDate = null;
+            _currentPage = 1;
             ListViewPanel.Visibility = Visibility.Visible;
             WeekViewPanel.Visibility = Visibility.Collapsed;
             MonthViewPanel.Visibility = Visibility.Collapsed;
@@ -549,14 +568,14 @@ namespace Healthcare.Client.UI.Doctor
 
         private async Task LoadDoctorSlots()
         {
-            if (SessionStorage.CurrentUser == null || string.IsNullOrEmpty(SessionStorage.CurrentUser.Id)) return;
+            if (SessionStorage.CurrentUser == null || string.IsNullOrEmpty(SessionStorage.CurrentUser.Id))
+                return;
 
             try
             {
                 var query = _supabase.From<TimeSlot>()
                     .Where(x => x.DoctorId == SessionStorage.CurrentUser.Id);
 
-                // Filter by date if set
                 if (FilterSlotDatePicker.Date != null)
                 {
                     var filterDate = FilterSlotDatePicker.Date.DateTime.Date;
@@ -567,6 +586,7 @@ namespace Healthcare.Client.UI.Doctor
                 var allSlots = response.Models ?? new List<TimeSlot>();
 
                 DoctorSlotsList.Clear();
+
                 foreach (var s in allSlots.OrderBy(x => x.SlotDate).ThenBy(x => x.StartTime))
                 {
                     DoctorSlotsList.Add(new SlotViewModel(s));
@@ -580,7 +600,8 @@ namespace Healthcare.Client.UI.Doctor
 
         private async void BtnAutoCreateSlots_Click(object sender, RoutedEventArgs e)
         {
-            if (SessionStorage.CurrentUser == null) return;
+            if (SessionStorage.CurrentUser == null)
+                return;
 
             var date = NewSlotDatePicker.Date.DateTime.Date;
             var start = NewSlotStartTime.Time;
@@ -607,6 +628,7 @@ namespace Healthcare.Client.UI.Doctor
                     EndTime = current + duration,
                     Status = "Available"
                 });
+
                 current += duration + buffer;
             }
 
@@ -619,6 +641,10 @@ namespace Healthcare.Client.UI.Doctor
             try
             {
                 await _supabase.From<TimeSlot>().Insert(slotsToCreate);
+
+                // Đồng bộ bộ lọc ngày sang ngày vừa tạo để bác sĩ thấy ngay
+                FilterSlotDatePicker.Date = NewSlotDatePicker.Date;
+
                 await ShowMsg("Thành công", $"Đã tạo {slotsToCreate.Count} khung giờ cho ngày {date:dd/MM/yyyy}");
                 await LoadDoctorSlots();
             }
@@ -630,13 +656,31 @@ namespace Healthcare.Client.UI.Doctor
 
         private async void BtnDeleteSlot_Click(object sender, RoutedEventArgs e)
         {
-            string id = (sender as Button)?.CommandParameter?.ToString();
-            if (string.IsNullOrEmpty(id)) return;
+            string? id = (sender as Button)?.CommandParameter?.ToString();
+
+            if (string.IsNullOrEmpty(id))
+                return;
+
+            // Hỏi xác nhận trước khi xoá
+            var confirmDialog = new ContentDialog
+            {
+                Title = "Xác nhận xoá",
+                Content = "Bạn có chắc muốn xoá khung giờ này không?",
+                PrimaryButtonText = "Xoá",
+                CloseButtonText = "Huỷ",
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = this.XamlRoot
+            };
+
+            var result = await confirmDialog.ShowAsync();
+            if (result != ContentDialogResult.Primary)
+                return;
 
             try
             {
                 await _supabase.From<TimeSlot>().Where(x => x.Id == id).Delete();
                 await LoadDoctorSlots();
+                await ShowMsg("Thành công", "Đã xoá khung giờ thành công.");
             }
             catch (Exception ex)
             {
@@ -646,8 +690,25 @@ namespace Healthcare.Client.UI.Doctor
 
         private async void BtnDeleteAllAvailableSlots_Click(object sender, RoutedEventArgs e)
         {
-            if (SessionStorage.CurrentUser == null) return;
+            if (SessionStorage.CurrentUser == null)
+                return;
+
             var date = FilterSlotDatePicker.Date.DateTime.Date;
+
+            // Hỏi xác nhận trước khi xoá hàng loạt
+            var confirmDialog = new ContentDialog
+            {
+                Title = "Xác nhận xoá tất cả",
+                Content = $"Bạn có chắc muốn xoá tất cả khung giờ trống ngày {date:dd/MM/yyyy}?",
+                PrimaryButtonText = "Xoá tất cả",
+                CloseButtonText = "Huỷ",
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = this.XamlRoot
+            };
+
+            var result = await confirmDialog.ShowAsync();
+            if (result != ContentDialogResult.Primary)
+                return;
 
             try
             {
@@ -656,7 +717,9 @@ namespace Healthcare.Client.UI.Doctor
                     .Where(x => x.SlotDate == date)
                     .Where(x => x.Status == "Available")
                     .Delete();
+
                 await LoadDoctorSlots();
+                await ShowMsg("Thành công", $"Đã xoá tất cả khung giờ trống ngày {date:dd/MM/yyyy}.");
             }
             catch (Exception ex)
             {
@@ -689,10 +752,25 @@ namespace Healthcare.Client.UI.Doctor
             for (int i = 0; i < buttons.Length; i++)
             {
                 bool isActive = buttons[i] == activeBtn;
-                buttons[i].Background = new SolidColorBrush(isActive ? Color.FromArgb(255, 58, 141, 255) : Colors.Transparent);
-                if (icons[i] != null) icons[i].Foreground = new SolidColorBrush(isActive ? Colors.White : Color.FromArgb(255, 100, 116, 139));
-                if (labels[i] != null) labels[i].Foreground = new SolidColorBrush(isActive ? Colors.White : Color.FromArgb(255, 100, 116, 139));
-                if (labels[i] != null) labels[i].FontWeight = isActive ? Microsoft.UI.Text.FontWeights.Bold : Microsoft.UI.Text.FontWeights.SemiBold;
+
+                buttons[i].Background = new SolidColorBrush(
+                    isActive ? Color.FromArgb(255, 58, 141, 255) : Colors.Transparent
+                );
+
+                if (icons[i] != null)
+                    icons[i].Foreground = new SolidColorBrush(
+                        isActive ? Colors.White : Color.FromArgb(255, 100, 116, 139)
+                    );
+
+                if (labels[i] != null)
+                    labels[i].Foreground = new SolidColorBrush(
+                        isActive ? Colors.White : Color.FromArgb(255, 100, 116, 139)
+                    );
+
+                if (labels[i] != null)
+                    labels[i].FontWeight = isActive
+                        ? Microsoft.UI.Text.FontWeights.Bold
+                        : Microsoft.UI.Text.FontWeights.SemiBold;
             }
         }
 
@@ -723,22 +801,29 @@ namespace Healthcare.Client.UI.Doctor
 
     public class SlotViewModel
     {
-        public string Id { get; set; }
-        public string TimeRange { get; set; }
-        public string DateFormatted { get; set; }
-        public string StatusText { get; set; }
-        public string Status { get; set; }
+        public string Id { get; set; } = string.Empty;
+        public string TimeRange { get; set; } = string.Empty;
+        public string DateFormatted { get; set; } = string.Empty;
+        public string StatusText { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+
         public SolidColorBrush StatusBg => new Microsoft.UI.Xaml.Media.SolidColorBrush(
-            Status == "Available" ? Windows.UI.Color.FromArgb(255, 5, 150, 105) : 
-            (Status == "Booked" ? Windows.UI.Color.FromArgb(255, 0, 89, 187) : Windows.UI.Color.FromArgb(255, 100, 116, 139)));
-        public Visibility CanDeleteVisibility => Status == "Available" ? Visibility.Visible : Visibility.Collapsed;
+            Status == "Available"
+                ? Windows.UI.Color.FromArgb(255, 5, 150, 105)
+                : (Status == "Booked"
+                    ? Windows.UI.Color.FromArgb(255, 0, 89, 187)
+                    : Windows.UI.Color.FromArgb(255, 100, 116, 139)));
+
+        public Visibility CanDeleteVisibility =>
+            Status == "Available" ? Visibility.Visible : Visibility.Collapsed;
 
         public SlotViewModel(TimeSlot model)
         {
-            Id = model.Id;
+            Id = model.Id ?? string.Empty;
             TimeRange = $"{model.StartTime:hh\\:mm} - {model.EndTime:hh\\:mm}";
             DateFormatted = model.SlotDate.ToString("dd/MM/yyyy");
-            Status = model.Status;
+            Status = model.Status ?? string.Empty;
+
             StatusText = Status switch
             {
                 "Available" => "Trống",
@@ -751,34 +836,47 @@ namespace Healthcare.Client.UI.Doctor
 
     public class AppointmentViewModel
     {
-        public string Id { get; set; }
-        public string PatientId { get; set; }
-        public string PatientName { get; set; }
-        public string Time { get; set; }
-        public string BaseStatus { get; set; }
+        public string Id { get; set; } = string.Empty;
+        public string PatientId { get; set; } = string.Empty;
+        public string PatientName { get; set; } = string.Empty;
+        public string Time { get; set; } = string.Empty;
+        public string BaseStatus { get; set; } = string.Empty;
+        public string TypeText { get; set; } = string.Empty;
+        public string PaymentText { get; set; } = string.Empty;
+        public string DateFormatted { get; set; } = string.Empty;
 
-        public Visibility IsPending => BaseStatus == "Pending" ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility IsConfirmed => (BaseStatus == "Confirmed" || BaseStatus == "Arrived") ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility IsOnlineCallVisible => ((BaseStatus == "Confirmed" || BaseStatus == "Arrived") && TypeText == "Online") ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility IsPending =>
+            BaseStatus == "Pending" ? Visibility.Visible : Visibility.Collapsed;
+
+        public Visibility IsConfirmed =>
+            (BaseStatus == "Confirmed" || BaseStatus == "Arrived")
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+
+        public Visibility IsOnlineCallVisible =>
+            ((BaseStatus == "Confirmed" || BaseStatus == "Arrived") && TypeText == "Online")
+                ? Visibility.Visible
+                : Visibility.Collapsed;
 
         public SolidColorBrush BgBrush => new SolidColorBrush(
             BaseStatus == "Pending"
                 ? Color.FromArgb(255, 255, 248, 225)
                 : Color.FromArgb(255, 243, 248, 255));
 
-        public Color BorderColorCode => BaseStatus == "Pending"
-            ? Color.FromArgb(255, 255, 224, 130)
-            : Color.FromArgb(255, 191, 217, 253);
+        public Color BorderColorCode =>
+            BaseStatus == "Pending"
+                ? Color.FromArgb(255, 255, 224, 130)
+                : Color.FromArgb(255, 191, 217, 253);
 
         public SolidColorBrush TagBgBrush => new SolidColorBrush(
             BaseStatus switch
             {
-                "Pending" => Color.FromArgb(255, 255, 179, 0),    // Cam - Chờ duyệt
-                "Confirmed" => Color.FromArgb(255, 0, 89, 187),  // Lam - Sẵn sàng
-                "Arrived" => Color.FromArgb(255, 14, 165, 233),   // Xanh dương nhạt - Đã đến
-                "Completed" => Color.FromArgb(255, 5, 150, 105), // Xanh lá - Hoàn thành
-                "Cancelled" => Color.FromArgb(255, 220, 38, 38), // Đỏ - Đã hủy
-                _ => Color.FromArgb(255, 100, 116, 139)          // Xám - Khác
+                "Pending" => Color.FromArgb(255, 255, 179, 0),
+                "Confirmed" => Color.FromArgb(255, 0, 89, 187),
+                "Arrived" => Color.FromArgb(255, 14, 165, 233),
+                "Completed" => Color.FromArgb(255, 5, 150, 105),
+                "Cancelled" => Color.FromArgb(255, 220, 38, 38),
+                _ => Color.FromArgb(255, 100, 116, 139)
             });
 
         public string StatusText => BaseStatus switch
@@ -790,22 +888,25 @@ namespace Healthcare.Client.UI.Doctor
             "Cancelled" => "Đã hủy",
             _ => "Không rõ"
         };
-        public string TypeText { get; set; }
-        public string PaymentText { get; set; }
-        public string DateFormatted { get; set; }
-        public SolidColorBrush TypeBgBrush => new SolidColorBrush(
-            TypeText == "Online" ? Color.FromArgb(255, 124, 58, 237) : Color.FromArgb(255, 5, 150, 105));
 
-        public AppointmentViewModel(Appointment model, string name, string paymentMethod = null)
+        public SolidColorBrush TypeBgBrush => new SolidColorBrush(
+            TypeText == "Online"
+                ? Color.FromArgb(255, 124, 58, 237)
+                : Color.FromArgb(255, 5, 150, 105));
+
+        public AppointmentViewModel(Appointment model, string name, string? paymentMethod = null)
         {
-            Id = model.Id;
-            PatientId = model.PatientId;
-            PatientName = name;
+            Id = model.Id ?? string.Empty;
+            PatientId = model.PatientId ?? string.Empty;
+            PatientName = name ?? "Bệnh nhân (ẩn danh)";
             Time = $"{model.StartTime:hh\\:mm} - {model.EndTime:hh\\:mm}";
-            BaseStatus = model.Status;
+            BaseStatus = model.Status ?? string.Empty;
             DateFormatted = model.AppointmentDate.ToString("dd/MM/yyyy");
             TypeText = model.ExaminationType ?? "Offline";
-            PaymentText = paymentMethod == "Online" ? "Chuyển khoản" : (paymentMethod == "Manual" ? "Tại quầy" : "Chưa rõ");
+
+            PaymentText = paymentMethod == "Online"
+                ? "Chuyển khoản"
+                : (paymentMethod == "Manual" ? "Tại quầy" : "Chưa rõ");
         }
     }
 }

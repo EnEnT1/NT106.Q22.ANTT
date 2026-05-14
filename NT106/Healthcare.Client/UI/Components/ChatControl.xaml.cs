@@ -1,4 +1,3 @@
-using Healthcare.Client.Models.Core;
 using Healthcare.Client.SupabaseIntegration;
 using Microsoft.UI;
 using Microsoft.UI.Text;
@@ -10,7 +9,8 @@ using Postgrest.Attributes;
 using Postgrest.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Windows.UI;
 using Supabase.Realtime;
@@ -28,8 +28,13 @@ namespace Healthcare.Client.UI.Components
 
         private RealtimeChannel? _chatChannel;
 
-        private string _activeTab = "chat";
         private readonly List<string> _quickNotes = new();
+
+        private readonly HttpClient _httpClient = new HttpClient
+        {
+            // Nhớ sửa port này theo Healthcare.Server/Properties/launchSettings.json
+            BaseAddress = new Uri("https://localhost:5001/")
+        };
 
         public ChatControl()
         {
@@ -37,7 +42,10 @@ namespace Healthcare.Client.UI.Components
             this.Unloaded += OnUnloaded;
         }
 
-        private void OnUnloaded(object sender, RoutedEventArgs e) => Cleanup();
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            Cleanup();
+        }
 
         public async Task InitializeAsync(string appointmentId, string currentUserId, string patientId)
         {
@@ -94,7 +102,11 @@ namespace Healthcare.Client.UI.Components
                     (sender, change) =>
                     {
                         var msg = change.Model<ChatMessageItem>();
-                        if (msg != null && msg.AppointmentId == _appointmentId && msg.SenderId != _currentUserId)
+
+                        if (msg != null &&
+                            msg.AppointmentId == _appointmentId &&
+                            msg.SenderId != _currentUserId &&
+                            msg.SenderId != "AI")
                         {
                             DispatcherQueue.TryEnqueue(() =>
                             {
@@ -105,7 +117,10 @@ namespace Healthcare.Client.UI.Components
 
                 await _chatChannel.Subscribe();
             }
-            catch { }
+            catch
+            {
+               
+            }
         }
 
         private async void BtnSend_Click(object sender, RoutedEventArgs e)
@@ -124,9 +139,12 @@ namespace Healthcare.Client.UI.Components
         private async Task SendMessageAsync()
         {
             var text = ChatInput.Text.Trim();
-            if (string.IsNullOrEmpty(text)) return;
+
+            if (string.IsNullOrEmpty(text))
+                return;
 
             ChatInput.Text = string.Empty;
+            BtnSend.IsEnabled = false;
 
             var msg = new ChatMessageItem
             {
@@ -143,11 +161,57 @@ namespace Healthcare.Client.UI.Components
             {
                 var client = SupabaseManager.Instance.Client;
                 await client.From<ChatMessageItem>().Insert(msg);
+
+                await SendMessageToAiAsync(text);
             }
             catch (Exception ex)
             {
                 await ShowDialogAsync("Lỗi", "Không gửi được tin nhắn: " + ex.Message);
             }
+            finally
+            {
+                BtnSend.IsEnabled = true;
+            }
+        }
+
+        private async Task SendMessageToAiAsync(string userMessage)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/ai/chat", new
+                {
+                    message = userMessage
+                });
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    AppendAiMessage("AI hiện chưa phản hồi được. Vui lòng thử lại sau.");
+                    return;
+                }
+
+                var result = await response.Content.ReadFromJsonAsync<AiChatResponse>();
+
+                AppendAiMessage(result?.Reply ?? "AI chưa có câu trả lời phù hợp.");
+            }
+            catch (Exception ex)
+            {
+                AppendAiMessage("Không kết nối được AI: " + ex.Message);
+            }
+        }
+
+        private void AppendAiMessage(string content)
+        {
+            var msg = new ChatMessageItem
+            {
+                Id = Guid.NewGuid().ToString(),
+                AppointmentId = _appointmentId,
+                SenderId = "AI",
+                Content = content,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            MessageList.Children.Add(BuildBubble(msg, false, "AI"));
+            ScrollToBottom();
         }
 
         private void AppendBubble(ChatMessageItem msg, bool isSelf)
@@ -156,22 +220,23 @@ namespace Healthcare.Client.UI.Components
             ScrollToBottom();
         }
 
-        private UIElement BuildBubble(ChatMessageItem msg, bool isSelf)
+        private UIElement BuildBubble(ChatMessageItem msg, bool isSelf, string? displayName = null)
         {
             var wrapper = new StackPanel
             {
                 Spacing = 3,
                 HorizontalAlignment = isSelf ? HorizontalAlignment.Right : HorizontalAlignment.Left,
-                MaxWidth = 240,
+                MaxWidth = 280,
                 Margin = new Thickness(0, 4, 0, 4)
             };
 
             var time = msg.CreatedAt.ToLocalTime();
+
             wrapper.Children.Add(new TextBlock
             {
                 Text = isSelf
                     ? $"Bạn • {time:HH:mm}"
-                    : $"Bác sĩ/Bệnh nhân • {time:HH:mm}",
+                    : $"{displayName ?? "Bác sĩ/Bệnh nhân"} • {time:HH:mm}",
                 FontSize = 9,
                 FontWeight = FontWeights.Bold,
                 Foreground = new SolidColorBrush(HexToColor("#64748B")),
@@ -203,30 +268,61 @@ namespace Healthcare.Client.UI.Components
 
         private async Task ShowDialogAsync(string title, string message)
         {
-            var d = new ContentDialog { Title = title, Content = message, CloseButtonText = "Đóng", XamlRoot = this.XamlRoot, DefaultButton = ContentDialogButton.Close };
+            var d = new ContentDialog
+            {
+                Title = title,
+                Content = message,
+                CloseButtonText = "Đóng",
+                XamlRoot = this.XamlRoot,
+                DefaultButton = ContentDialogButton.Close
+            };
+
             await d.ShowAsync();
         }
 
         private static Color HexToColor(string hex)
         {
             hex = hex.TrimStart('#');
-            return Color.FromArgb(255, Convert.ToByte(hex.Substring(0, 2), 16), Convert.ToByte(hex.Substring(2, 2), 16), Convert.ToByte(hex.Substring(4, 2), 16));
+
+            return Color.FromArgb(
+                255,
+                Convert.ToByte(hex.Substring(0, 2), 16),
+                Convert.ToByte(hex.Substring(2, 2), 16),
+                Convert.ToByte(hex.Substring(4, 2), 16)
+            );
         }
     }
 
     [Table("chat_messages")]
     public class ChatMessageItem : BaseModel
     {
-        [PrimaryKey("id", false)] public string Id { get; set; } = string.Empty;
-        [Column("appointment_id")] public string AppointmentId { get; set; } = string.Empty;
-        [Column("sender_id")] public string SenderId { get; set; } = string.Empty;
-        [Column("content")] public string Content { get; set; } = string.Empty;
-        [Column("created_at")] public DateTime CreatedAt { get; set; }
+        [PrimaryKey("id", false)]
+        public string Id { get; set; } = string.Empty;
+
+        [Column("appointment_id")]
+        public string AppointmentId { get; set; } = string.Empty;
+
+        [Column("sender_id")]
+        public string SenderId { get; set; } = string.Empty;
+
+        [Column("content")]
+        public string Content { get; set; } = string.Empty;
+
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; }
     }
 
     public class MedicalNotesSavedEventArgs : EventArgs
     {
         public string Diagnosis { get; set; } = string.Empty;
+
         public List<string> QuickNotes { get; set; } = new();
+    }
+
+    public class AiChatResponse
+    {
+        public bool Success { get; set; }
+
+        public string Reply { get; set; } = string.Empty;
     }
 }
