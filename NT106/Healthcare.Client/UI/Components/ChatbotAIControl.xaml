@@ -14,11 +14,12 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- HEADER -->
         <Border Grid.Row="0"
                 Background="White"
                 BorderBrush="#E5E7EB"
                 BorderThickness="0,0,0,1"
-                Padding="16">
+                Padding="16,12">
             <StackPanel Spacing="4">
                 <TextBlock Text="Chatbot AI"
                            FontSize="20"
@@ -31,20 +32,22 @@
             </StackPanel>
         </Border>
 
+        <!-- MESSAGE AREA -->
         <ScrollViewer x:Name="ChatScrollViewer"
                       Grid.Row="1"
                       VerticalScrollBarVisibility="Auto"
-                      Padding="16">
+                      Padding="16,12">
             <StackPanel x:Name="MessageList"
                         Spacing="8"/>
         </ScrollViewer>
 
+        <!-- INPUT AREA -->
         <Border Grid.Row="2"
                 Background="White"
                 BorderBrush="#E5E7EB"
                 BorderThickness="1,1,1,0"
-                Padding="12">
-            <Grid ColumnSpacing="10">
+                Padding="8">
+            <Grid ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
@@ -54,7 +57,7 @@
                          Grid.Column="0"
                          PlaceholderText="Nhập câu hỏi cho ChatGPT..."
                          KeyDown="ChatInput_KeyDown"
-                         MinHeight="42"
+                         MinHeight="40"
                          TextWrapping="Wrap"
                          AcceptsReturn="False"/>
 
@@ -65,30 +68,26 @@
                         Foreground="White"
                         BorderThickness="0"
                         CornerRadius="10"
-                        Padding="14,10">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <FontIcon FontFamily="Segoe MDL2 Assets"
-                                  Glyph="&#xE724;"
-                                  FontSize="13"
-                                  Foreground="White"/>
-
-                        <TextBlock Text="Gửi"
-                                   FontSize="13"
-                                   FontWeight="SemiBold"
-                                   Foreground="White"/>
-                    </StackPanel>
+                        Padding="12,8"
+                        MinWidth="46">
+                    <FontIcon FontFamily="Segoe MDL2 Assets"
+                              Glyph="&#xE724;"
+                              FontSize="13"
+                              Foreground="White"/>
                 </Button>
             </Grid>
         </Border>
 
+        <!-- NOTE -->
         <Border Grid.Row="3"
                 Background="#F8FAFC"
                 BorderBrush="#E5E7EB"
                 BorderThickness="1,1,1,0"
-                Padding="12">
+                Padding="10">
             <TextBlock Text="ChatGPT chỉ hỗ trợ tư vấn cơ bản, không thay thế chẩn đoán của bác sĩ."
                        FontSize="11"
-                       Foreground="#64748B"/>
+                       Foreground="#64748B"
+                       TextWrapping="Wrap"/>
         </Border>
     </Grid>
 </UserControl>
