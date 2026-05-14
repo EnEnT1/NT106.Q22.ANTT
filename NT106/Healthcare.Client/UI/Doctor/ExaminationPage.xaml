@@ -5,21 +5,8 @@
     xmlns:components="using:Healthcare.Client.UI.Components"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
-
-    <Page.Background>
-        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#f0f9ff" Offset="0"/>
-            <GradientStop Color="#e0e7ff" Offset="0.25"/>
-            <GradientStop Color="#faf5ff" Offset="0.50"/>
-            <GradientStop Color="#fdf4ff" Offset="0.75"/>
-            <GradientStop Color="#ffffff" Offset="1"/>
-        </LinearGradientBrush>
-    </Page.Background>
-
-    <Page.Resources>
-        <ThemeShadow x:Name="SharedShadow"/>
-    </Page.Resources>
+    mc:Ignorable="d"
+    Background="{StaticResource AppBackdropGradientBrush}">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -30,7 +17,7 @@
         <!-- LEFT SIDE: DOMINANT VIDEO AREA -->
         <Grid Grid.Column="0" Margin="20">
             <!-- Video call control -->
-            <Border CornerRadius="20" Background="Black" Shadow="{StaticResource SharedShadow}">
+            <Border CornerRadius="20" Background="Black" Shadow="{StaticResource HealthcareThemeShadow}">
                 <components:VideoCallControl x:Name="VideoCall"
                                              CallStarted="VideoCall_CallStarted"
                                              CallEnded="VideoCall_CallEnded"
@@ -91,7 +78,7 @@
             </Grid.RowDefinitions>
 
             <!-- Navigation Tabs -->
-            <Border Grid.Row="0" Background="White" CornerRadius="16" Padding="8" Margin="0,0,0,16" Shadow="{StaticResource SharedShadow}">
+            <Border Grid.Row="0" Background="White" CornerRadius="16" Padding="8" Margin="0,0,0,16" Shadow="{StaticResource HealthcareThemeShadow}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -118,7 +105,7 @@
             <!-- Panels -->
             <Grid Grid.Row="1">
                 <!-- Info Panel -->
-                <Border x:Name="InfoPanel" Visibility="Visible" Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource SharedShadow}">
+                <Border x:Name="InfoPanel" Visibility="Visible" Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource HealthcareThemeShadow}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Spacing="24">
                             <TextBlock Text="Thông tin bệnh nhân" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
@@ -154,12 +141,12 @@
                 </Border>
 
                 <!-- Chat Panel -->
-                <Border x:Name="ChatPanel" Visibility="Collapsed" Background="White" CornerRadius="20" Shadow="{StaticResource SharedShadow}">
+                <Border x:Name="ChatPanel" Visibility="Collapsed" Background="White" CornerRadius="20" Shadow="{StaticResource HealthcareThemeShadow}">
                     <components:ChatControl x:Name="Chat"/>
                 </Border>
 
                 <!-- Notes Panel -->
-                <Border x:Name="NotesPanel" Visibility="Collapsed" Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource SharedShadow}">
+                <Border x:Name="NotesPanel" Visibility="Collapsed" Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource HealthcareThemeShadow}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Spacing="20">
                             <TextBlock Text="Ghi chú &amp; Chẩn đoán" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
@@ -187,7 +174,7 @@
                 </Border>
 
                 <!-- Prescription Panel -->
-                <Border x:Name="PrescriptionPanel" Visibility="Collapsed" Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource SharedShadow}">
+                <Border x:Name="PrescriptionPanel" Visibility="Collapsed" Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource HealthcareThemeShadow}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Spacing="20">
                             <Grid>

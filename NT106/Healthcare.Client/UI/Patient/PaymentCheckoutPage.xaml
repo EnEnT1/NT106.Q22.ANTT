@@ -5,9 +5,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="#F8FAFC">
+    Background="{StaticResource AppBackdropGradientBrush}">
 
-    <Grid>
+    <Grid Margin="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -15,7 +15,7 @@
 
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
             <TextBlock Text="Lịch Sử Giao Dịch" FontSize="28" FontWeight="Bold" Foreground="#0F172A"/>
-            <TextBlock Text="Xem tất cả các khoản thanh toán trực tuyến và tại quầy của bạn" Foreground="#64748B" Margin="0,5,0,0"/>
+            <TextBlock Text="Xem tất cả các khoản thanh toán trực tuyến và tại quầy của bạn" FontSize="15" Foreground="#64748B" Margin="0,5,0,0"/>
         </StackPanel>
 
         <Border Grid.Row="1" Background="White" CornerRadius="12" BorderBrush="#E2E8F0" BorderThickness="1" Padding="20">
@@ -37,11 +37,11 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                     <TextBlock Text="{Binding TransactionRef}" FontWeight="Bold" FontSize="16" Foreground="#1E293B"/>
-                                    <TextBlock Text="{Binding AppointmentId}" FontSize="12" Foreground="#64748B"/>
+                                    <TextBlock Text="{Binding AppointmentId}" FontSize="14" Foreground="#64748B" Margin="0,4,0,0"/>
                                 </StackPanel>
-                                <TextBlock Grid.Column="1" Text="{Binding AmountFormatted}" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#0284C7"/>
-                                <Border Grid.Column="2" Background="{Binding StatusBackgroundColor}" CornerRadius="4" Padding="8,4" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding StatusText}" Foreground="{Binding StatusTextColor}" FontSize="12" FontWeight="Bold"/>
+                                <TextBlock Grid.Column="1" Text="{Binding AmountFormatted}" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,20,0" FontWeight="Bold" Foreground="#0284C7"/>
+                                <Border Grid.Column="2" Background="{Binding StatusBackgroundColor}" CornerRadius="6" Padding="12,6" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding StatusText}" Foreground="{Binding StatusTextColor}" FontSize="13" FontWeight="Bold"/>
                                 </Border>
                             </Grid>
                         </Border>
@@ -58,18 +58,18 @@
                 <TextBlock x:Name="DetailTitle" Text="Chi tiết giao dịch" FontSize="20" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center"/>
                 
                 <Border Background="#F1F5F9" CornerRadius="12" Padding="20">
-                    <StackPanel Spacing="8">
+                    <StackPanel Spacing="12">
                         <Grid>
-                            <TextBlock Text="Số tiền:" Foreground="#64748B"/>
-                            <TextBlock x:Name="DetailAmount" Text="---" FontWeight="Bold" Foreground="#0284C7" HorizontalAlignment="Right"/>
+                            <TextBlock Text="Số tiền:" FontSize="15" Foreground="#64748B" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="DetailAmount" Text="---" FontSize="16" FontWeight="Bold" Foreground="#0284C7" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                         </Grid>
                         <Grid>
-                            <TextBlock Text="Mã giao dịch:" Foreground="#64748B"/>
-                            <TextBlock x:Name="DetailRef" Text="---" Foreground="#1E293B" HorizontalAlignment="Right"/>
+                            <TextBlock Text="Mã giao dịch:" FontSize="15" Foreground="#64748B" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="DetailRef" Text="---" FontSize="15" FontWeight="SemiBold" Foreground="#1E293B" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                         </Grid>
                         <Grid>
-                            <TextBlock Text="Trạng thái:" Foreground="#64748B"/>
-                            <TextBlock x:Name="DetailStatus" Text="---" FontWeight="Bold" HorizontalAlignment="Right"/>
+                            <TextBlock Text="Trạng thái:" FontSize="15" Foreground="#64748B" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="DetailStatus" Text="---" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                         </Grid>
                     </StackPanel>
                 </Border>

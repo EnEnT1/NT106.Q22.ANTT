@@ -6,17 +6,8 @@
     xmlns:comp="using:Healthcare.Client.UI.Components"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
-
-    <Page.Background>
-        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#f0f9ff" Offset="0"/>
-            <GradientStop Color="#e0e7ff" Offset="0.25"/>
-            <GradientStop Color="#faf5ff" Offset="0.50"/>
-            <GradientStop Color="#fdf4ff" Offset="0.75"/>
-            <GradientStop Color="#ffffff" Offset="1"/>
-        </LinearGradientBrush>
-    </Page.Background>
+    mc:Ignorable="d"
+    Background="{StaticResource AppBackdropGradientBrush}">
 
     <Page.Resources>
         <!-- Color Resources -->
@@ -152,15 +143,9 @@
         <!--                  SIDEBAR                  -->
         <!-- ══════════════════════════════════════════ -->
         <Border Grid.Column="0"
+                Background="{StaticResource ShellSidebarAcrylicBrush}"
                 BorderBrush="#D0E4FF"
                 BorderThickness="0,0,1,0">
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Color="#EEF6FF" Offset="0"/>
-                    <GradientStop Color="#E8EEFF" Offset="0.5"/>
-                    <GradientStop Color="#F0EEFF" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>  <!-- Logo -->
@@ -189,8 +174,10 @@
 
                 <!-- Patient Profile Card -->
                 <Border Grid.Row="1" Margin="16,0,16,32"
-                        Background="{StaticResource SlateGray50}"
-                        CornerRadius="16">
+                        Background="{StaticResource GlassCardAcrylicBrush}"
+                        CornerRadius="16"
+                        Translation="0,0,4"
+                        Shadow="{StaticResource HealthcareThemeShadow}">
                     <StackPanel Orientation="Horizontal" Spacing="16" Padding="16">
                         <PersonPicture x:Name="PatientAvatar" Width="44" Height="44"
                                        Initials="BA"/>
@@ -319,7 +306,7 @@
             <!--                 TOP BAR               -->
             <!-- ══════════════════════════════════════ -->
             <Border Grid.Row="0"
-                    Background="#EEF6FF"
+                    Background="{StaticResource ShellTopBarAcrylicBrush}"
                     BorderBrush="#D0E4FF"
                     BorderThickness="0,0,0,1">
                 <Grid Margin="40,0">
@@ -339,10 +326,12 @@
 
                     <!-- Date Badge -->
                     <Border Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,24,0"
-                            Background="White" CornerRadius="16"
+                            Background="{StaticResource GlassCardAcrylicBrush}" CornerRadius="16"
                             Padding="16,8"
                             BorderBrush="{StaticResource BorderSubtleBrush}"
-                            BorderThickness="1">
+                            BorderThickness="1"
+                            Translation="0,0,2"
+                            Shadow="{StaticResource HealthcareThemeShadow}">
                         <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                             <FontIcon Glyph="&#xE787;" FontSize="16"
                                       Foreground="{StaticResource PrimaryBrush}"
@@ -408,7 +397,7 @@
             <!-- ══════════════════════════════════════ -->
             <!--         PAGE CONTENT (Frame)          -->
             <!-- ══════════════════════════════════════ -->
-            <Frame x:Name="ContentFrame" Grid.Row="1"/>
+            <Frame x:Name="ContentFrame" Grid.Row="1" Background="Transparent"/>
         </Grid>
 
         <!-- Floating Action Button (Chat) -->
@@ -416,7 +405,9 @@
                 Style="{StaticResource FABButtonStyle}"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
-                Margin="0,0,40,40">
+                Margin="0,0,40,40"
+                Translation="0,0,8"
+                Shadow="{StaticResource HealthcareThemeShadow}">
             <FontIcon Glyph="&#xE8BD;" FontSize="26" Foreground="White"
                       FontFamily="Segoe Fluent Icons"/>
         </Button>

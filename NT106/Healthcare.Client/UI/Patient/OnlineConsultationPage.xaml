@@ -5,11 +5,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="Transparent">
+    Background="{StaticResource AppBackdropGradientBrush}">
 
     <Page.Resources>
-        <ThemeShadow x:Name="SharedShadow"/>
-        
         <Style x:Key="ActionButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#2563EB"/>
             <Setter Property="Foreground" Value="White"/>
@@ -97,7 +95,7 @@
                     </ListView.ItemContainerStyle>
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource SharedShadow}">
+                            <Border Background="White" CornerRadius="20" Padding="24" Shadow="{StaticResource HealthcareThemeShadow}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
@@ -146,7 +144,7 @@
             <StackPanel Spacing="16">
                 <TextBlock Text="Lịch sử khám trực tuyến" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
                 
-                <Border Background="White" CornerRadius="20" Shadow="{StaticResource SharedShadow}">
+                <Border Background="White" CornerRadius="20" Shadow="{StaticResource HealthcareThemeShadow}">
                     <ListView x:Name="HistoryAppointmentsList" SelectionMode="None" ItemsSource="{x:Bind HistoryAppointments, Mode=OneWay}">
                         <ListView.HeaderTemplate>
                             <DataTemplate>

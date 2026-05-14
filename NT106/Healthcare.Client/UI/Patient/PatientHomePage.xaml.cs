@@ -13,7 +13,7 @@ namespace Healthcare.Client.UI.Patient
     public sealed partial class PatientHomePage : Page
     {
         // Tham chiếu tới PatientShell, nhận qua NavigationEventArgs.Parameter
-        private PatientShell _shell;
+        private PatientShell? _shell;
 
         public PatientHomePage()
         {
