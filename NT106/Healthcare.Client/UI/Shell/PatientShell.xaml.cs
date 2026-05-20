@@ -157,7 +157,7 @@ namespace Healthcare.Client.UI.Shell
         {
             var profile = new ProfileControl
             {
-                Width = 560,
+                Width = 460,
                 Height = 600
             };
 
@@ -177,8 +177,8 @@ namespace Healthcare.Client.UI.Shell
         {
             var chatbot = new ChatbotAIControl
             {
-                Width = 560,
-                Height = 620
+                Width = 460,
+                Height = 500
             };
 
             var dialog = new ContentDialog
