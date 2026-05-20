@@ -469,7 +469,7 @@ namespace Healthcare.Client.UI.Doctor
 
                 if (parent is DoctorShell shell)
                 {
-                    shell.SelectNavItem(pageTag);
+                    shell.SelectPage(pageTag);
                 }
                 else
                 {

@@ -483,38 +483,13 @@
             <!-- ═══════════════════════════════════════════════════════ -->
             <!-- SLOT MANAGEMENT PANEL                                   -->
             <!-- ═══════════════════════════════════════════════════════ -->
-            <Grid x:Name="SlotManagementPanel" Visibility="Collapsed" ColumnSpacing="32">
-                <VisualStateManager.VisualStateGroups>
-                    <VisualStateGroup>
-                        <VisualState x:Name="WideState">
-                            <VisualState.StateTriggers>
-                                <AdaptiveTrigger MinWindowWidth="1000" />
-                            </VisualState.StateTriggers>
-                        </VisualState>
-                        <VisualState x:Name="NarrowState">
-                            <VisualState.StateTriggers>
-                                <AdaptiveTrigger MinWindowWidth="0" />
-                            </VisualState.StateTriggers>
-                            <VisualState.Setters>
-                                <!-- Setters for narrow layout if needed -->
-                                <Setter Target="SlotGrid.ColumnDefinitions[0].Width" Value="*" />
-                                <Setter Target="SlotGrid.ColumnDefinitions[1].Width" Value="0" />
-                                <Setter Target="RightPanelBorder.(Grid.Row)" Value="1" />
-                                <Setter Target="RightPanelBorder.(Grid.Column)" Value="0" />
-                            </VisualState.Setters>
-                        </VisualState>
-                    </VisualStateGroup>
-                </VisualStateManager.VisualStateGroups>
+            <Grid x:Name="SlotManagementPanel" Visibility="Collapsed">
 
-                <Grid x:Name="SlotGrid" ColumnSpacing="32">
+                <Grid x:Name="SlotGrid" ColumnSpacing="28">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="380"/>
+                        <ColumnDefinition Width="360" MinWidth="300"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
 
                     <!-- Left: Configuration Tool -->
                     <Border Grid.Column="0" Style="{StaticResource SurfaceCardStyle}" VerticalAlignment="Top">
@@ -544,17 +519,22 @@
                                 </StackPanel>
                             </Grid>
 
-                            <StackPanel Spacing="8">
-                                <TextBlock Text="Thời lượng (phút)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
-                                <NumberBox x:Name="SlotDurationBox" Value="30" SpinButtonPlacementMode="Inline" HorizontalAlignment="Stretch"/>
-                            </StackPanel>
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="8">
+                                    <TextBlock Text="Thời lượng (phút)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                                    <NumberBox x:Name="SlotDurationBox" Value="30" SpinButtonPlacementMode="Inline" HorizontalAlignment="Stretch"/>
+                                </StackPanel>
+                                <StackPanel Spacing="8" Grid.Column="1">
+                                    <TextBlock Text="Nghỉ giữa ca (phút)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                                    <NumberBox x:Name="BufferDurationBox" Value="5" SpinButtonPlacementMode="Inline" HorizontalAlignment="Stretch"/>
+                                </StackPanel>
+                            </Grid>
 
-                            <StackPanel Spacing="8">
-                                <TextBlock Text="Nghỉ giữa ca (phút)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
-                                <NumberBox x:Name="BufferDurationBox" Value="5" SpinButtonPlacementMode="Inline" HorizontalAlignment="Stretch"/>
-                            </StackPanel>
-
-                            <Button x:Name="BtnAutoCreateSlots" Click="BtnAutoCreateSlots_Click" Content="Tự động tạo ca" Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Stretch" Margin="0,12,0,0"/>
+                            <Button x:Name="BtnAutoCreateSlots" Click="BtnAutoCreateSlots_Click" Content="Tự động tạo ca" Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
                         </StackPanel>
                     </Border>
 
@@ -570,16 +550,28 @@
                                     <TextBlock Text="Danh Sách Ca Khám" FontSize="20" FontWeight="Bold"/>
                                     <TextBlock Text="Các khung giờ hiện có trong hệ thống" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
                                 </StackPanel>
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
-                                    <DatePicker x:Name="FilterSlotDatePicker" DateChanged="FilterSlotDatePicker_DateChanged" Height="38"/>
-                                    <Button Click="BtnDeleteAllAvailableSlots_Click" Content="Xóa trống" Foreground="{StaticResource DangerRed}" Background="Transparent" BorderThickness="1" BorderBrush="#FECACA" HorizontalAlignment="Right"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                    <DatePicker x:Name="FilterSlotDatePicker" DateChanged="FilterSlotDatePicker_DateChanged" VerticalAlignment="Center"/>
+                                    <Button Click="BtnDeleteAllAvailableSlots_Click" Background="Transparent" BorderThickness="1" BorderBrush="#FECACA" Padding="12,8" CornerRadius="8" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <FontIcon Glyph="&#xE74D;" FontSize="12" Foreground="{StaticResource DangerRed}"/>
+                                            <TextBlock Text="Xóa trống" FontSize="13" Foreground="{StaticResource DangerRed}"/>
+                                        </StackPanel>
+                                    </Button>
                                 </StackPanel>
                             </Grid>
 
-                            <ListView x:Name="SlotsListView" ItemsSource="{x:Bind DoctorSlotsList}" SelectionMode="None">
+                            <ListView x:Name="SlotsListView" ItemsSource="{x:Bind DoctorSlotsList}" SelectionMode="None" MaxHeight="480">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="MinHeight" Value="0"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
                                 <ListView.ItemTemplate>
                                     <DataTemplate x:DataType="local:SlotViewModel">
-                                        <Grid Padding="8,12" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" ColumnSpacing="20">
+                                        <Grid Padding="4,12" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" ColumnSpacing="16">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="*"/>
@@ -587,18 +579,20 @@
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             
-                                            <FontIcon Glyph="&#xE822;" FontSize="18" Foreground="{StaticResource MedicalBlue}" VerticalAlignment="Center"/>
+                                            <Border Width="36" Height="36" CornerRadius="10" Background="{StaticResource MedicalBlueLight}" VerticalAlignment="Center">
+                                                <FontIcon Glyph="&#xE822;" FontSize="16" Foreground="{StaticResource MedicalBlue}"/>
+                                            </Border>
                                             
-                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                <TextBlock Text="{x:Bind TimeRange}" FontWeight="Bold" FontSize="15" Foreground="{StaticResource TextPrimary}"/>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                                <TextBlock Text="{x:Bind TimeRange}" FontWeight="Bold" FontSize="14" Foreground="{StaticResource TextPrimary}"/>
                                                 <TextBlock Text="{x:Bind DateFormatted}" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
                                             </StackPanel>
 
-                                            <Border Grid.Column="2" Background="{x:Bind StatusBg}" CornerRadius="12" Padding="12,3" VerticalAlignment="Center">
-                                                <TextBlock Text="{x:Bind StatusText}" FontSize="10" Foreground="White" FontWeight="Bold"/>
+                                            <Border Grid.Column="2" Background="{x:Bind StatusBg}" CornerRadius="10" Padding="10,4" VerticalAlignment="Center">
+                                                <TextBlock Text="{x:Bind StatusText}" FontSize="11" Foreground="White" FontWeight="Bold"/>
                                             </Border>
 
-                                            <Button Grid.Column="3" Click="BtnDeleteSlot_Click" CommandParameter="{x:Bind Id}" Visibility="{x:Bind CanDeleteVisibility}" Style="{StaticResource NavIconButtonStyle}" Foreground="{StaticResource DangerRed}">
+                                            <Button Grid.Column="3" Click="BtnDeleteSlot_Click" CommandParameter="{x:Bind Id}" Visibility="{x:Bind CanDeleteVisibility}" Style="{StaticResource NavIconButtonStyle}" Foreground="{StaticResource DangerRed}" VerticalAlignment="Center">
                                                 <FontIcon Glyph="&#xE74D;" FontSize="14"/>
                                             </Button>
                                         </Grid>
