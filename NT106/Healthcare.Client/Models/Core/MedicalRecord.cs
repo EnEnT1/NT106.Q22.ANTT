@@ -1,6 +1,7 @@
 using Postgrest.Attributes;
 using Postgrest.Models;
 using System;
+using System.Collections.Generic;
 
 namespace Healthcare.Client.Models.Core
 {
@@ -18,7 +19,7 @@ namespace Healthcare.Client.Models.Core
         [Column("diagnosis")] public string Diagnosis { get; set; }
         [Column("prescription_image_url")] public string PrescriptionImageUrl { get; set; }
 
-        [Column("ai_medicines")] public string AiMedicines { get; set; }
+        [Column("ai_medicines")] public List<string> AiMedicines { get; set; } = new List<string>();
 
         [Column("created_at")] public DateTime CreatedAt { get; set; }
     }

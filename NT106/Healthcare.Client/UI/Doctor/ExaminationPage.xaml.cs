@@ -487,7 +487,7 @@ namespace Healthcare.Client.UI.Doctor
                     PatientId = _patientId,
                     Diagnosis = DiagnosisBox.Text ?? string.Empty,
                     PrescriptionImageUrl = string.Empty,
-                    AiMedicines = string.Join(" | ", _quickNotes),
+                    AiMedicines = _quickNotes.ToList(),
                     CreatedAt = DateTime.Now
                 };
                 await client.From<MedicalRecord>().Insert(record);
@@ -525,7 +525,7 @@ namespace Healthcare.Client.UI.Doctor
                         PatientId = _patientId,
                         DoctorId = _currentUserId,
                         Diagnosis = DiagnosisBox.Text ?? string.Empty,
-                        AiMedicines = string.Join(" | ", _quickNotes),
+                        AiMedicines = _quickNotes.ToList(),
                         CreatedAt = DateTime.Now
                     };
 

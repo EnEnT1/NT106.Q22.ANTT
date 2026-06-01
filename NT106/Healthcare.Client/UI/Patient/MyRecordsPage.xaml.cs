@@ -70,9 +70,9 @@ namespace Healthcare.Client.UI.Patient
                         var docName = await GetDoctorName(rec.DoctorId);
                         
                         string medList = "Không có đơn thuốc";
-                        if (!string.IsNullOrEmpty(rec.AiMedicines))
+                        if (rec.AiMedicines != null && rec.AiMedicines.Count > 0)
                         {
-                            medList = rec.AiMedicines;
+                            medList = string.Join(", ", rec.AiMedicines);
                         }
 
                         _records.Add(new RecordViewModel

@@ -248,7 +248,7 @@ namespace Healthcare.Client.UI.Doctor
             {
                 DiagnosisText.Text = _medicalRecord.Diagnosis ?? "Bác sĩ chưa có ghi chú cho cuộc khám này.";
                 NoteDateText.Text = _medicalRecord.CreatedAt.ToString("MMM dd, hh:mm tt");
-                MedicineText.Text = !string.IsNullOrEmpty(_medicalRecord.AiMedicines) ? "Đã kê thuốc" : "Không có thuốc";
+                MedicineText.Text = (_medicalRecord.AiMedicines != null && _medicalRecord.AiMedicines.Count > 0) ? "Đã kê thuốc" : "Không có thuốc";
             }
 
             // Timeline

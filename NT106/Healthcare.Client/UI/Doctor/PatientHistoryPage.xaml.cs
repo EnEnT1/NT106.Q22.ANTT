@@ -316,7 +316,7 @@ namespace Healthcare.Client.UI.Doctor
 
         private void BindMedication(MedicalRecord? latestRecord)
         {
-            if (latestRecord == null || string.IsNullOrWhiteSpace(latestRecord.AiMedicines))
+            if (latestRecord == null || latestRecord.AiMedicines == null || latestRecord.AiMedicines.Count == 0)
             {
                 TxtMedName.Text = "Chưa cập nhật";
                 TxtMedDosage.Text = "Chưa cập nhật";
@@ -324,7 +324,7 @@ namespace Healthcare.Client.UI.Doctor
                 return;
             }
 
-            TxtMedName.Text = latestRecord.AiMedicines;
+            TxtMedName.Text = string.Join(", ", latestRecord.AiMedicines);
             TxtMedDosage.Text = "Theo chỉ định gần nhất";
             TxtMedPeriod.Text = $"{latestRecord.CreatedAt:yyyy} - Hiện tại";
         }

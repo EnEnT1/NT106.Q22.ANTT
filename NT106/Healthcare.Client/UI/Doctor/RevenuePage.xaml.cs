@@ -93,9 +93,9 @@ namespace Healthcare.Client.UI.Doctor
                             DiagnosisText = string.IsNullOrWhiteSpace(record.Diagnosis)
                                 ? "Chưa có chẩn đoán"
                                 : "Chẩn đoán: " + record.Diagnosis,
-                            MedicineText = string.IsNullOrWhiteSpace(record.AiMedicines)
+                            MedicineText = (record.AiMedicines == null || record.AiMedicines.Count == 0)
                                 ? "Thuốc/đơn thuốc: Chưa cập nhật"
-                                : "Thuốc/đơn thuốc: " + record.AiMedicines,
+                                : "Thuốc/đơn thuốc: " + string.Join(", ", record.AiMedicines),
                             PaymentStatus = status,
                             PaymentStatusText = GetPaymentStatusText(status),
                             Amount = amount,
