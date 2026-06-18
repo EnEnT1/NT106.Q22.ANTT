@@ -129,8 +129,9 @@ namespace Healthcare.Client.UI.Doctor
             
             RoomCodeText.Text = _appointment.RoomCode ?? "CHƯA CÓ MÃ";
 
-            // Logic Ẩn nút Hủy nếu đã hoàn thành
-            BtnTopCancel.Visibility = _appointment.Status == "Completed" ? Visibility.Collapsed : Visibility.Visible;
+            // Logic Ẩn nút Hủy nếu đã hoàn thành hoặc vắng mặt
+            BtnTopCancel.Visibility = (_appointment.Status == "Completed" || _appointment.Status == "Missed") ? Visibility.Collapsed : Visibility.Visible;
+            BtnExamineEdit.Visibility = (_appointment.Status == "Completed" || _appointment.Status == "Cancelled" || _appointment.Status == "Missed") ? Visibility.Collapsed : Visibility.Visible;
 
             // Logic Gọi Video (Chỉ Online và ĐÚNG GIỜ)
             bool isOnline = _appointment.ExaminationType == "Online";
@@ -138,7 +139,7 @@ namespace Healthcare.Client.UI.Doctor
             DateTime appointmentEndFullDateTime = appointmentFullDateTime.AddMinutes(30);
             bool isOnTime = DateTime.Now >= appointmentFullDateTime.AddMinutes(-5) && DateTime.Now <= appointmentEndFullDateTime;
 
-            if (isOnline)
+            if (isOnline && _appointment.Status != "Missed" && _appointment.Status != "Cancelled" && _appointment.Status != "Completed")
             {
                 BtnCallAction.IsEnabled = isOnTime;
                 CallBtnLabel.Text = isOnTime ? "Gọi Video" : "Chưa đến giờ";
@@ -147,7 +148,7 @@ namespace Healthcare.Client.UI.Doctor
             else
             {
                 BtnCallAction.IsEnabled = false;
-                CallBtnLabel.Text = "Khám tại chỗ";
+                CallBtnLabel.Text = isOnline ? "Gọi Video" : "Khám tại chỗ";
                 BtnCallAction.Opacity = 0.5;
             }
 
@@ -187,6 +188,14 @@ namespace Healthcare.Client.UI.Doctor
             {
                 StatusText.Text = "ĐÃ HỦY";
                 StatusBadge.Background = new SolidColorBrush(Color.FromArgb(255, 225, 29, 72)); // Rose
+                BtnTopApprove.Visibility = Visibility.Collapsed;
+                BtnTopCancel.Visibility = Visibility.Collapsed;
+                BtnTopVideoCall.Visibility = Visibility.Collapsed;
+            }
+            else if (_appointment.Status == "Missed")
+            {
+                StatusText.Text = "VẮNG MẶT";
+                StatusBadge.Background = new SolidColorBrush(Color.FromArgb(255, 100, 116, 139)); // Slate gray
                 BtnTopApprove.Visibility = Visibility.Collapsed;
                 BtnTopCancel.Visibility = Visibility.Collapsed;
                 BtnTopVideoCall.Visibility = Visibility.Collapsed;
@@ -235,6 +244,16 @@ namespace Healthcare.Client.UI.Doctor
                 TimelineEndTime.Text = "Giao dịch đã bị chấm dứt";
                 TimelineEndReason.Visibility = Visibility.Visible;
                 TimelineEndReasonText.Text = "Lý do: Lịch hẹn không được thực hiện hoặc đã bị bác sĩ/bệnh nhân hủy.";
+            }
+            else if (_appointment.Status == "Missed")
+            {
+                TimelineEndTitle.Text = "VẮNG MẶT";
+                TimelineEndTitle.Foreground = new SolidColorBrush(Color.FromArgb(255, 100, 116, 139));
+                TimelineEndIconBg.Fill = new SolidColorBrush(Color.FromArgb(255, 100, 116, 139));
+                TimelineEndIcon.Glyph = "\xE711";
+                TimelineEndTime.Text = "Không thực hiện cuộc hẹn";
+                TimelineEndReason.Visibility = Visibility.Visible;
+                TimelineEndReasonText.Text = "Lý do: Cuộc hẹn đã bị quá giờ mà bệnh nhân không tham gia khám.";
             }
             else if (_appointment.Status == "Confirmed" || _appointment.Status == "Arrived")
             {

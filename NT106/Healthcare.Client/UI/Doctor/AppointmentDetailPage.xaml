@@ -124,7 +124,7 @@
                                         <TextBlock Text="Ghi chú lâm sàng" FontWeight="Bold" FontSize="20" Foreground="#1E293B" VerticalAlignment="Center"/>
                                     </StackPanel>
                                     
-                                    <Button HorizontalAlignment="Right" Click="BtnExamine_Click" Background="Transparent" Padding="8,4">
+                                    <Button x:Name="BtnExamineEdit" HorizontalAlignment="Right" Click="BtnExamine_Click" Background="Transparent" Padding="8,4">
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <FontIcon Glyph="&#xE70F;" FontSize="12" Foreground="#0284C7"/>
                                             <TextBlock Text="Chỉnh sửa" FontSize="13" Foreground="#0284C7" FontWeight="Bold"/>

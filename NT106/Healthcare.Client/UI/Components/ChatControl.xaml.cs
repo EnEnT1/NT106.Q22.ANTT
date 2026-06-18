@@ -70,7 +70,8 @@ namespace Healthcare.Client.UI.Components
 
                 var response = await client
                     .From<ChatMessageItem>()
-                    .Where(m => m.AppointmentId == _appointmentId)
+                    .Where(x => (x.SenderId == _currentUserId && x.ReceiverId == _patientId) || 
+                                (x.SenderId == _patientId && x.ReceiverId == _currentUserId))
                     .Order("created_at", Postgrest.Constants.Ordering.Ascending)
                     .Get();
 
@@ -104,9 +105,8 @@ namespace Healthcare.Client.UI.Components
                         var msg = change.Model<ChatMessageItem>();
 
                         if (msg != null &&
-                            msg.AppointmentId == _appointmentId &&
-                            msg.SenderId != _currentUserId &&
-                            msg.SenderId != "AI")
+                            msg.SenderId == _patientId &&
+                            msg.ReceiverId == _currentUserId)
                         {
                             DispatcherQueue.TryEnqueue(() =>
                             {
@@ -149,9 +149,10 @@ namespace Healthcare.Client.UI.Components
             var msg = new ChatMessageItem
             {
                 Id = Guid.NewGuid().ToString(),
-                AppointmentId = _appointmentId,
                 SenderId = _currentUserId,
-                Content = text,
+                ReceiverId = _patientId,
+                MessageText = text,
+                IsRead = false,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -204,9 +205,9 @@ namespace Healthcare.Client.UI.Components
             var msg = new ChatMessageItem
             {
                 Id = Guid.NewGuid().ToString(),
-                AppointmentId = _appointmentId,
                 SenderId = "AI",
-                Content = content,
+                ReceiverId = _currentUserId,
+                MessageText = content,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -250,7 +251,7 @@ namespace Healthcare.Client.UI.Components
                 Padding = new Thickness(12, 8, 12, 8),
                 Child = new TextBlock
                 {
-                    Text = msg.Content ?? string.Empty,
+                    Text = msg.MessageText ?? string.Empty,
                     FontSize = 13,
                     TextWrapping = TextWrapping.Wrap,
                     Foreground = new SolidColorBrush(isSelf ? Colors.White : HexToColor("#1E293B"))
@@ -299,14 +300,17 @@ namespace Healthcare.Client.UI.Components
         [PrimaryKey("id", false)]
         public string Id { get; set; } = string.Empty;
 
-        [Column("appointment_id")]
-        public string AppointmentId { get; set; } = string.Empty;
-
         [Column("sender_id")]
         public string SenderId { get; set; } = string.Empty;
 
-        [Column("content")]
-        public string Content { get; set; } = string.Empty;
+        [Column("receiver_id")]
+        public string ReceiverId { get; set; } = string.Empty;
+
+        [Column("message_text")]
+        public string MessageText { get; set; } = string.Empty;
+
+        [Column("is_read")]
+        public bool? IsRead { get; set; }
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }

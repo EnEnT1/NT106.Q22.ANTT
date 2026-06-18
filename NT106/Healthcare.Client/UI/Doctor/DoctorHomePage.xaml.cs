@@ -169,7 +169,7 @@ namespace Healthcare.Client.UI.Doctor
                         ? name
                         : "Bệnh nhân ẩn danh";
 
-                    var statusInfo = GetQueueStatusInfo(appt.Status ?? string.Empty);
+                    var statusInfo = GetQueueStatusInfo(appt.Status ?? string.Empty, appt.ExaminationType ?? "Offline");
 
                     bool isPriority =
                         appt.Status == "In Progress" ||
@@ -203,7 +203,7 @@ namespace Healthcare.Client.UI.Doctor
             }
         }
 
-        private (string Text, Brush Bg, Brush Fg) GetQueueStatusInfo(string status)
+        private (string Text, Brush Bg, Brush Fg) GetQueueStatusInfo(string status, string examType)
         {
             return status switch
             {
@@ -220,7 +220,7 @@ namespace Healthcare.Client.UI.Doctor
                 ),
 
                 "Confirmed" => (
-                    "CHƯA ĐẾN",
+                    examType == "Online" ? "CHỜ KHÁM" : "CHƯA ĐẾN",
                     new SolidColorBrush(Color.FromArgb(255, 241, 245, 249)),
                     new SolidColorBrush(Color.FromArgb(255, 100, 116, 139))
                 ),
@@ -241,6 +241,12 @@ namespace Healthcare.Client.UI.Doctor
                     "ĐÃ HỦY",
                     new SolidColorBrush(Color.FromArgb(255, 254, 226, 226)),
                     new SolidColorBrush(Color.FromArgb(255, 220, 38, 38))
+                ),
+
+                "Missed" => (
+                    "VẮNG MẶT",
+                    new SolidColorBrush(Color.FromArgb(255, 241, 245, 249)),
+                    new SolidColorBrush(Color.FromArgb(255, 100, 116, 139))
                 ),
 
                 _ => (

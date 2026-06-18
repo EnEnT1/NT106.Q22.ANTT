@@ -7,6 +7,7 @@ using Healthcare.Client.UI.Components;
 using Healthcare.Client.Models.Core;
 using Healthcare.Client.Models.Identity;
 using Healthcare.Client.SupabaseIntegration;
+using Healthcare.Client.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -43,7 +44,244 @@ namespace Healthcare.Client.UI.Patient
 
         private async void PatientHomePage_Loaded(object sender, RoutedEventArgs e)
         {
+            LoadWelcomeText();
+            await LoadUpcomingAppointmentAsync();
+            await LoadHealthMetricsAsync();
             await LoadSuggestedDoctorsAsync();
+        }
+
+        private void LoadWelcomeText()
+        {
+            var user = SessionStorage.CurrentUser;
+            var hour = DateTime.Now.Hour;
+            string greeting = hour < 12 ? "Chào buổi sáng"
+                : hour < 18 ? "Chào buổi chiều"
+                : "Chào buổi tối";
+            
+            WelcomeTextBlock.Text = $"{greeting}, {(user != null ? (user.FullName ?? "Bệnh nhân") : "Bệnh nhân")}";
+        }
+
+        private async Task LoadUpcomingAppointmentAsync()
+        {
+            try
+            {
+                var user = SessionStorage.CurrentUser;
+                if (user == null || string.IsNullOrWhiteSpace(user.Id))
+                {
+                    AppointmentActiveState.Visibility = Visibility.Collapsed;
+                    AppointmentEmptyState.Visibility = Visibility.Visible;
+                    return;
+                }
+
+                var client = SupabaseManager.Instance.Client;
+
+                var apptResponse = await client
+                    .From<Appointment>()
+                    .Where(x => x.PatientId == user.Id)
+                    .Get();
+
+                var appointments = apptResponse.Models ?? new List<Appointment>();
+
+                var upcomingAppt = appointments
+                    .Where(x => x.AppointmentDate.Date >= DateTime.Today && 
+                                x.Status != "Completed" && 
+                                x.Status != "Cancelled")
+                    .OrderBy(x => x.AppointmentDate)
+                    .ThenBy(x => x.StartTime)
+                    .FirstOrDefault();
+
+                if (upcomingAppt == null)
+                {
+                    AppointmentActiveState.Visibility = Visibility.Collapsed;
+                    AppointmentEmptyState.Visibility = Visibility.Visible;
+                    return;
+                }
+
+                string doctorName = "Bác sĩ";
+                string specialty = "Chuyên khoa";
+                string initials = "BS";
+
+                if (!string.IsNullOrWhiteSpace(upcomingAppt.DoctorId))
+                {
+                    var doctorUserResponse = await client
+                        .From<User>()
+                        .Where(x => x.Id == upcomingAppt.DoctorId)
+                        .Get();
+                    
+                    var doctorUser = doctorUserResponse.Models?.FirstOrDefault();
+                    if (doctorUser != null)
+                    {
+                        doctorName = doctorUser.FullName ?? "Bác sĩ";
+                        if (!doctorName.StartsWith("BS", StringComparison.OrdinalIgnoreCase))
+                        {
+                            doctorName = "BS. " + doctorName;
+                        }
+                        initials = GetInitials(doctorUser.FullName);
+                    }
+
+                    var doctorProfileResponse = await client
+                        .From<DoctorProfile>()
+                        .Where(x => x.DoctorId == upcomingAppt.DoctorId)
+                        .Get();
+                    
+                    var doctorProfile = doctorProfileResponse.Models?.FirstOrDefault();
+                    if (doctorProfile != null)
+                    {
+                        var spec = GetDoctorSpecialty(doctorProfile);
+                        if (!string.IsNullOrWhiteSpace(spec))
+                        {
+                            specialty = spec;
+                        }
+                    }
+                }
+
+                var apptDate = upcomingAppt.AppointmentDate;
+                string[] dayNames = { "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy" };
+                string dayOfWeekStr = dayNames[(int)apptDate.DayOfWeek];
+                
+                AppointmentDateTextBlock.Text = $"{dayOfWeekStr}, {apptDate:dd} Tháng {apptDate:MM}";
+                AppointmentTimeTextBlock.Text = DateTime.Today.Add(upcomingAppt.StartTime).ToString("hh:mm tt");
+                
+                AppointmentDoctorNameTextBlock.Text = doctorName;
+                AppointmentDoctorSpecialtyTextBlock.Text = specialty;
+                AppointmentDoctorPicture.Initials = initials;
+
+                AppointmentActiveState.Visibility = Visibility.Visible;
+                AppointmentEmptyState.Visibility = Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error loading upcoming appointment: " + ex.Message);
+                AppointmentActiveState.Visibility = Visibility.Collapsed;
+                AppointmentEmptyState.Visibility = Visibility.Visible;
+            }
+        }
+
+        private async Task LoadHealthMetricsAsync()
+        {
+            try
+            {
+                var user = SessionStorage.CurrentUser;
+                if (user == null || string.IsNullOrWhiteSpace(user.Id))
+                {
+                    HealthIndicatorsCard.Visibility = Visibility.Collapsed;
+                    Grid.SetColumnSpan(UpcomingAppointmentCard, 2);
+                    return;
+                }
+
+                var client = SupabaseManager.Instance.Client;
+                var healthMetricsResponse = await client
+                    .From<HealthMetric>()
+                    .Where(x => x.PatientId == user.Id)
+                    .Get();
+
+                var healthMetrics = healthMetricsResponse.Models ?? new List<HealthMetric>();
+
+                if (healthMetrics.Count == 0)
+                {
+                    HealthIndicatorsCard.Visibility = Visibility.Collapsed;
+                    Grid.SetColumnSpan(UpcomingAppointmentCard, 2);
+                }
+                else
+                {
+                    HealthIndicatorsCard.Visibility = Visibility.Visible;
+                    Grid.SetColumnSpan(UpcomingAppointmentCard, 1);
+
+                    var latestBp = healthMetrics
+                        .Where(x => x.MetricType != null &&
+                                    (x.MetricType.Equals("blood_pressure", StringComparison.OrdinalIgnoreCase) ||
+                                     x.MetricType.Equals("huyết áp", StringComparison.OrdinalIgnoreCase)))
+                        .OrderByDescending(x => x.MeasuredAt)
+                        .FirstOrDefault();
+
+                    var latestHr = healthMetrics
+                        .Where(x => x.MetricType != null &&
+                                    (x.MetricType.Equals("heart_rate", StringComparison.OrdinalIgnoreCase) ||
+                                     x.MetricType.Equals("nhịp tim", StringComparison.OrdinalIgnoreCase)))
+                        .OrderByDescending(x => x.MeasuredAt)
+                        .FirstOrDefault();
+
+                    if (latestBp == null && latestHr == null)
+                    {
+                        HealthIndicatorsCard.Visibility = Visibility.Collapsed;
+                        Grid.SetColumnSpan(UpcomingAppointmentCard, 2);
+                        return;
+                    }
+
+                    var latestTime = healthMetrics.Max(x => x.MeasuredAt);
+                    var timeDiff = DateTime.UtcNow - latestTime.ToUniversalTime();
+                    string timeDiffStr;
+                    if (timeDiff.TotalMinutes < 60)
+                    {
+                        timeDiffStr = $"Cập nhật {(int)Math.Max(1, timeDiff.TotalMinutes)} phút trước";
+                    }
+                    else if (timeDiff.TotalHours < 24)
+                    {
+                        timeDiffStr = $"Cập nhật {(int)timeDiff.TotalHours} giờ trước";
+                    }
+                    else
+                    {
+                        timeDiffStr = $"Cập nhật {latestTime.ToLocalTime():dd/MM/yyyy}";
+                    }
+
+                    HealthMetricsUpdateTimeTextBlock.Text = timeDiffStr;
+
+                    if (latestBp != null)
+                    {
+                        var diastolic = healthMetrics
+                            .Where(x => x.MetricType != null &&
+                                        (x.MetricType.Equals("diastolic", StringComparison.OrdinalIgnoreCase) ||
+                                         x.MetricType.Equals("huyết áp tâm trương", StringComparison.OrdinalIgnoreCase)))
+                            .OrderByDescending(x => x.MeasuredAt)
+                            .FirstOrDefault();
+
+                        if (diastolic != null)
+                        {
+                            BloodPressureValueTextBlock.Text = $"{(int)latestBp.Value}/{(int)diastolic.Value}";
+                        }
+                        else
+                        {
+                            BloodPressureValueTextBlock.Text = $"{(int)latestBp.Value}/80";
+                        }
+                        BloodPressureStatusTextBlock.Text = EvaluateBloodPressure(BloodPressureValueTextBlock.Text);
+                    }
+                    else
+                    {
+                        BloodPressureValueTextBlock.Text = "--/--";
+                        BloodPressureStatusTextBlock.Text = "Chưa đo";
+                    }
+
+                    if (latestHr != null)
+                    {
+                        HeartRateValueTextBlock.Text = $"{(int)latestHr.Value}";
+                        HeartRateStatusTextBlock.Text = latestHr.Value >= 60 && latestHr.Value <= 100 ? "Ổn định" : "Cần theo dõi";
+                    }
+                    else
+                    {
+                        HeartRateValueTextBlock.Text = "--";
+                        HeartRateStatusTextBlock.Text = "Chưa đo";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error loading health metrics: " + ex.Message);
+                HealthIndicatorsCard.Visibility = Visibility.Collapsed;
+                Grid.SetColumnSpan(UpcomingAppointmentCard, 2);
+            }
+        }
+
+        private static string EvaluateBloodPressure(string bpText)
+        {
+            var parts = bpText.Split('/');
+            if (parts.Length != 2) return "Bình thường";
+            if (!int.TryParse(parts[0].Trim(), out int sys)) return "Bình thường";
+            if (!int.TryParse(parts[1].Trim(), out int dia)) return "Bình thường";
+
+            if (sys < 120 && dia < 80) return "Bình thường";
+            if (sys < 130 && dia < 80) return "Cao - GĐ 1";
+            if (sys < 140 || dia < 90) return "Cao - GĐ 2";
+            return "Tăng huyết áp";
         }
 
         private async Task LoadSuggestedDoctorsAsync()
@@ -174,7 +412,7 @@ namespace Healthcare.Client.UI.Patient
 
         private void QuickAccess_OnlineConsult_Click(object sender, RoutedEventArgs e)
         {
-            _shell?.NavigateToPage(typeof(LabResultsPage));
+            _shell?.NavigateToPage(typeof(OnlineConsultationPage));
         }
 
         private void QuickAccess_Records_Click(object sender, RoutedEventArgs e)

@@ -50,9 +50,32 @@ namespace Healthcare.Client.UI.Auth
             string username = UsernameBox.Text.Trim();
             string password = PasswordBox.Password;
 
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            // 1. Kiểm tra email đăng nhập trống
+            if (string.IsNullOrEmpty(username))
             {
-                await ShowDialogAsync("Thông tin chưa đầy đủ", "Vui lòng nhập tên đăng nhập và mật khẩu.");
+                await ShowDialogAsync("Thiếu thông tin", "Vui lòng nhập Email đăng nhập.");
+                return;
+            }
+
+            // 2. Kiểm tra định dạng email
+            string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            if (!System.Text.RegularExpressions.Regex.IsMatch(username, emailPattern))
+            {
+                await ShowDialogAsync("Email không hợp lệ", "Email đăng nhập không đúng định dạng. Vui lòng nhập đúng (Ví dụ: name@example.com).");
+                return;
+            }
+
+            // 3. Kiểm tra mật khẩu trống
+            if (string.IsNullOrEmpty(password))
+            {
+                await ShowDialogAsync("Thiếu thông tin", "Vui lòng nhập Mật khẩu.");
+                return;
+            }
+
+            // 4. Kiểm tra độ dài mật khẩu (tối thiểu 6 ký tự)
+            if (password.Length < 6)
+            {
+                await ShowDialogAsync("Mật khẩu không hợp lệ", "Mật khẩu đăng nhập phải có ít nhất 6 ký tự.");
                 return;
             }
 
@@ -66,7 +89,8 @@ namespace Healthcare.Client.UI.Auth
 
                 if (!result.Success)
                 {
-                    await ShowDialogAsync("Đăng nhập thất bại", result.Message);
+                    string friendlyMessage = GetFriendlyErrorMessage(result.Message);
+                    await ShowDialogAsync("Đăng nhập thất bại", friendlyMessage);
                     return;
                 }
 
@@ -113,7 +137,8 @@ namespace Healthcare.Client.UI.Auth
             }
             catch (Exception ex)
             {
-                await ShowDialogAsync("Đăng nhập thất bại", ex.Message);
+                string friendlyMessage = GetFriendlyErrorMessage(ex.Message);
+                await ShowDialogAsync("Đăng nhập thất bại", friendlyMessage);
             }
             finally
             {
@@ -146,6 +171,36 @@ namespace Healthcare.Client.UI.Auth
                 {
                     Effect = SlideNavigationTransitionEffect.FromRight
                 });
+        }
+
+        // ──────────────────────────────────────────────
+        // Helper: Chuyển đổi thông báo lỗi của Supabase sang Tiếng Việt dễ hiểu
+        // ──────────────────────────────────────────────
+        private string GetFriendlyErrorMessage(string rawMessage)
+        {
+            if (string.IsNullOrEmpty(rawMessage))
+                return "Đã xảy ra lỗi không xác định. Vui lòng thử lại sau.";
+
+            string lowerMsg = rawMessage.ToLower();
+
+            if (lowerMsg.Contains("invalid login credentials") || lowerMsg.Contains("invalid_credentials") || lowerMsg.Contains("username or password"))
+            {
+                return "Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.";
+            }
+            if (lowerMsg.Contains("email not confirmed") || lowerMsg.Contains("confirm your email"))
+            {
+                return "Tài khoản chưa được xác nhận email. Vui lòng kiểm tra hộp thư điện tử của bạn để kích hoạt.";
+            }
+            if (lowerMsg.Contains("rate limit") || lowerMsg.Contains("too many requests"))
+            {
+                return "Bạn đã thử đăng nhập quá nhiều lần. Vui lòng thử lại sau ít phút.";
+            }
+            if (lowerMsg.Contains("invalid email"))
+            {
+                return "Địa chỉ email đăng nhập không hợp lệ.";
+            }
+
+            return rawMessage;
         }
 
         // ──────────────────────────────────────────────

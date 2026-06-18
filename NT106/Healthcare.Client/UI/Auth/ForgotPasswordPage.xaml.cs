@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using System;
@@ -88,7 +88,7 @@ namespace Healthcare.Client.UI.Auth
 
             if (otp.Length < 8)
             {
-                await ShowDialogAsync("Mã OTP chưa đầy đủ", "Vui lòng nhập đủ 6 chữ số.");
+                await ShowDialogAsync("Mã OTP chưa đầy đủ", "Vui lòng nhập đủ 8 chữ số.");
                 return;
             }
 
@@ -135,8 +135,7 @@ namespace Healthcare.Client.UI.Auth
 
         private void ClearOtpBoxes()
         {
-            Otp1.Text = Otp2.Text = Otp3.Text = Otp4.Text = "";
-            Otp5.Text = Otp6.Text = Otp7.Text = Otp8.Text = "";
+            Otp1.Text = Otp2.Text = Otp3.Text = Otp4.Text = Otp5.Text = Otp6.Text = Otp7.Text = Otp8.Text = "";
             Otp1.Focus(FocusState.Programmatic);
         }
 

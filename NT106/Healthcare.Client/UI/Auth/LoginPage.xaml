@@ -244,7 +244,7 @@
 
                     <!-- Username Field -->
                     <StackPanel Spacing="6">
-                        <TextBlock Text="TÊN ĐĂNG NHẬP"
+                        <TextBlock Text="EMAIL ĐĂNG NHẬP"
                                    FontSize="11"
                                    FontWeight="Bold"
                                    Foreground="{StaticResource SecondaryBrush}"
@@ -252,7 +252,7 @@
                         <Grid>
                             <TextBox x:Name="UsernameBox"
                                      Style="{StaticResource AuthTextBoxStyle}"
-                                     PlaceholderText="Nhập tên đăng nhập"/>
+                                     PlaceholderText="Nhập email đăng nhập"/>
                             <!-- Icon Left -->
                             <FontIcon Glyph="&#xE77B;"
                                       FontSize="18"

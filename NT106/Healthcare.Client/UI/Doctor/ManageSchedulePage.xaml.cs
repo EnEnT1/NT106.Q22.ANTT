@@ -923,16 +923,18 @@ namespace Healthcare.Client.UI.Doctor
                 "Arrived" => Color.FromArgb(255, 14, 165, 233),
                 "Completed" => Color.FromArgb(255, 5, 150, 105),
                 "Cancelled" => Color.FromArgb(255, 220, 38, 38),
+                "Missed" => Color.FromArgb(255, 100, 116, 139), // Slate gray for Missed/Vắng mặt
                 _ => Color.FromArgb(255, 100, 116, 139)
             });
 
         public string StatusText => BaseStatus switch
         {
             "Pending" => "Chờ duyệt",
-            "Confirmed" => "Chưa đến",
+            "Confirmed" => TypeText == "Online" ? "Chờ khám" : "Chưa đến",
             "Arrived" => "Đã đến",
             "Completed" => "Đã hoàn thành",
             "Cancelled" => "Đã hủy",
+            "Missed" => "Vắng mặt",
             _ => "Không rõ"
         };
 

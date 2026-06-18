@@ -92,7 +92,8 @@
 
                 <!-- WELCOME -->
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Chào buổi sáng, Bệnh Nhân A"
+                    <TextBlock x:Name="WelcomeTextBlock"
+                               Text="Chào buổi sáng, Bệnh Nhân A"
                                FontSize="28"
                                FontWeight="ExtraBold"
                                Foreground="{StaticResource SlateGray900}"
@@ -112,7 +113,7 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- UPCOMING APPOINTMENT -->
-                    <Border Grid.Column="0"
+                    <Border x:Name="UpcomingAppointmentCard" Grid.Column="0"
                             Background="{StaticResource PrimaryBrush}"
                             CornerRadius="16"
                             Padding="32"
@@ -126,7 +127,8 @@
                                       VerticalAlignment="Bottom"
                                       Margin="0,0,-24,-24"/>
 
-                            <StackPanel Spacing="0">
+                            <!-- Active State -->
+                            <StackPanel x:Name="AppointmentActiveState" Spacing="0" Visibility="Collapsed">
                                 <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,24">
                                     <FontIcon Glyph="&#xE787;"
                                               FontSize="18"
@@ -138,14 +140,16 @@
                                                Foreground="#CCFFFFFF"/>
                                 </StackPanel>
 
-                                <TextBlock Text="09:30 AM"
+                                <TextBlock x:Name="AppointmentTimeTextBlock"
+                                           Text="09:30 AM"
                                            FontSize="36"
                                            FontWeight="ExtraBold"
                                            Foreground="White"
                                            CharacterSpacing="-10"
                                            Margin="0,0,0,4"/>
 
-                                <TextBlock Text="Thứ Tư, 26 Tháng 5"
+                                <TextBlock x:Name="AppointmentDateTextBlock"
+                                           Text="Thứ Tư, 26 Tháng 5"
                                            FontSize="14"
                                            FontWeight="Medium"
                                            Foreground="#CCFFFFFF"
@@ -155,28 +159,68 @@
                                         CornerRadius="16"
                                         Padding="16">
                                     <StackPanel Orientation="Horizontal" Spacing="16">
-                                        <PersonPicture Width="48"
+                                        <PersonPicture x:Name="AppointmentDoctorPicture"
+                                                       Width="48"
                                                        Height="48"
-                                                       Initials="NB"
-                                                       ProfilePicture="ms-appx:///Assets/DoctorB.jpg"/>
+                                                       Initials="NB"/>
 
                                         <StackPanel VerticalAlignment="Center" Spacing="2">
-                                            <TextBlock Text="BS. Nguyễn Văn B"
+                                            <TextBlock x:Name="AppointmentDoctorNameTextBlock"
+                                                       Text="BS. Nguyễn Văn B"
                                                        FontSize="13"
                                                        FontWeight="Bold"
                                                        Foreground="White"/>
-                                            <TextBlock Text="Chuyên khoa Nội"
+                                            <TextBlock x:Name="AppointmentDoctorSpecialtyTextBlock"
+                                                       Text="Chuyên khoa Nội"
                                                        FontSize="12"
                                                        Foreground="#99FFFFFF"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </Border>
                             </StackPanel>
+
+                            <!-- Empty State -->
+                            <StackPanel x:Name="AppointmentEmptyState" Spacing="12" VerticalAlignment="Center" Visibility="Visible">
+                                <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
+                                    <FontIcon Glyph="&#xE787;"
+                                              FontSize="18"
+                                              Foreground="#CCFFFFFF"
+                                              FontFamily="Segoe Fluent Icons"/>
+                                    <TextBlock Text="Lịch hẹn sắp tới"
+                                               FontSize="14"
+                                               FontWeight="Bold"
+                                               Foreground="#CCFFFFFF"/>
+                                </StackPanel>
+
+                                <TextBlock Text="Không có lịch hẹn"
+                                           FontSize="24"
+                                           FontWeight="ExtraBold"
+                                           Foreground="White"
+                                           CharacterSpacing="-10"
+                                           Margin="0,0,0,2"/>
+
+                                <TextBlock Text="Bạn không có lịch hẹn nào sắp tới. Hãy chủ động chăm sóc sức khỏe nhé!"
+                                           FontSize="12"
+                                           Foreground="#CCFFFFFF"
+                                           TextWrapping="Wrap"
+                                           Margin="0,0,0,16"/>
+
+                                <Button Content="Đặt lịch ngay"
+                                        Background="White"
+                                        Foreground="{StaticResource PrimaryBrush}"
+                                        CornerRadius="8"
+                                        Padding="16,6"
+                                        FontWeight="Bold"
+                                        FontSize="12"
+                                        BorderThickness="0"
+                                        HorizontalAlignment="Left"
+                                        Click="QuickAccess_BookAppointment_Click"/>
+                            </StackPanel>
                         </Grid>
                     </Border>
 
                     <!-- HEALTH INDICATORS -->
-                    <Border Grid.Column="1" Style="{StaticResource CardStyle}">
+                    <Border x:Name="HealthIndicatorsCard" Grid.Column="1" Style="{StaticResource CardStyle}">
                         <StackPanel Spacing="0">
                             <Grid Margin="0,0,0,24">
                                 <TextBlock Text="Chỉ số sức khỏe"
@@ -185,7 +229,8 @@
                                            Foreground="{StaticResource SlateGray800}"
                                            HorizontalAlignment="Left"/>
 
-                                <TextBlock Text="Cập nhật 2 giờ trước"
+                                <TextBlock x:Name="HealthMetricsUpdateTimeTextBlock"
+                                           Text="Cập nhật 2 giờ trước"
                                            FontSize="11"
                                            FontWeight="Bold"
                                            Foreground="{StaticResource SlateGray400}"
@@ -230,7 +275,8 @@
                                                        FontSize="13"
                                                        FontWeight="Bold"
                                                        Foreground="{StaticResource SlateGray500}"/>
-                                            <TextBlock Text="Bình thường"
+                                            <TextBlock x:Name="BloodPressureStatusTextBlock"
+                                                       Text="Bình thường"
                                                        FontSize="10"
                                                        FontWeight="Bold"
                                                        Foreground="#10B981"
@@ -238,7 +284,8 @@
                                         </StackPanel>
 
                                         <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                            <TextBlock Text="120/80"
+                                            <TextBlock x:Name="BloodPressureValueTextBlock"
+                                                       Text="120/80"
                                                        FontSize="26"
                                                        FontWeight="ExtraBold"
                                                        Foreground="{StaticResource SlateGray800}"
@@ -281,7 +328,8 @@
                                                        FontSize="13"
                                                        FontWeight="Bold"
                                                        Foreground="{StaticResource SlateGray500}"/>
-                                            <TextBlock Text="Ổn định"
+                                            <TextBlock x:Name="HeartRateStatusTextBlock"
+                                                       Text="Ổn định"
                                                        FontSize="10"
                                                        FontWeight="Bold"
                                                        Foreground="#10B981"
@@ -289,7 +337,8 @@
                                         </StackPanel>
 
                                         <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                            <TextBlock Text="72"
+                                            <TextBlock x:Name="HeartRateValueTextBlock"
+                                                       Text="72"
                                                        FontSize="26"
                                                        FontWeight="ExtraBold"
                                                        Foreground="{StaticResource SlateGray800}"
@@ -344,7 +393,7 @@
                                               Foreground="#2D6CDF"
                                               FontFamily="Segoe Fluent Icons"/>
                                 </Border>
-                                <TextBlock Text="Lịch trực"
+                                <TextBlock Text="Đặt lịch khám"
                                            FontSize="13"
                                            FontWeight="Bold"
                                            Foreground="{StaticResource SlateGray800}"

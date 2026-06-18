@@ -60,16 +60,28 @@
                 <Border Background="#F1F5F9" CornerRadius="12" Padding="20">
                     <StackPanel Spacing="12">
                         <Grid>
-                            <TextBlock Text="Số tiền:" FontSize="15" Foreground="#64748B" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="DetailAmount" Text="---" FontSize="16" FontWeight="Bold" Foreground="#0284C7" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Số tiền:" FontSize="15" Foreground="#64748B" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" x:Name="DetailAmount" Text="---" FontSize="16" FontWeight="Bold" Foreground="#0284C7" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                         </Grid>
                         <Grid>
-                            <TextBlock Text="Mã giao dịch:" FontSize="15" Foreground="#64748B" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="DetailRef" Text="---" FontSize="15" FontWeight="SemiBold" Foreground="#1E293B" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Mã giao dịch:" FontSize="15" Foreground="#64748B" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" x:Name="DetailRef" Text="---" FontSize="14" FontWeight="SemiBold" Foreground="#1E293B" HorizontalAlignment="Right" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Right"/>
                         </Grid>
                         <Grid>
-                            <TextBlock Text="Trạng thái:" FontSize="15" Foreground="#64748B" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="DetailStatus" Text="---" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Trạng thái:" FontSize="15" Foreground="#64748B" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" x:Name="DetailStatus" Text="---" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                         </Grid>
                     </StackPanel>
                 </Border>
