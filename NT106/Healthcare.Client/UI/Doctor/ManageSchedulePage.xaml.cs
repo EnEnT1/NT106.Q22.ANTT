@@ -576,11 +576,8 @@ namespace Healthcare.Client.UI.Doctor
                 var query = _supabase.From<TimeSlot>()
                     .Where(x => x.DoctorId == SessionStorage.CurrentUser.Id);
 
-                if (FilterSlotDatePicker.Date != null)
-                {
-                    var filterDate = FilterSlotDatePicker.Date.DateTime.Date;
-                    query = query.Where(s => s.SlotDate == filterDate);
-                }
+                var filterDate = DateTime.SpecifyKind(FilterSlotDatePicker.Date.DateTime.Date, DateTimeKind.Utc);
+                query = query.Where(s => s.SlotDate == filterDate);
 
                 var response = await query.Get();
                 var allSlots = response.Models ?? new List<TimeSlot>();
@@ -598,6 +595,18 @@ namespace Healthcare.Client.UI.Doctor
             }
         }
 
+        private void TimeRange_Changed(object sender, TimePickerValueChangedEventArgs e)
+        {
+            if (NewSlotStartTime == null || NewSlotEndTime == null || SlotDurationBox == null)
+                return;
+
+            var start = NewSlotStartTime.Time;
+            var end = NewSlotEndTime.Time;
+
+            var diff = end - start;
+            SlotDurationBox.Value = diff.TotalMinutes > 0 ? diff.TotalMinutes : 0;
+        }
+
         private async void BtnAutoCreateSlots_Click(object sender, RoutedEventArgs e)
         {
             if (SessionStorage.CurrentUser == null)
@@ -607,7 +616,7 @@ namespace Healthcare.Client.UI.Doctor
             var start = NewSlotStartTime.Time;
             var end = NewSlotEndTime.Time;
             var duration = TimeSpan.FromMinutes(SlotDurationBox.Value);
-            var buffer = TimeSpan.FromMinutes(BufferDurationBox.Value);
+            var buffer = TimeSpan.Zero;
 
             if (end <= start)
             {
@@ -615,26 +624,60 @@ namespace Healthcare.Client.UI.Doctor
                 return;
             }
 
+            // Load existing slots for this doctor on the selected date to prevent overlaps
+            List<TimeSlot> existingSlots = new List<TimeSlot>();
+            try
+            {
+                var existingSlotsResponse = await _supabase.From<TimeSlot>()
+                    .Where(x => x.DoctorId == SessionStorage.CurrentUser.Id)
+                    .Where(x => x.SlotDate == DateTime.SpecifyKind(date, DateTimeKind.Utc))
+                    .Get();
+                existingSlots = existingSlotsResponse.Models ?? new List<TimeSlot>();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error fetching existing slots: {ex.Message}");
+            }
+
             var slotsToCreate = new List<TimeSlot>();
             var current = start;
+            int totalCandidates = 0;
 
             while (current + duration <= end)
             {
-                slotsToCreate.Add(new TimeSlot
+                totalCandidates++;
+                var slotStart = current;
+                var slotEnd = current + duration;
+
+                bool overlaps = existingSlots.Any(s => slotStart < s.EndTime && slotEnd > s.StartTime);
+
+                if (!overlaps)
                 {
-                    DoctorId = SessionStorage.CurrentUser.Id,
-                    SlotDate = date,
-                    StartTime = current,
-                    EndTime = current + duration,
-                    Status = "Available"
-                });
+                    slotsToCreate.Add(new TimeSlot
+                    {
+                        DoctorId = SessionStorage.CurrentUser.Id,
+                        SlotDate = DateTime.SpecifyKind(date, DateTimeKind.Utc),
+                        StartTime = slotStart,
+                        EndTime = slotEnd,
+                        Status = "Available"
+                    });
+                }
 
                 current += duration + buffer;
             }
 
+            int skippedCount = totalCandidates - slotsToCreate.Count;
+
             if (!slotsToCreate.Any())
             {
-                await ShowMsg("Lỗi", "Không thể tạo khung giờ nào với thiết lập hiện tại.");
+                if (skippedCount > 0)
+                {
+                    await ShowMsg("Trùng lịch khám", $"Tất cả {skippedCount} khung giờ dự kiến đều trùng với các ca khám đã có trên hệ thống.");
+                }
+                else
+                {
+                    await ShowMsg("Lỗi", "Không thể tạo khung giờ nào với thiết lập hiện tại.");
+                }
                 return;
             }
 
@@ -645,7 +688,11 @@ namespace Healthcare.Client.UI.Doctor
                 // Đồng bộ bộ lọc ngày sang ngày vừa tạo để bác sĩ thấy ngay
                 FilterSlotDatePicker.Date = NewSlotDatePicker.Date;
 
-                await ShowMsg("Thành công", $"Đã tạo {slotsToCreate.Count} khung giờ cho ngày {date:dd/MM/yyyy}");
+                string successMsg = skippedCount > 0 
+                    ? $"Đã tạo thành công {slotsToCreate.Count} khung giờ cho ngày {date:dd/MM/yyyy}.\n\n* Lưu ý: Bỏ qua {skippedCount} khung giờ do trùng lịch hiện tại."
+                    : $"Đã tạo thành công {slotsToCreate.Count} ca khám cho ngày {date:dd/MM/yyyy}.";
+
+                await ShowMsg("Thành công", successMsg);
                 await LoadDoctorSlots();
             }
             catch (Exception ex)
@@ -693,7 +740,7 @@ namespace Healthcare.Client.UI.Doctor
             if (SessionStorage.CurrentUser == null)
                 return;
 
-            var date = FilterSlotDatePicker.Date.DateTime.Date;
+            var date = DateTime.SpecifyKind(FilterSlotDatePicker.Date.DateTime.Date, DateTimeKind.Utc);
 
             // Hỏi xác nhận trước khi xoá hàng loạt
             var confirmDialog = new ContentDialog

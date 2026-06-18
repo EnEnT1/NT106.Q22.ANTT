@@ -151,44 +151,16 @@ namespace Healthcare.Client.UI.Doctor
                 BtnCallAction.Opacity = 0.5;
             }
 
-            // Avatar Logic (Initials + Random Color)
+            // Avatar Logic (PersonPicture with default anonymous silhouette placeholder)
             if (!string.IsNullOrEmpty(_patient?.AvatarUrl))
             {
-                AvatarPlaceholder.Visibility = Visibility.Collapsed;
-                AvatarContainer.Visibility = Visibility.Visible;
-                PatientAvatarBrush.ImageSource = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(_patient.AvatarUrl));
+                PatientAvatar.ProfilePicture = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(_patient.AvatarUrl));
             }
             else
             {
-                AvatarPlaceholder.Visibility = Visibility.Visible;
-                AvatarContainer.Visibility = Visibility.Collapsed;
-                
-                // Calculate Initials: 2 letters from last 2 words
-                string initials = "??";
-                if (!string.IsNullOrEmpty(fullName))
-                {
-                    var words = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                    if (words.Length >= 2)
-                    {
-                        initials = (words[words.Length - 2][0].ToString() + words[words.Length - 1][0].ToString()).ToUpper();
-                    }
-                    else if (words.Length == 1)
-                    {
-                        initials = words[0][0].ToString().ToUpper();
-                    }
-                }
-                AvatarInitials.Text = initials;
-
-                // Random Color: Pinkish Grey, Blue, Purple, Green, Indigo
-                string[] palette = { "#C3A6A0", "#3B82F6", "#8B5CF6", "#10B981", "#6366F1" };
-                int colorIndex = Math.Abs(fullName.GetHashCode()) % palette.Length;
-                string hex = palette[colorIndex];
-                
-                // Parse Hex to Color
-                byte r = Convert.ToByte(hex.Substring(1, 2), 16);
-                byte g = Convert.ToByte(hex.Substring(3, 2), 16);
-                byte b = Convert.ToByte(hex.Substring(5, 2), 16);
-                AvatarPlaceholder.Background = new SolidColorBrush(Color.FromArgb(255, r, g, b));
+                PatientAvatar.ProfilePicture = null;
+                PatientAvatar.DisplayName = null;
+                PatientAvatar.Initials = null;
             }
 
             // Status Badge & Top Buttons
@@ -288,42 +260,9 @@ namespace Healthcare.Client.UI.Doctor
 
         private void BtnBack_Click(object sender, RoutedEventArgs e) => Frame.Navigate(typeof(ManageSchedulePage));
 
-        private void BtnCloseChat_Click(object sender, RoutedEventArgs e)
-        {
-            _isChatOpen = false;
-            ChatColumn.Width = new GridLength(0);
-            ChatPane.Visibility = Visibility.Collapsed;
-        }
-
-        private void BtnHistory_Click(object sender, RoutedEventArgs e)
+         private void BtnHistory_Click(object sender, RoutedEventArgs e)
         {
             // Logic xem lịch sử sẽ được cập nhật sau
-        }
-
-        private bool _isChatOpen = false;
-
-        private async void BtnChat_Click(object sender, RoutedEventArgs e)
-        {
-            if (_patient == null) return;
-
-            _isChatOpen = !_isChatOpen;
-
-            if (_isChatOpen)
-            {
-                // Mở khung chat
-                ChatColumn.Width = new GridLength(400); // Độ rộng khung chat
-                ChatPane.Visibility = Visibility.Visible;
-                
-                // Khởi tạo/Tải dữ liệu chat nếu chưa làm
-                string currentDoctorId = SessionStorage.CurrentUser?.Id ?? "";
-                await ChatPane.InitializeAsync(_appointment.Id, currentDoctorId, _patient.Id);
-            }
-            else
-            {
-                // Đóng khung chat
-                ChatColumn.Width = new GridLength(0);
-                ChatPane.Visibility = Visibility.Collapsed;
-            }
         }
 
         private async void BtnApprove_Click(object sender, RoutedEventArgs e)

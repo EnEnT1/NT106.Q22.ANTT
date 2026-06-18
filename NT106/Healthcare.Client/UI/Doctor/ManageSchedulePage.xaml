@@ -507,30 +507,25 @@
                             <Grid ColumnSpacing="12">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="96"/>
                                 </Grid.ColumnDefinitions>
-                                <StackPanel Spacing="8">
-                                    <TextBlock Text="Bắt đầu" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
-                                    <TimePicker x:Name="NewSlotStartTime" ClockIdentifier="24HourClock" HorizontalAlignment="Stretch"/>
-                                </StackPanel>
-                                <StackPanel Spacing="8" Grid.Column="1">
-                                    <TextBlock Text="Kết thúc" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
-                                    <TimePicker x:Name="NewSlotEndTime" ClockIdentifier="24HourClock" HorizontalAlignment="Stretch"/>
-                                </StackPanel>
-                            </Grid>
 
-                            <Grid ColumnSpacing="12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Spacing="8">
-                                    <TextBlock Text="Thời lượng (phút)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
-                                    <NumberBox x:Name="SlotDurationBox" Value="30" SpinButtonPlacementMode="Inline" HorizontalAlignment="Stretch"/>
+                                <!-- Bắt đầu + Kết thúc xếp dọc bên trái -->
+                                <StackPanel Spacing="12" Grid.Column="0">
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="Bắt đầu" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                                        <TimePicker x:Name="NewSlotStartTime" ClockIdentifier="24HourClock" HorizontalAlignment="Stretch" TimeChanged="TimeRange_Changed"/>
+                                    </StackPanel>
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="Kết thúc" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                                        <TimePicker x:Name="NewSlotEndTime" ClockIdentifier="24HourClock" HorizontalAlignment="Stretch" TimeChanged="TimeRange_Changed"/>
+                                    </StackPanel>
                                 </StackPanel>
-                                <StackPanel Spacing="8" Grid.Column="1">
-                                    <TextBlock Text="Nghỉ giữa ca (phút)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
-                                    <NumberBox x:Name="BufferDurationBox" Value="5" SpinButtonPlacementMode="Inline" HorizontalAlignment="Stretch"/>
+
+                                <!-- Thời lượng bên phải -->
+                                <StackPanel Spacing="8" Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Thời lượng (phút)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" TextWrapping="Wrap"/>
+                                    <NumberBox x:Name="SlotDurationBox" Value="0" SpinButtonPlacementMode="Compact" HorizontalAlignment="Stretch" IsEnabled="False"/>
                                 </StackPanel>
                             </Grid>
 

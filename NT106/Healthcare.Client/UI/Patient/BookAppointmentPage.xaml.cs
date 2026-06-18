@@ -293,9 +293,11 @@ namespace Healthcare.Client.UI.Patient
 
             try
             {
+                var nextDay = selectedDateVM.DateValue.Date.AddDays(1);
                 var response = await _supabase.From<TimeSlot>()
                     .Where(x => x.DoctorId == selectedDoctorVM.Id)
-                    .Where(x => x.SlotDate == selectedDateVM.DateValue.Date)
+                    .Filter("slot_date", Postgrest.Constants.Operator.GreaterThanOrEqual, selectedDateVM.DateValue.Date.ToString("yyyy-MM-dd"))
+                    .Filter("slot_date", Postgrest.Constants.Operator.LessThan, nextDay.ToString("yyyy-MM-dd"))
                     .Where(x => x.Status == "Available")
                     .Get();
 
@@ -482,7 +484,7 @@ namespace Healthcare.Client.UI.Patient
                 {
                     PatientId = SessionStorage.CurrentUser.Id,
                     DoctorId = finalDoctorId,
-                    AppointmentDate = selectedDateVM.DateValue.Date,
+                    AppointmentDate = DateTime.SpecifyKind(selectedDateVM.DateValue.Date, DateTimeKind.Utc),
                     StartTime = selectedSlotVM.StartTime,
                     EndTime = selectedSlotVM.EndTime,
                     SlotId = selectedSlotVM.Id,
