@@ -45,7 +45,7 @@ var supabaseAdmin = app.Services.GetRequiredService<SupabaseAdminHelper>();
 await supabaseAdmin.InitializeAsync();
 
 // 5. Cấu hình HTTP Pipeline
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
