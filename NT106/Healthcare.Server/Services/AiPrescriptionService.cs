@@ -135,5 +135,43 @@ Nếu không đọc được thì trả:
 
             return new List<string> { modelReply };
         }
+
+        public async Task<string> GetChatResponseAsync(string userMessage)
+        {
+            var requestBody = new
+            {
+                model = _model,
+                messages = new object[]
+                {
+                    new
+                    {
+                        role = "system",
+                        content = "Bạn là trợ lý y tế thông minh ChatGPT của ứng dụng Healthcare. Hãy tư vấn sức khỏe cơ bản một cách thân thiện và chuyên nghiệp. Nhắc nhở người dùng rằng lời khuyên này không thay thế chẩn đoán của bác sĩ."
+                    },
+                    new
+                    {
+                        role = "user",
+                        content = userMessage
+                    }
+                },
+                temperature = 0.7
+            };
+
+            string json = JsonSerializer.Serialize(requestBody);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _httpClient.PostAsync("chat/completions", content);
+            string responseText = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception("Lỗi OpenAI: " + responseText);
+
+            using JsonDocument doc = JsonDocument.Parse(responseText);
+            return doc.RootElement
+                      .GetProperty("choices")[0]
+                      .GetProperty("message")
+                      .GetProperty("content")
+                      .GetString() ?? "Xin lỗi, tôi không thể xử lý câu trả lời lúc này.";
+        }
     }
 }

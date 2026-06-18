@@ -1,11 +1,11 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace Healthcare.Client.APIClient
 {
     // Kế thừa BaseHttpClient
     public class PaymentApiClient : BaseHttpClient
     {
-        public PaymentApiClient() : base("http://localhost:5246/api/")
+        public PaymentApiClient() : base(ServerBaseUrl + "api/")
         {
         }
 

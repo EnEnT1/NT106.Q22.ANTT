@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
@@ -15,12 +15,12 @@ namespace Healthcare.Client.APIClient
         {
             _httpClient = new HttpClient
             {
-                BaseAddress = new Uri("http://localhost:5246/")
+                BaseAddress = new Uri(BaseHttpClient.ServerBaseUrl)
             };
         }
 
         // Hàm này dùng cho UploadPrescriptionPage đang truyền _selectedFilePath
-        public async Task<List<PrescriptionMedicineDto>> AnalyzePrescriptionAsync(string filePath)
+        public async Task<List<string>> AnalyzePrescriptionAsync(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
@@ -39,7 +39,7 @@ namespace Healthcare.Client.APIClient
         }
 
         // Hàm này dùng khi đã có Stream và fileName
-        public async Task<List<PrescriptionMedicineDto>> AnalyzePrescriptionAsync(Stream imageStream, string fileName = "prescription.jpg")
+        public async Task<List<string>> AnalyzePrescriptionAsync(Stream imageStream, string fileName = "prescription.jpg")
         {
             using var form = new MultipartFormDataContent();
 
@@ -66,7 +66,7 @@ namespace Healthcare.Client.APIClient
                 }
             );
 
-            return result?.Medicines ?? new List<PrescriptionMedicineDto>();
+            return result?.Medicines ?? new List<string>();
         }
     }
 
@@ -74,19 +74,6 @@ namespace Healthcare.Client.APIClient
     {
         public bool Success { get; set; }
 
-        public List<PrescriptionMedicineDto> Medicines { get; set; } = new();
-    }
-
-    public class PrescriptionMedicineDto
-    {
-        public string Name { get; set; } = string.Empty;
-
-        public string Dosage { get; set; } = string.Empty;
-
-        public string Frequency { get; set; } = string.Empty;
-
-        public string Duration { get; set; } = string.Empty;
-
-        public string Note { get; set; } = string.Empty;
+        public List<string> Medicines { get; set; } = new();
     }
 }

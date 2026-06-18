@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +34,7 @@ namespace Healthcare.Server.Controllers
         }
 
         [HttpPost("chat")]
-        public IActionResult Chat([FromBody] ChatRequest request)
+        public async Task<IActionResult> Chat([FromBody] ChatRequest request)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.Message))
             {
@@ -45,13 +45,25 @@ namespace Healthcare.Server.Controllers
                 });
             }
 
-            string reply = GenerateHealthReply(request.Message);
-
-            return Ok(new
+            try
             {
-                success = true,
-                reply = reply
-            });
+                string reply = await _aiPrescriptionService.GetChatResponseAsync(request.Message);
+                return Ok(new
+                {
+                    success = true,
+                    reply = reply
+                });
+            }
+            catch (Exception ex)
+            {
+                // Fallback về rules offline nếu OpenAI bị lỗi (hoặc chưa cấu hình API Key)
+                string reply = GenerateHealthReply(request.Message);
+                return Ok(new
+                {
+                    success = true,
+                    reply = $"{reply}\n\n*(Lưu ý: Đang chạy ở chế độ offline do lỗi OpenAI: {ex.Message})*"
+                });
+            }
         }
 
         private string GenerateHealthReply(string message)

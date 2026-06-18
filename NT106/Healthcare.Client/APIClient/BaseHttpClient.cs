@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -13,6 +13,10 @@ namespace Healthcare.Client.APIClient
     /// </summary>
     public abstract class BaseHttpClient
     {
+        // 🌐 URL cấu hình Server tập trung (Bật/tắt giữa Localhost và Azure tại đây)
+        public static string ServerBaseUrl { get; set; } = "https://healthcare-server-nt10631-hkafb0dnhhdddxc0.southeastasia-01.azurewebsites.net/";
+        // public static string ServerBaseUrl { get; set; } = "http://localhost:5246/";
+
         protected readonly HttpClient _httpClient;
         protected readonly JsonSerializerOptions _jsonOptions;
 

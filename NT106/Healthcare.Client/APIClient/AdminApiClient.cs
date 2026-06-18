@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace Healthcare.Client.APIClient
@@ -6,7 +6,7 @@ namespace Healthcare.Client.APIClient
     // Kế thừa BaseHttpClient 
     public class AdminApiClient : BaseHttpClient
     {
-        public AdminApiClient() : base("http://localhost:5246/api/")
+        public AdminApiClient() : base(ServerBaseUrl + "api/")
         {
         }
 

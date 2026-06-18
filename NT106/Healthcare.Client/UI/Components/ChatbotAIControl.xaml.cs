@@ -1,4 +1,4 @@
-﻿using Microsoft.UI;
+using Microsoft.UI;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.UI;
+using Healthcare.Client.APIClient;
 
 namespace Healthcare.Client.UI.Components
 {
@@ -17,8 +18,7 @@ namespace Healthcare.Client.UI.Components
     {
         private readonly HttpClient _httpClient = new HttpClient
         {
-            // Sửa port này theo Healthcare.Server/Properties/launchSettings.json nếu khác
-            BaseAddress = new Uri("https://localhost:5001/")
+            BaseAddress = new Uri(BaseHttpClient.ServerBaseUrl)
         };
 
         public ChatbotAIControl()
