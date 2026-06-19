@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Healthcare.Client.Models.Communication;
 using Healthcare.Client.SupabaseIntegration;
+using Supabase.Realtime;
 using Healthcare.Client.Helpers;
 using Microsoft.UI;
 using Microsoft.UI.Text;
@@ -165,6 +166,7 @@ namespace Healthcare.Client.UI.Components
         private readonly ObservableCollection<NotificationViewModel> _displayed = new();
         private List<NotificationViewModel> _allItems = new();
         private string _activeTab = "All"; // "All" | "Unread"
+        private RealtimeChannel? _notificationChannel;
 
         // ── Constructor ───────────────────────────────────────────────────
 
@@ -173,6 +175,7 @@ namespace Healthcare.Client.UI.Components
             InitializeComponent();
             NotificationsListView.ItemsSource = _displayed;
             Loaded += NotificationPanel_Loaded;
+            Unloaded += (s, e) => _notificationChannel?.Unsubscribe();
         }
 
         // ── Lifecycle ─────────────────────────────────────────────────────
@@ -192,20 +195,23 @@ namespace Healthcare.Client.UI.Components
         {
             try
             {
-                // ── Kết nối Supabase thật ─────────────────────────────────
-                // var userId = SessionStorage.CurrentUser?.Id ?? string.Empty;
-                // var records = await SupabaseDbService.Instance
-                //     .GetAsync<Notification>(n => n.UserId == userId);
-                //
-                // _allItems = records
-                //     .OrderByDescending(n => n.CreatedAt)
-                //     .Select(MapToViewModel)
-                //     .ToList();
-                // ─────────────────────────────────────────────────────────
+                var userId = SessionStorage.CurrentUser?.Id;
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    var response = await SupabaseManager.Instance.Client
+                        .From<Notification>()
+                        .Where(n => n.UserId == userId)
+                        .Order("created_at", Postgrest.Constants.Ordering.Descending)
+                        .Get();
 
-                // ── Dữ liệu mẫu (xóa khi kết nối Supabase thật) ──────────
-                _allItems = GetSampleData();
-                // ─────────────────────────────────────────────────────────
+                    _allItems = response.Models
+                        .Select(MapToViewModel)
+                        .ToList();
+                }
+                else
+                {
+                    _allItems = new List<NotificationViewModel>();
+                }
 
                 ApplyFilter();
             }
@@ -218,19 +224,41 @@ namespace Healthcare.Client.UI.Components
         /// <summary>
         /// Subscribe Supabase Realtime — nhận thông báo mới ngay lập tức mà không cần refresh.
         /// </summary>
-        private void SubscribeRealtime()
+        private async void SubscribeRealtime()
         {
-            // TODO: Kết nối SupabaseRealtimeService để lắng nghe INSERT trên bảng notifications
-            //
-            // SupabaseRealtimeService.Instance.OnNotificationReceived += (sender, notification) =>
-            // {
-            //     DispatcherQueue.TryEnqueue(() =>
-            //     {
-            //         var vm = MapToViewModel(notification);
-            //         _allItems.Insert(0, vm);
-            //         ApplyFilter();
-            //     });
-            // };
+            try
+            {
+                var userId = SessionStorage.CurrentUser?.Id;
+                if (string.IsNullOrEmpty(userId)) return;
+
+                var client = SupabaseManager.Instance.Client;
+                _notificationChannel = client.Realtime.Channel("notifications_channel", "public", "notifications");
+
+                _notificationChannel.AddPostgresChangeHandler(
+                    Supabase.Realtime.PostgresChanges.PostgresChangesOptions.ListenType.Inserts,
+                    (sender, change) =>
+                    {
+                        var notification = change.Model<Notification>();
+                        if (notification != null && notification.UserId == userId)
+                        {
+                            DispatcherQueue.TryEnqueue(() =>
+                            {
+                                var vm = MapToViewModel(notification);
+                                if (!_allItems.Any(x => x.Id == vm.Id))
+                                {
+                                    _allItems.Insert(0, vm);
+                                    ApplyFilter();
+                                }
+                            });
+                        }
+                    });
+
+                await _notificationChannel.Subscribe();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[NotificationPanel] SubscribeRealtime error: {ex.Message}");
+            }
         }
 
         // ── Mapping ───────────────────────────────────────────────────────
@@ -301,20 +329,42 @@ namespace Healthcare.Client.UI.Components
             }
         }
 
-        private void MarkAllRead_Click(object sender, RoutedEventArgs e)
+        private async void MarkAllRead_Click(object sender, RoutedEventArgs e)
         {
             foreach (var item in _allItems)
                 item.IsRead = true;
 
-            // TODO: Gọi Supabase batch update
-            // await SupabaseDbService.Instance.MarkAllNotificationsReadAsync(SessionStorage.CurrentUser.Id);
+            try
+            {
+                var userId = SessionStorage.CurrentUser?.Id;
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    await SupabaseManager.Instance.Client
+                        .From<Notification>()
+                        .Where(n => n.UserId == userId)
+                        .Where(n => n.IsRead == false)
+                        .Set(n => n.IsRead, true)
+                        .Update();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[NotificationPanel] MarkAllRead error: {ex.Message}");
+            }
 
             ApplyFilter();
         }
 
-        private void NotificationSettings_Click(object sender, RoutedEventArgs e)
+        private async void NotificationSettings_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Mở trang cài đặt thông báo / dialog
+            var dialog = new ContentDialog
+            {
+                Title = "Cài đặt thông báo",
+                Content = "Tính năng cấu hình nhận thông báo (Email, Push, SMS) đang được phát triển.",
+                CloseButtonText = "Đóng",
+                XamlRoot = this.XamlRoot
+            };
+            await dialog.ShowAsync();
         }
 
         /// <summary>
@@ -331,9 +381,18 @@ namespace Healthcare.Client.UI.Components
             {
                 vm.IsRead = true;
 
-                // TODO: Cập nhật Supabase
-                // await SupabaseDbService.Instance.UpdateAsync<Notification>(
-                //     vm.Id, n => n.IsRead = true);
+                try
+                {
+                    await SupabaseManager.Instance.Client
+                        .From<Notification>()
+                        .Where(n => n.Id == vm.Id)
+                        .Set(n => n.IsRead, true)
+                        .Update();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[NotificationPanel] Update notification read status error: {ex.Message}");
+                }
 
                 ApplyFilter();
             }

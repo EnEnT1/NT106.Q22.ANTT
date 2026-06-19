@@ -121,7 +121,24 @@ namespace Healthcare.Client.Communication
                     break;
 
                 case "ice-candidate":
-                    // Parse candidate JSON và truyền vào _peerConnection.AddIceCandidate(...)
+                    try
+                    {
+                        var candidateInit = System.Text.Json.JsonSerializer.Deserialize<IceCandidateData>(data);
+                        if (candidateInit != null)
+                        {
+                            var candidate = new IceCandidate
+                            {
+                                Content = candidateInit.candidate,
+                                SdpMid = candidateInit.sdpMid,
+                                SdpMlineIndex = candidateInit.sdpMLineIndex
+                            };
+                            _peerConnection.AddIceCandidate(candidate);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Lỗi phân tích hoặc thêm ICE Candidate: {ex.Message}");
+                    }
                     break;
             }
         }
@@ -147,5 +164,12 @@ namespace Healthcare.Client.Communication
             _peerConnection?.Close();
             _peerConnection?.Dispose();
         }
+    }
+
+    public class IceCandidateData
+    {
+        public string candidate { get; set; } = string.Empty;
+        public string sdpMid { get; set; } = string.Empty;
+        public int sdpMLineIndex { get; set; }
     }
 }

@@ -21,12 +21,12 @@
                 BorderThickness="0,0,0,1"
                 Padding="16,12">
             <StackPanel Spacing="4">
-                <TextBlock Text="Chatbot AI"
+                <TextBlock Text="Trợ lý sức khỏe"
                            FontSize="20"
                            FontWeight="Bold"
                            Foreground="#1E293B"/>
 
-                <TextBlock Text="Hỏi đáp sức khỏe cơ bản với ChatGPT"
+                <TextBlock Text="Hỏi đáp sức khỏe cơ bản với Gemini"
                            FontSize="12"
                            Foreground="#64748B"/>
             </StackPanel>
@@ -55,7 +55,7 @@
 
                 <TextBox x:Name="ChatInput"
                          Grid.Column="0"
-                         PlaceholderText="Nhập câu hỏi cho ChatGPT..."
+                         PlaceholderText="Nhập câu hỏi sức khỏe..."
                          KeyDown="ChatInput_KeyDown"
                          MinHeight="40"
                          TextWrapping="Wrap"
@@ -84,7 +84,7 @@
                 BorderBrush="#E5E7EB"
                 BorderThickness="1,1,1,0"
                 Padding="10">
-            <TextBlock Text="ChatGPT chỉ hỗ trợ tư vấn cơ bản, không thay thế chẩn đoán của bác sĩ."
+            <TextBlock Text="Gemini chỉ hỗ trợ tư vấn cơ bản, không thay thế chẩn đoán của bác sĩ."
                        FontSize="11"
                        Foreground="#64748B"
                        TextWrapping="Wrap"/>

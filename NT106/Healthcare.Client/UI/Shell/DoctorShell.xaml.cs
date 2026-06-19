@@ -1,6 +1,7 @@
 using Healthcare.Client.Helpers;
 using Healthcare.Client.UI.Auth;
 using Healthcare.Client.UI.Doctor;
+using Healthcare.Client.UI.Components;
 using Healthcare.Client.SupabaseIntegration;
 using Healthcare.Client.Models.Identity;
 using Microsoft.UI.Xaml;
@@ -142,16 +143,60 @@ namespace Healthcare.Client.UI.Shell
         private void NavRevenue_Click(object sender, RoutedEventArgs e)
             => NavigateTo(typeof(RevenuePage), NavRevenue);
 
-        // ── Notification button ──
-        private void BtnNotification_Click(object sender, RoutedEventArgs e)
+        // ── Notification Panel Handlers ──
+        private void NotifPanel_UnreadCountChanged(object sender, int count)
         {
-            // TODO: mở NotificationPanel flyout
+            NotifBadgeText.Text = count.ToString();
+            NotifBadge.Visibility = count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void NotifPanel_NavigationRequested(object sender, NotificationNavigationRequestedEventArgs e)
+        {
+            BtnNotification.Flyout?.Hide();
+            if (e.TargetPageType != null)
+            {
+                NavigateToPage(e.TargetPageType);
+            }
+        }
+
+        public void NavigateToPage(Type pageType)
+        {
+            if (pageType == typeof(DoctorHomePage))
+                NavigateTo(pageType, NavHome);
+            else if (pageType == typeof(ManageSchedulePage))
+                NavigateTo(pageType, NavSchedule);
+            else if (pageType == typeof(PatientHistoryPage))
+                NavigateTo(pageType, NavPatients);
+            else if (pageType == typeof(RevenuePage))
+                NavigateTo(pageType, NavRevenue);
+            else
+                ContentFrame.Navigate(pageType);
         }
 
         // ── Settings button ──
-        private void BtnSettings_Click(object sender, RoutedEventArgs e)
+        private async void BtnSettings_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: navigate sang Settings page
+            await OpenSettingsDialogAsync();
+        }
+
+        private async System.Threading.Tasks.Task OpenSettingsDialogAsync()
+        {
+            var profile = new ProfileControl
+            {
+                Width = 460,
+                Height = 600
+            };
+
+            var dialog = new ContentDialog
+            {
+                Title = "Cài đặt tài khoản",
+                Content = profile,
+                CloseButtonText = "Đóng",
+                XamlRoot = this.XamlRoot,
+                DefaultButton = ContentDialogButton.Close
+            };
+
+            await dialog.ShowAsync();
         }
 
         // ── Đăng xuất ──

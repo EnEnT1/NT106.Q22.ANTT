@@ -183,7 +183,7 @@ namespace Healthcare.Client.UI.Shell
 
             var dialog = new ContentDialog
             {
-                Title = "Tư vấn sức khỏe AI",
+                Title = "Trợ lý sức khỏe",
                 Content = chatbot,
                 CloseButtonText = "Đóng",
                 XamlRoot = this.XamlRoot,

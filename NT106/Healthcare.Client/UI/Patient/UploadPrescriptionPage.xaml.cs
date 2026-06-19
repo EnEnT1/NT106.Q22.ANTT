@@ -21,6 +21,7 @@ namespace Healthcare.Client.UI.Patient
     {
         private string _selectedFilePath;
         private PatientShell _shell;
+        private PrescriptionData _currentPrescription;
 
         public UploadPrescriptionPage()
         {
@@ -90,14 +91,14 @@ namespace Healthcare.Client.UI.Patient
             try
             {
                 // Gọi API AI thật của Server để trích xuất danh sách thuốc
-                List<string> medicines = null;
+                _currentPrescription = null;
                 bool isFallback = false;
                 string apiErrorMsg = "";
 
                 try
                 {
                     var aiClient = new AiClient();
-                    medicines = await aiClient.AnalyzePrescriptionAsync(_selectedFilePath);
+                    _currentPrescription = await aiClient.AnalyzePrescriptionAsync(_selectedFilePath);
                 }
                 catch (Exception apiEx)
                 {
@@ -106,85 +107,72 @@ namespace Healthcare.Client.UI.Patient
                 }
 
                 // Nếu API bị lỗi hoặc không nhận diện được thuốc, tiến hành Fallback động để demo
-                if (medicines == null || medicines.Count == 0)
+                if (_currentPrescription == null || _currentPrescription.Medicines == null || _currentPrescription.Medicines.Count == 0)
                 {
                     isFallback = true;
-                    medicines = new List<string>
+                    _currentPrescription = new PrescriptionData
                     {
-                        "Paracetamol 500mg - Uống 1 viên x 2 lần/ngày (sáng, tối) sau ăn khi sốt trên 38.5 độ C - 20 Viên",
-                        "Amoxicillin 500mg - Uống 1 viên x 3 lần/ngày (sáng, trưa, tối) sau ăn - 21 Viên",
-                        "Decolgen Forte - Uống 1 viên x 2 lần/ngày (sáng, tối) sau ăn khi sổ mũi - 10 Viên",
-                        "Siro Ho Prospan 100ml - Uống 5ml x 3 lần/ngày sau ăn - 1 Chai"
+                        ClinicName = "Hệ thống Y tế Số Healthcare Clinic",
+                        ClinicAddress = "Lầu 5, Tòa nhà Công nghệ thông tin, Khu đô thị ĐHQG HCM, Thủ Đức, TP. HCM",
+                        ClinicPhone = "1900 6060",
+                        PatientName = SessionStorage.CurrentUser?.FullName ?? "Nguyễn Văn Bệnh Nhân",
+                        PatientAge = "25",
+                        PatientGender = "Nam",
+                        PatientAddress = "Thủ Đức, TP. Hồ Chí Minh",
+                        Diagnosis = "Viêm họng cấp tính / Sốt nhẹ chưa rõ nguyên nhân",
+                        DoctorName = "ThS. BS. Nguyễn Minh Đức",
+                        PrescriptionDate = DateTime.Now.ToString("dd/MM/yyyy"),
+                        DoctorAdvice = "Uống nhiều nước ấm, súc họng bằng nước muối sinh lý ấm ít nhất 3 lần/ngày. Nghỉ ngơi hợp lý, tránh làm việc quá sức, tránh thức ăn cay nóng, đồ uống lạnh. Tái khám sau 7 ngày hoặc ngay khi có các triệu chứng bất thường như khó thở, sốt cao liên tục không giảm.",
+                        Medicines = new List<MedicineItem>
+                        {
+                            new MedicineItem { Name = "Paracetamol 500mg", Quantity = "20 Viên", TimesPerDay = "2", QuantityPerTime = "1 viên", Note = "sáng, tối sau ăn khi sốt trên 38.5 độ C" },
+                            new MedicineItem { Name = "Amoxicillin 500mg", Quantity = "21 Viên", TimesPerDay = "3", QuantityPerTime = "1 viên", Note = "sáng, trưa, tối sau ăn" },
+                            new MedicineItem { Name = "Decolgen Forte", Quantity = "10 Viên", TimesPerDay = "2", QuantityPerTime = "1 viên", Note = "sáng, tối sau ăn khi sổ mũi" },
+                            new MedicineItem { Name = "Siro Ho Prospan 100ml", Quantity = "1 Chai", TimesPerDay = "3", QuantityPerTime = "5ml", Note = "sau ăn" }
+                        }
                     };
                 }
 
                 // 1. Cập nhật dữ liệu lên giao diện (ở cột bên phải "Đơn thuốc")
-                // Lọc bỏ phần số lượng ở đuôi nếu có để hiển thị danh sách sạch đẹp trên list view
                 var uiMedicines = new List<string>();
-                foreach (var med in medicines)
+                foreach (var med in _currentPrescription.Medicines)
                 {
-                    var parts = med.Split(new[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (parts.Length >= 2)
+                    string desc = $"{med.Name} - SL: {med.Quantity}. Uống {med.QuantityPerTime} x {med.TimesPerDay} lần/ngày";
+                    if (!string.IsNullOrEmpty(med.Note))
                     {
-                        uiMedicines.Add($"{parts[0].Trim()} - {parts[1].Trim()}");
+                        desc += $" ({med.Note})";
                     }
-                    else
-                    {
-                        uiMedicines.Add(med);
-                    }
+                    uiMedicines.Add(desc);
                 }
                 ListMedicines.ItemsSource = uiMedicines;
                 ListMedicines.Visibility = Visibility.Visible;
                 BtnContinueBooking.IsEnabled = true;
 
-                // 2. Lấy thông tin Bệnh nhân thực tế từ SessionStorage
-                string patientName = SessionStorage.CurrentUser?.FullName ?? "Nguyễn Văn Bệnh Nhân";
-                string patientGender = "Nam"; // Mặc định
-                string patientAge = "25"; // Mặc định
-                string patientAddress = "Thủ Đức, TP. Hồ Chí Minh";
-                string insuranceCode = "GD4797910200115";
-                
-                // Chẩn đoán thông minh dựa trên thuốc
-                string diagnosis = "Viêm họng cấp tính / Sốt nhẹ chưa rõ nguyên nhân";
-                bool hasAntibiotic = false;
-                foreach (var med in medicines)
-                {
-                    if (med.ToLower().Contains("amoxicillin") || med.ToLower().Contains("kháng sinh") || med.ToLower().Contains("cef"))
-                    {
-                        hasAntibiotic = true;
-                        break;
-                    }
-                }
-                if (!hasAntibiotic && !isFallback)
-                {
-                    diagnosis = "Theo dõi sức khỏe / Kê đơn điều trị ngoại trú";
-                }
+                // 2. Chuẩn bị thông tin Bệnh nhân/Phòng khám/Chẩn đoán (Ưu tiên thông tin từ AI)
+                string clinicName = string.IsNullOrWhiteSpace(_currentPrescription.ClinicName) ? "Hệ thống Y tế Số Healthcare Clinic" : _currentPrescription.ClinicName;
+                string clinicAddress = string.IsNullOrWhiteSpace(_currentPrescription.ClinicAddress) ? "Lầu 5, Tòa nhà Công nghệ thông tin, Khu đô thị ĐHQG HCM, Thủ Đức, TP. HCM" : _currentPrescription.ClinicAddress;
+                string clinicPhone = string.IsNullOrWhiteSpace(_currentPrescription.ClinicPhone) ? "1900 6060" : _currentPrescription.ClinicPhone;
+
+                string patientName = string.IsNullOrWhiteSpace(_currentPrescription.PatientName) ? (SessionStorage.CurrentUser?.FullName ?? "Nguyễn Văn Bệnh Nhân") : _currentPrescription.PatientName;
+                string patientGender = string.IsNullOrWhiteSpace(_currentPrescription.PatientGender) ? "Nam" : _currentPrescription.PatientGender;
+                string patientAge = string.IsNullOrWhiteSpace(_currentPrescription.PatientAge) ? "25" : _currentPrescription.PatientAge;
+                string patientAddress = string.IsNullOrWhiteSpace(_currentPrescription.PatientAddress) ? "Thủ Đức, TP. Hồ Chí Minh" : _currentPrescription.PatientAddress;
+                string insuranceCode = "GD4797910200115"; // Thẻ BHYT mặc định
+
+                string diagnosis = string.IsNullOrWhiteSpace(_currentPrescription.Diagnosis) ? "Theo dõi sức khỏe / Kê đơn điều trị ngoại trú" : _currentPrescription.Diagnosis;
+                string doctorName = string.IsNullOrWhiteSpace(_currentPrescription.DoctorName) ? "ThS. BS. Nguyễn Minh Đức" : _currentPrescription.DoctorName;
 
                 // 3. Xây dựng HTML bảng thuốc động
                 var tableRowsBuilder = new StringBuilder();
-                for (int i = 0; i < medicines.Count; i++)
+                for (int i = 0; i < _currentPrescription.Medicines.Count; i++)
                 {
-                    var med = medicines[i];
-                    string name = med;
-                    string qty = "10 Viên"; // Mặc định
-                    string usage = "Uống theo chỉ dẫn của bác sĩ."; // Mặc định
-
-                    var parts = med.Split(new[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (parts.Length >= 1) name = parts[0].Trim();
-                    if (parts.Length >= 2) usage = parts[1].Trim();
-                    if (parts.Length >= 3) qty = parts[2].Trim();
-
-                    // Cố gắng phân tách số lượng nếu nó nằm ở phần cuối của usage hoặc tự động
-                    if (parts.Length == 2)
+                    var med = _currentPrescription.Medicines[i];
+                    string name = med.Name;
+                    string qty = med.Quantity;
+                    string usage = $"Uống {med.QuantityPerTime} x {med.TimesPerDay} lần/ngày";
+                    if (!string.IsNullOrEmpty(med.Note))
                     {
-                        // Thử tìm regex số lượng trong phần cách dùng
-                        var qtyMatch = System.Text.RegularExpressions.Regex.Match(usage, @"(\d+)\s*(viên|vien|vỉ|vi|chai|tuýp|tuyp|hộp|hop|ống|ong|gói|goi)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                        if (qtyMatch.Success)
-                        {
-                            qty = qtyMatch.Value;
-                            // Xóa phần số lượng khỏi chuỗi cách dùng để tránh lặp
-                            usage = usage.Replace(qtyMatch.Value, "").Trim(new char[] { ' ', '-', ',', '.' });
-                        }
+                        usage += $" ({med.Note})";
                     }
 
                     tableRowsBuilder.AppendLine($@"
@@ -198,8 +186,26 @@ namespace Healthcare.Client.UI.Patient
                     </tr>");
                 }
 
+                // Xây dựng lời dặn của bác sĩ
+                string doctorAdviceHtml = "";
+                if (!string.IsNullOrWhiteSpace(_currentPrescription.DoctorAdvice))
+                {
+                    var adviceLines = _currentPrescription.DoctorAdvice.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var line in adviceLines)
+                    {
+                        var cleanLine = line.Trim().TrimStart('•', '-', '*', ' ');
+                        doctorAdviceHtml += $"<p>• {cleanLine}</p>\n";
+                    }
+                }
+                else
+                {
+                    doctorAdviceHtml = @"<p>• Uống nhiều nước ấm, súc họng bằng nước muối sinh lý ấm ít nhất 3 lần/ngày.</p>
+        <p>• Nghỉ ngơi hợp lý, tránh làm việc quá sức, tránh thức ăn cay nóng, đồ uống lạnh.</p>
+        <p>• Tái khám sau 7 ngày hoặc ngay khi có các triệu chứng bất thường như khó thở, sốt cao liên tục không giảm.</p>";
+                }
+
                 // 4. Tạo HTML hoàn chỉnh từ template
-                string prescriptionCode = "DT-AI-" + DateTime.Now.ToString("yyyyMMdd") + "-" + new Random().Next(100, 999);
+                string prescriptionCode = "DT-" + DateTime.Now.ToString("yyyyMMdd") + "-" + new Random().Next(100, 999);
                 string currentDateString = "Ngày " + DateTime.Now.Day + " tháng " + DateTime.Now.Month + " năm " + DateTime.Now.Year;
                 string currentTimeString = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
 
@@ -207,7 +213,7 @@ namespace Healthcare.Client.UI.Patient
 <html lang=""vi"">
 <head>
     <meta charset=""UTF-8"">
-    <title>Đơn Thuốc AI - Healthcare Clinic</title>
+    <title>Đơn Thuốc - Healthcare Clinic</title>
     <style>
         body {{
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -413,20 +419,20 @@ namespace Healthcare.Client.UI.Patient
         <div class=""logo-area"">
             <div class=""logo-icon"">+</div>
             <div class=""clinic-info"">
-                <h1>Hệ thống Y tế Số Healthcare Clinic</h1>
-                <p>Địa chỉ: Lầu 5, Tòa nhà Công nghệ thông tin, Khu đô thị ĐHQG HCM, Thủ Đức, TP. HCM</p>
-                <p>Điện thoại: 1900 6060 | Hotline: 0988 888 888</p>
+                <h1>{clinicName}</h1>
+                <p>Địa chỉ: {clinicAddress}</p>
+                <p>Điện thoại: {clinicPhone}</p>
             </div>
         </div>
         <div class=""prescription-code"">
-            <h2>MÃ ĐƠN THUỐC AI</h2>
+            <h2>MÃ ĐƠN THUỐC</h2>
             <p>{prescriptionCode}</p>
         </div>
     </div>
 
     <div class=""title"">
         <h3>ĐƠN THUỐC ĐIỆN TỬ</h3>
-        <p>Được trích xuất và tối ưu bởi Trí tuệ nhân tạo Healthcare AI</p>
+        <p>Được trích xuất và tối ưu bởi Hệ thống Healthcare</p>
     </div>
 
     <div class=""section-title"">Thông tin bệnh nhân</div>
@@ -469,9 +475,7 @@ namespace Healthcare.Client.UI.Patient
 
     <div class=""section-title"">Lời dặn của Bác sĩ</div>
     <div class=""notes-box"">
-        <p>• Uống nhiều nước ấm, súc họng bằng nước muối sinh lý ấm ít nhất 3 lần/ngày.</p>
-        <p>• Nghỉ ngơi hợp lý, tránh làm việc quá sức, tránh thức ăn cay nóng, đồ uống lạnh.</p>
-        <p>• Tái khám sau 7 ngày hoặc ngay khi có các triệu chứng bất thường như khó thở, sốt cao liên tục không giảm.</p>
+        {doctorAdviceHtml}
     </div>
 
     <div class=""footer-signatures"">
@@ -483,10 +487,10 @@ namespace Healthcare.Client.UI.Patient
         <div class=""signature-item"">
             <div class=""date"">{currentDateString}</div>
             <div class=""role"">BÁC SĨ ĐIỀU TRỊ</div>
-            <div class=""name"">ThS. BS. Nguyễn Minh Đức</div>
+            <div class=""name"">{doctorName}</div>
             <div class=""digital-sig"">
                 ✓ ĐÃ KÝ ĐIỆN TỬ<br>
-                Healthcare AI System<br>
+                Healthcare System<br>
                 Thời gian: {currentTimeString}
             </div>
         </div>
@@ -579,7 +583,7 @@ namespace Healthcare.Client.UI.Patient
                     var infoDialog = new ContentDialog
                     {
                         Title = "Thông tin thử nghiệm",
-                        Content = $"Không thể kết nối API AI trên Server (Chi tiết: {apiErrorMsg}).\n\nỨng dụng đã tự động giả lập và sinh đơn thuốc mẫu động để bạn thử nghiệm đầy đủ tính năng.",
+                        Content = $"Không thể kết nối API trên Server (Chi tiết: {apiErrorMsg}).\n\nỨng dụng đã tự động giả lập và sinh đơn thuốc mẫu động để bạn thử nghiệm đầy đủ tính năng.",
                         CloseButtonText = "Đóng",
                         XamlRoot = this.XamlRoot
                     };
@@ -608,8 +612,7 @@ namespace Healthcare.Client.UI.Patient
 
         private async void BtnBook_Click(object sender, RoutedEventArgs e)
         {
-            var medicines = ListMedicines.ItemsSource as List<string>;
-            if (medicines == null || medicines.Count == 0)
+            if (_currentPrescription == null || _currentPrescription.Medicines == null || _currentPrescription.Medicines.Count == 0)
             {
                 _shell?.NavigateToPage(typeof(BookAppointmentPage));
                 return;
@@ -636,7 +639,7 @@ namespace Healthcare.Client.UI.Patient
                     textBlock.Text = "Đang lưu nhắc nhở uống thuốc...";
                 }
 
-                await SaveMedicinesAndRemindersAsync(medicines);
+                await SaveMedicinesAndRemindersAsync(_currentPrescription.Medicines);
 
                 LoadingOverlay.Visibility = Visibility.Collapsed;
                 _shell?.NavigateToPage(typeof(BookAppointmentPage));
@@ -647,7 +650,7 @@ namespace Healthcare.Client.UI.Patient
             }
         }
 
-        private async Task SaveMedicinesAndRemindersAsync(List<string> medicines)
+        private async Task SaveMedicinesAndRemindersAsync(List<MedicineItem> medicines)
         {
             try
             {
@@ -655,8 +658,11 @@ namespace Healthcare.Client.UI.Patient
                 var currentUserId = SessionStorage.CurrentUser?.Id;
                 if (string.IsNullOrEmpty(currentUserId)) return;
 
-                foreach (var medName in medicines)
+                foreach (var med in medicines)
                 {
+                    string medName = med.Name;
+                    if (string.IsNullOrWhiteSpace(medName)) continue;
+
                     // 1. Kiểm tra và thêm vào MasterMedicine nếu chưa có
                     var checkMed = await client.From<MasterMedicine>()
                         .Where(m => m.MedicineName == medName)
@@ -668,7 +674,7 @@ namespace Healthcare.Client.UI.Patient
                         {
                             Id = Guid.NewGuid().ToString(),
                             MedicineName = medName,
-                            DefaultDosage = "Theo chỉ dẫn bác sĩ"
+                            DefaultDosage = string.IsNullOrEmpty(med.QuantityPerTime) ? "Theo chỉ dẫn bác sĩ" : $"{med.QuantityPerTime} x {med.TimesPerDay} lần/ngày"
                         };
                         await client.From<MasterMedicine>().Insert(newMed);
                     }
@@ -679,7 +685,7 @@ namespace Healthcare.Client.UI.Patient
                         Id = Guid.NewGuid().ToString(),
                         PatientId = currentUserId,
                         MedicineName = medName,
-                        Dosage = "1 viên",
+                        Dosage = string.IsNullOrEmpty(med.QuantityPerTime) ? "1 viên" : med.QuantityPerTime,
                         TimeToTake = new TimeSpan(8, 0, 0), // Mặc định 8:00 sáng
                         StartDate = DateTime.Now,
                         IsActive = true

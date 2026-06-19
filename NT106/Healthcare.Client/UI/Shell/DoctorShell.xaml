@@ -284,13 +284,45 @@
                     <!-- Action Buttons -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4"
                                 VerticalAlignment="Center">
-                        <!-- Notification -->
-                        <Button x:Name="BtnNotification" Style="{StaticResource IconButtonStyle}"
-                                Click="BtnNotification_Click"
-                                ToolTipService.ToolTip="Thông báo">
-                            <FontIcon Glyph="&#xEA8F;" FontSize="20"
-                                      Foreground="{StaticResource SlateGray500}"
-                                      FontFamily="Segoe Fluent Icons"/>
+                        <!-- Notification Bell Button with Flyout -->
+                        <Button x:Name="BtnNotification" Style="{StaticResource IconButtonStyle}" ToolTipService.ToolTip="Thông báo">
+                            <Button.Flyout>
+                                <Flyout Placement="BottomEdgeAlignedRight">
+                                    <Flyout.FlyoutPresenterStyle>
+                                        <Style TargetType="FlyoutPresenter">
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="CornerRadius" Value="14"/>
+                                            <Setter Property="MinWidth" Value="0"/>
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                        </Style>
+                                    </Flyout.FlyoutPresenterStyle>
+                                    <comp:NotificationPanel x:Name="NotifPanel"
+                                                             UnreadCountChanged="NotifPanel_UnreadCountChanged"
+                                                             NavigationRequested="NotifPanel_NavigationRequested"/>
+                                </Flyout>
+                            </Button.Flyout>
+                            <Grid>
+                                <FontIcon Glyph="&#xEA8F;" FontSize="20"
+                                          Foreground="{StaticResource SlateGray500}"
+                                          FontFamily="Segoe Fluent Icons"/>
+                                <!-- Unread badge -->
+                                <Border x:Name="NotifBadge"
+                                        Background="#EF4444"
+                                        CornerRadius="8"
+                                        MinWidth="16" Height="16"
+                                        Padding="4,0"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Margin="0,-4,-4,0"
+                                        Visibility="Collapsed">
+                                    <TextBlock x:Name="NotifBadgeText"
+                                               Text="0" FontSize="9" FontWeight="Bold"
+                                               Foreground="White"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                            </Grid>
                         </Button>
                         <!-- Settings -->
                         <Button x:Name="BtnSettings" Style="{StaticResource IconButtonStyle}"

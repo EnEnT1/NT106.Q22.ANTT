@@ -25,7 +25,7 @@ namespace Healthcare.Client.UI.Components
         {
             this.InitializeComponent();
 
-            AppendBotMessage("Xin chào! Tôi là ChatGPT hỗ trợ tư vấn sức khỏe cơ bản. Bạn cần hỏi gì?");
+            AppendBotMessage("Xin chào! Tôi là Gemini hỗ trợ tư vấn sức khỏe cơ bản. Bạn cần hỏi gì?");
         }
 
         private async void BtnSend_Click(object sender, RoutedEventArgs e)
@@ -57,7 +57,7 @@ namespace Healthcare.Client.UI.Components
             {
                 AppendBotMessage("Đang suy nghĩ...");
 
-                string reply = await CallChatGptApiAsync(message);
+                string reply = await CallGeminiApiAsync(message);
 
                 RemoveLastMessage();
                 AppendBotMessage(reply);
@@ -65,7 +65,8 @@ namespace Healthcare.Client.UI.Components
             catch (Exception ex)
             {
                 RemoveLastMessage();
-                AppendBotMessage("Không kết nối được ChatGPT: " + ex.Message);
+                AppendBotMessage("Hệ thống hiện đang bận hoặc mất kết nối mạng. Vui lòng thử lại sau.");
+                System.Diagnostics.Debug.WriteLine($"[Chatbot AI Error]: {ex.Message}");
             }
             finally
             {
@@ -73,7 +74,7 @@ namespace Healthcare.Client.UI.Components
             }
         }
 
-        private async Task<string> CallChatGptApiAsync(string message)
+        private async Task<string> CallGeminiApiAsync(string message)
         {
             var requestBody = new
             {
@@ -97,7 +98,7 @@ namespace Healthcare.Client.UI.Components
                 return "Server AI lỗi: " + responseJson;
             }
 
-            var result = JsonSerializer.Deserialize<ChatGptResponse>(
+            var result = JsonSerializer.Deserialize<GeminiChatResponse>(
                 responseJson,
                 new JsonSerializerOptions
                 {
@@ -107,7 +108,7 @@ namespace Healthcare.Client.UI.Components
 
             if (result == null || string.IsNullOrWhiteSpace(result.Reply))
             {
-                return "ChatGPT chưa có câu trả lời phù hợp.";
+                return "Gemini chưa có câu trả lời phù hợp.";
             }
 
             return result.Reply;
@@ -127,7 +128,7 @@ namespace Healthcare.Client.UI.Components
         private void AppendBotMessage(string text)
         {
             MessageList.Children.Add(BuildBubble(
-                senderName: "ChatGPT",
+                senderName: "Gemini",
                 message: text,
                 isUser: false
             ));
@@ -207,7 +208,7 @@ namespace Healthcare.Client.UI.Components
         }
     }
 
-    public class ChatGptResponse
+    public class GeminiChatResponse
     {
         public bool Success { get; set; }
 

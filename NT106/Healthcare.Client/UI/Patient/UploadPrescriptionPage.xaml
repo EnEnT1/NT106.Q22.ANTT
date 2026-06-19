@@ -4,32 +4,43 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:Healthcare.Client.UI.Patient"
     mc:Ignorable="d"
     Background="{StaticResource AppBackdropGradientBrush}">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="60,40,60,60" Spacing="40" MaxWidth="1100" HorizontalAlignment="Center">
-            
-            <StackPanel Spacing="10">
-                <TextBlock Text="Nhập đơn thuốc AI" FontSize="36" FontWeight="ExtraBold" Foreground="#0F172A" CharacterSpacing="-15"/>
-                <TextBlock Text="Tải lên ảnh hoặc file đơn thuốc để AI tự động trích xuất thông tin thuốc và hỗ trợ đặt lịch." 
-                           FontSize="16" Foreground="#64748B"/>
-            </StackPanel>
+    <Grid Margin="40,32,40,40" RowSpacing="32" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Header -->
+            <RowDefinition Height="*"/>    <!-- Main Content -->
+        </Grid.RowDefinitions>
 
-            <Grid ColumnSpacing="40">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Spacing="8">
+            <TextBlock Text="Nhập đơn thuốc" FontSize="36" FontWeight="ExtraBold" Foreground="#0F172A" CharacterSpacing="-15"/>
+            <TextBlock Text="Tải lên ảnh hoặc file đơn thuốc để tự động trích xuất thông tin thuốc và hỗ trợ đặt lịch." 
+                       FontSize="16" Foreground="#64748B"/>
+        </StackPanel>
 
-                <!-- Left Column: Upload Area and Action Buttons -->
-                <StackPanel Grid.Column="0" Spacing="24">
-                    
-                    <!-- Upload Area -->
-                    <Border Background="White" CornerRadius="24" Padding="40" BorderBrush="#E2E8F0" BorderThickness="2">
-                        <StackPanel Spacing="24" HorizontalAlignment="Center">
-                            <Border Width="80" Height="80" CornerRadius="40" Background="#EFF6FF">
-                                <FontIcon Glyph="&#xE8E5;" FontSize="32" Foreground="#2563EB" FontFamily="Segoe Fluent Icons"/>
+        <!-- Main Content Columns -->
+        <Grid Grid.Row="1" ColumnSpacing="32" VerticalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Column: Upload Area and Action Buttons -->
+            <Grid Grid.Column="0" RowSpacing="24" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>    <!-- Upload card fills space -->
+                    <RowDefinition Height="Auto"/> <!-- Buttons at the bottom -->
+                </Grid.RowDefinitions>
+
+                <!-- Upload Area -->
+                <Border Grid.Row="0" Background="White" CornerRadius="24" Padding="40" BorderBrush="#E2E8F0" BorderThickness="2" VerticalAlignment="Stretch">
+                    <Grid VerticalAlignment="Center">
+                        <StackPanel Spacing="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Border Width="80" Height="80" CornerRadius="40" Background="#EFF6FF" HorizontalAlignment="Center">
+                                <FontIcon Glyph="&#xE8E5;" FontSize="32" Foreground="#2563EB" FontFamily="Segoe Fluent Icons" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Spacing="8" HorizontalAlignment="Center">
                                 <TextBlock Text="Chọn file đơn thuốc của bạn" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
@@ -46,7 +57,7 @@
                                 <Button x:Name="BtnAnalyze" Click="BtnAnalyze_Click" IsEnabled="False" Padding="24,12" CornerRadius="12" BorderThickness="1" BorderBrush="#E2E8F0" Background="White">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <FontIcon Glyph="&#xE9D9;" FontSize="16" Foreground="#2563EB" FontFamily="Segoe Fluent Icons"/>
-                                        <TextBlock Text="Phân tích AI" FontWeight="Bold" Foreground="#2563EB"/>
+                                        <TextBlock Text="Phân tích" FontWeight="Bold" Foreground="#2563EB"/>
                                     </StackPanel>
                                 </Button>
                             </StackPanel>
@@ -58,71 +69,77 @@
                                 </StackPanel>
                             </Border>
                         </StackPanel>
-                    </Border>
-
-                    <!-- Primary & Secondary Actions -->
-                    <Grid ColumnSpacing="16" HorizontalAlignment="Stretch">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*"/>
-                            <ColumnDefinition Width="1*"/>
-                        </Grid.ColumnDefinitions>
-                        
-                        <Button x:Name="BtnContinueBooking" Grid.Column="0" Click="BtnBook_Click" IsEnabled="False" HorizontalAlignment="Stretch" Padding="0,16" Background="#2563EB" Foreground="White" CornerRadius="14" FontWeight="Bold">
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                <TextBlock Text="Tiếp tục đặt lịch"/>
-                                <FontIcon Glyph="&#xE76C;" FontSize="12" FontFamily="Segoe Fluent Icons"/>
-                            </StackPanel>
-                        </Button>
-                        
-                        <Button Grid.Column="1" Click="BtnCancel_Click" HorizontalAlignment="Stretch" Padding="0,16" Background="Transparent" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="14">
-                            <TextBlock Text="Bỏ qua" FontSize="14" FontWeight="SemiBold" Foreground="#64748B"/>
-                        </Button>
                     </Grid>
-                </StackPanel>
+                </Border>
 
-                <!-- Right Column: Results (Đơn thuốc) -->
-                <StackPanel Grid.Column="1" Spacing="20">
-                    <TextBlock Text="Đơn thuốc" FontSize="20" FontWeight="Bold" Foreground="#1E293B"/>
-                    <Border Background="White" CornerRadius="24" Padding="32" BorderBrush="#F1F5F9" BorderThickness="1" MinHeight="400" VerticalAlignment="Stretch">
-                        <Grid>
-                            <StackPanel x:Name="EmptyResultState" VerticalAlignment="Center" Spacing="16">
-                                <FontIcon Glyph="&#xE977;" FontSize="48" Foreground="#E2E8F0" FontFamily="Segoe Fluent Icons"/>
-                                <TextBlock Text="Kết quả phân tích sẽ hiển thị tại đây" FontSize="15" Foreground="#94A3B8" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                            
-                            <ListView x:Name="ListMedicines" SelectionMode="None" Visibility="Collapsed">
-                                <ListView.ItemContainerStyle>
-                                    <Style TargetType="ListViewItem">
-                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                        <Setter Property="Padding" Value="0,0,0,12"/>
-                                    </Style>
-                                </ListView.ItemContainerStyle>
-                                <ListView.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Background="#F8FAFC" CornerRadius="12" Padding="16">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
-                                                <Border Width="32" Height="32" CornerRadius="8" Background="#EFF6FF" Margin="0,0,16,0">
-                                                    <FontIcon Glyph="&#xE945;" FontSize="14" Foreground="#2563EB" FontFamily="Segoe Fluent Icons"/>
-                                                </Border>
-                                                <TextBlock Grid.Column="1" Text="{Binding}" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="#334155"/>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
-
-                            <StackPanel x:Name="LoadingOverlay" Visibility="Collapsed" VerticalAlignment="Center" Spacing="20">
-                                <ProgressRing IsActive="True" Width="48" Height="48" Foreground="#2563EB"/>
-                                <TextBlock Text="Đang phân tích đơn thuốc bằng AI..." FontSize="14" Foreground="#2563EB" FontWeight="Bold" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-                </StackPanel>
+                <!-- Primary & Secondary Actions -->
+                <Grid Grid.Row="1" ColumnSpacing="16" HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Button x:Name="BtnContinueBooking" Grid.Column="0" Click="BtnBook_Click" IsEnabled="False" HorizontalAlignment="Stretch" Padding="0,16" Background="#2563EB" Foreground="White" CornerRadius="14" FontWeight="Bold">
+                        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="Tiếp tục đặt lịch"/>
+                            <FontIcon Glyph="&#xE76C;" FontSize="12" FontFamily="Segoe Fluent Icons" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Button Grid.Column="1" Click="BtnCancel_Click" HorizontalAlignment="Stretch" Padding="0,16" Background="Transparent" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="14">
+                        <TextBlock Text="Bỏ qua" FontSize="14" FontWeight="SemiBold" Foreground="#64748B" HorizontalAlignment="Center"/>
+                    </Button>
+                </Grid>
             </Grid>
-        </StackPanel>
-    </ScrollViewer>
+
+            <!-- Right Column: Results (Đơn thuốc) -->
+            <Grid Grid.Column="1" RowSpacing="16" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Title -->
+                    <RowDefinition Height="*"/>    <!-- Result card fills space -->
+                </Grid.RowDefinitions>
+                
+                <TextBlock Grid.Row="0" Text="Đơn thuốc" FontSize="20" FontWeight="Bold" Foreground="#1E293B" VerticalAlignment="Center"/>
+                
+                <Border Grid.Row="1" Background="White" CornerRadius="24" Padding="32" BorderBrush="#F1F5F9" BorderThickness="1" VerticalAlignment="Stretch">
+                    <Grid>
+                        <StackPanel x:Name="EmptyResultState" VerticalAlignment="Center" Spacing="16">
+                            <FontIcon Glyph="&#xE977;" FontSize="48" Foreground="#E2E8F0" FontFamily="Segoe Fluent Icons"/>
+                            <TextBlock Text="Kết quả phân tích sẽ hiển thị tại đây" FontSize="15" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                        
+                        <ListView x:Name="ListMedicines" SelectionMode="None" Visibility="Collapsed" VerticalAlignment="Stretch">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Padding" Value="0,0,0,12"/>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#F8FAFC" CornerRadius="12" Padding="16">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Width="32" Height="32" CornerRadius="8" Background="#EFF6FF" Margin="0,0,16,0">
+                                                <FontIcon Glyph="&#xE945;" FontSize="14" Foreground="#2563EB" FontFamily="Segoe Fluent Icons" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Grid.Column="1" Text="{Binding}" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="#334155"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+
+                        <StackPanel x:Name="LoadingOverlay" Visibility="Collapsed" VerticalAlignment="Center" Spacing="20">
+                            <ProgressRing IsActive="True" Width="48" Height="48" Foreground="#2563EB"/>
+                            <TextBlock Text="Đang phân tích đơn thuốc..." FontSize="14" Foreground="#2563EB" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
 </Page>

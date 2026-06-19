@@ -32,8 +32,7 @@ namespace Healthcare.Client.UI.Components
 
         private readonly HttpClient _httpClient = new HttpClient
         {
-            // Nhớ sửa port này theo Healthcare.Server/Properties/launchSettings.json
-            BaseAddress = new Uri("https://localhost:5001/")
+            BaseAddress = new Uri(Healthcare.Client.APIClient.BaseHttpClient.ServerBaseUrl)
         };
 
         public ChatControl()
@@ -196,7 +195,8 @@ namespace Healthcare.Client.UI.Components
             }
             catch (Exception ex)
             {
-                AppendAiMessage("Không kết nối được AI: " + ex.Message);
+                AppendAiMessage("Không kết nối được với hệ thống hỗ trợ. Vui lòng kiểm tra lại kết nối mạng.");
+                System.Diagnostics.Debug.WriteLine($"[Ai Chat Error]: {ex.Message}");
             }
         }
 

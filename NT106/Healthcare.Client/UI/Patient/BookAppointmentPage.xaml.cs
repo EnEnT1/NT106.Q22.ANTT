@@ -483,6 +483,7 @@ namespace Healthcare.Client.UI.Patient
 
                 var appt = new Appointment
                 {
+                    Id = Guid.NewGuid().ToString(),
                     PatientId = SessionStorage.CurrentUser.Id,
                     DoctorId = finalDoctorId,
                     AppointmentDate = DateTime.SpecifyKind(selectedDateVM.DateValue.Date, DateTimeKind.Utc),
@@ -505,17 +506,12 @@ namespace Healthcare.Client.UI.Patient
                     return;
                 }
 
-                // Cập nhật trạng thái Slot thành Booked
-                await _supabase.From<TimeSlot>()
-                    .Where(x => x.Id == selectedSlotVM.Id)
-                    .Set(x => x.Status, "Booked")
-                    .Update();
-
                 // Tính phí (lấy từ Appointment Summary đã nối vào DoctorViewModel)
                 decimal feeToPay = selectedDoctorVM.ConsultationFee;
 
                 var transaction = new Transaction
                 {
+                    Id = Guid.NewGuid().ToString(),
                     AppointmentId = insertedAppt.Id,
                     PatientId = SessionStorage.CurrentUser.Id,
                     Amount = feeToPay, 

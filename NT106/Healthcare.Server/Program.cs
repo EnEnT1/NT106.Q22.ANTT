@@ -29,6 +29,7 @@ builder.Services.AddScoped<Supabase.Client>(_ => new Supabase.Client(supabaseUrl
 
 builder.Services.AddSingleton<SupabaseAdminHelper>();
 builder.Services.AddScoped<AiPrescriptionService>();
+builder.Services.AddScoped<GeminiChatService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddSingleton<SupabaseAdminService>();
 

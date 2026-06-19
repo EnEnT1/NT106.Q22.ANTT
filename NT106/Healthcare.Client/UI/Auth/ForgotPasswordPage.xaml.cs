@@ -167,7 +167,6 @@ namespace Healthcare.Client.UI.Auth
 
             try
             {
-                // TODO: Gọi API đặt lại mật khẩu
                 await SupabaseAuthService.UpdatePasswordAsync(newPass);
 
                 await ShowDialogAsync("Thành công", "Mật khẩu đã được cập nhật. Vui lòng đăng nhập lại.");

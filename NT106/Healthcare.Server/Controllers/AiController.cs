@@ -24,14 +24,17 @@ namespace Healthcare.Server.Controllers
                 return BadRequest("Vui lòng chọn ảnh đơn thuốc.");
 
             using var stream = file.OpenReadStream();
-            var medicines = await _aiPrescriptionService.AnalyzeImageAsync(stream);
+            var data = await _aiPrescriptionService.AnalyzeImageAsync(stream);
 
             return Ok(new
             {
                 success = true,
-                medicines = medicines
+                data = data,
+                // giữ backward-compat: medicines là list tên thuốc đơn giản
+                medicines = data.Medicines?.ConvertAll(m => m.Name) ?? new System.Collections.Generic.List<string>()
             });
         }
+
 
         [HttpPost("chat")]
         public async Task<IActionResult> Chat([FromBody] ChatRequest request)
@@ -56,12 +59,15 @@ namespace Healthcare.Server.Controllers
             }
             catch (Exception ex)
             {
-                // Fallback về rules offline nếu OpenAI bị lỗi (hoặc chưa cấu hình API Key)
+                // Ghi nhận lỗi Gemini vào console của máy chủ để bảo mật thông tin
+                Console.WriteLine($"[Gemini Error]: {ex.Message}");
+
+                // Fallback về rules offline nếu Gemini bị lỗi (hoặc chưa cấu hình API Key)
                 string reply = GenerateHealthReply(request.Message);
                 return Ok(new
                 {
                     success = true,
-                    reply = $"{reply}\n\n*(Lưu ý: Đang chạy ở chế độ offline do lỗi OpenAI: {ex.Message})*"
+                    reply = $"{reply}\n\n*(Lưu ý: Đang chạy ở chế độ offline)*"
                 });
             }
         }
