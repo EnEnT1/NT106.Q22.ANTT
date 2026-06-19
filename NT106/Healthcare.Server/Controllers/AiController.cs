@@ -23,16 +23,28 @@ namespace Healthcare.Server.Controllers
             if (file == null || file.Length == 0)
                 return BadRequest("Vui lòng chọn ảnh đơn thuốc.");
 
-            using var stream = file.OpenReadStream();
-            var data = await _aiPrescriptionService.AnalyzeImageAsync(stream);
-
-            return Ok(new
+            try
             {
-                success = true,
-                data = data,
-                // giữ backward-compat: medicines là list tên thuốc đơn giản
-                medicines = data.Medicines?.ConvertAll(m => m.Name) ?? new System.Collections.Generic.List<string>()
-            });
+                using var stream = file.OpenReadStream();
+                var data = await _aiPrescriptionService.AnalyzeImageAsync(stream);
+
+                return Ok(new
+                {
+                    success = true,
+                    data = data,
+                    // giữ backward-compat: medicines là list tên thuốc đơn giản
+                    medicines = data.Medicines?.ConvertAll(m => m.Name) ?? new System.Collections.Generic.List<string>()
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[AiPrescription Error]: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
         }
 
 
