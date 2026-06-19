@@ -69,7 +69,6 @@ namespace Healthcare.Client.UI.Patient
                     // Reset result state
                     EmptyResultState.Visibility = Visibility.Visible;
                     ListMedicines.Visibility = Visibility.Collapsed;
-                    BtnContinueBooking.IsEnabled = false;
                 }
             }
             catch (Exception ex)
@@ -146,7 +145,6 @@ namespace Healthcare.Client.UI.Patient
                 }
                 ListMedicines.ItemsSource = uiMedicines;
                 ListMedicines.Visibility = Visibility.Visible;
-                BtnContinueBooking.IsEnabled = true;
 
                 // 2. Chuẩn bị thông tin Bệnh nhân/Phòng khám/Chẩn đoán (Ưu tiên thông tin từ AI)
                 string clinicName = string.IsNullOrWhiteSpace(_currentPrescription.ClinicName) ? "Hệ thống Y tế Số Healthcare Clinic" : _currentPrescription.ClinicName;
@@ -632,7 +630,6 @@ namespace Healthcare.Client.UI.Patient
             var result = await dialog.ShowAsync();
             if (result == ContentDialogResult.Primary)
             {
-                BtnContinueBooking.IsEnabled = false;
                 LoadingOverlay.Visibility = Visibility.Visible;
                 if (LoadingOverlay.Children[1] is TextBlock textBlock)
                 {

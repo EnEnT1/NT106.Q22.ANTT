@@ -28,15 +28,10 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Left Column: Upload Area and Action Buttons -->
-            <Grid Grid.Column="0" RowSpacing="24" VerticalAlignment="Stretch">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>    <!-- Upload card fills space -->
-                    <RowDefinition Height="Auto"/> <!-- Buttons at the bottom -->
-                </Grid.RowDefinitions>
-
+            <!-- Left Column: Upload Area -->
+            <Grid Grid.Column="0" VerticalAlignment="Stretch">
                 <!-- Upload Area -->
-                <Border Grid.Row="0" Background="White" CornerRadius="24" Padding="40" BorderBrush="#E2E8F0" BorderThickness="2" VerticalAlignment="Stretch">
+                <Border Background="White" CornerRadius="24" Padding="40" BorderBrush="#E2E8F0" BorderThickness="2" VerticalAlignment="Stretch">
                     <Grid VerticalAlignment="Center">
                         <StackPanel Spacing="24" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <Border Width="80" Height="80" CornerRadius="40" Background="#EFF6FF" HorizontalAlignment="Center">
@@ -71,25 +66,6 @@
                         </StackPanel>
                     </Grid>
                 </Border>
-
-                <!-- Primary & Secondary Actions -->
-                <Grid Grid.Row="1" ColumnSpacing="16" HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <Button x:Name="BtnContinueBooking" Grid.Column="0" Click="BtnBook_Click" IsEnabled="False" HorizontalAlignment="Stretch" Padding="0,16" Background="#2563EB" Foreground="White" CornerRadius="14" FontWeight="Bold">
-                        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock Text="Tiếp tục đặt lịch"/>
-                            <FontIcon Glyph="&#xE76C;" FontSize="12" FontFamily="Segoe Fluent Icons" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                    
-                    <Button Grid.Column="1" Click="BtnCancel_Click" HorizontalAlignment="Stretch" Padding="0,16" Background="Transparent" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="14">
-                        <TextBlock Text="Bỏ qua" FontSize="14" FontWeight="SemiBold" Foreground="#64748B" HorizontalAlignment="Center"/>
-                    </Button>
-                </Grid>
             </Grid>
 
             <!-- Right Column: Results (Đơn thuốc) -->

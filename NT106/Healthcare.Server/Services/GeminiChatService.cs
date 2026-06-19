@@ -18,7 +18,7 @@ namespace Healthcare.Server.Services
         {
             _httpClient = new HttpClient();
             _apiKey = configuration["Gemini:ApiKey"] ?? "";
-            _model  = configuration["Gemini:Model"]  ?? "gemini-1.5-flash";
+            _model  = configuration["Gemini:Model"]  ?? "gemini-3.5-flash";
         }
 
         public async Task<string> AskAsync(string message)
