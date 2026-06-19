@@ -23,7 +23,7 @@ namespace Healthcare.Server.Services
                       ?? throw new Exception("Thiếu Gemini:ApiKey trong appsettings.json");
 
             _model = _configuration["Gemini:Model"]
-                     ?? "gemini-1.5-flash";
+                     ?? "gemini-3.5-flash";
 
             _httpClient = new HttpClient();
         }
