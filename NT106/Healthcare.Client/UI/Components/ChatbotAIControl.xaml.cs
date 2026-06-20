@@ -25,7 +25,7 @@ namespace Healthcare.Client.UI.Components
         {
             this.InitializeComponent();
 
-            AppendBotMessage("Xin chào! Tôi là Gemini hỗ trợ tư vấn sức khỏe cơ bản. Bạn cần hỏi gì?");
+            AppendBotMessage("Xin chào! Tôi là Elizabeth hỗ trợ tư vấn sức khỏe cơ bản. Bạn cần hỏi gì?");
         }
 
         private async void BtnSend_Click(object sender, RoutedEventArgs e)
@@ -108,7 +108,7 @@ namespace Healthcare.Client.UI.Components
 
             if (result == null || string.IsNullOrWhiteSpace(result.Reply))
             {
-                return "Gemini chưa có câu trả lời phù hợp.";
+                return "Elizabeth chưa có câu trả lời phù hợp.";
             }
 
             return result.Reply;
@@ -128,7 +128,7 @@ namespace Healthcare.Client.UI.Components
         private void AppendBotMessage(string text)
         {
             MessageList.Children.Add(BuildBubble(
-                senderName: "Gemini",
+                senderName: "Elizabeth",
                 message: text,
                 isUser: false
             ));

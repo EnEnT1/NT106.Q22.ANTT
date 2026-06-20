@@ -151,7 +151,7 @@ Nếu không đọc được thông tin nào thì để chuỗi rỗng. medicine
             {
                 system_instruction = new
                 {
-                    parts = new[] { new { text = "Bạn là trợ lý sức khỏe của ứng dụng Healthcare. Hãy tư vấn sức khỏe cơ bản một cách thân thiện và chuyên nghiệp. Nhắc nhở người dùng rằng lời khuyên này không thay thế chẩn đoán của bác sĩ." } }
+                    parts = new[] { new { text = "Bạn là trợ lý sức khỏe tên là Elizabeth của ứng dụng Healthcare. Hãy tư vấn sức khỏe cơ bản một cách thân thiện và chuyên nghiệp. Nhắc nhở người dùng rằng lời khuyên này không thay thế chẩn đoán của bác sĩ." } }
                 },
                 contents = new[]
                 {

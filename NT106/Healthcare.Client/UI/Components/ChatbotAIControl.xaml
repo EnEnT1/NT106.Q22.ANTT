@@ -26,7 +26,7 @@
                            FontWeight="Bold"
                            Foreground="#1E293B"/>
 
-                <TextBlock Text="Hỏi đáp sức khỏe cơ bản với Gemini"
+                <TextBlock Text="Hỏi đáp sức khỏe cơ bản với Elizabeth"
                            FontSize="12"
                            Foreground="#64748B"/>
             </StackPanel>
@@ -84,7 +84,7 @@
                 BorderBrush="#E5E7EB"
                 BorderThickness="1,1,1,0"
                 Padding="10">
-            <TextBlock Text="Gemini chỉ hỗ trợ tư vấn cơ bản, không thay thế chẩn đoán của bác sĩ."
+            <TextBlock Text="Elizabeth chỉ hỗ trợ tư vấn cơ bản, không thay thế chẩn đoán của bác sĩ."
                        FontSize="11"
                        Foreground="#64748B"
                        TextWrapping="Wrap"/>
