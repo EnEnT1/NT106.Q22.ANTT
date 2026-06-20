@@ -1,182 +1,167 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-    <RootNamespace>Healthcare.Client</RootNamespace>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Platforms>x86;x64;ARM64</Platforms>
-    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
-    <PublishProfile>win-$(Platform).pubxml</PublishProfile>
-    <UseWinUI>true</UseWinUI>
-    <WinUISDKReferences>false</WinUISDKReferences>
-    <EnableMsixTooling>true</EnableMsixTooling>
-    <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<RootNamespace>Healthcare.Client</RootNamespace>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Platforms>x86;x64;ARM64</Platforms>
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+		<PublishProfile>win-$(Platform).pubxml</PublishProfile>
+		<UseWinUI>true</UseWinUI>
+		<WinUISDKReferences>false</WinUISDKReferences>
+		<EnableMsixTooling>true</EnableMsixTooling>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="Assets\**" />
-    <Manifest Include="$(ApplicationManifest)" />
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="Assets\**" />
+		<Manifest Include="$(ApplicationManifest)" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.WinUI.UI.Controls.DataGrid" Version="7.1.2" />
-    <PackageReference Include="Microsoft.MixedReality.WebRTC" Version="2.0.2" GeneratePathProperty="true" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260317003" />
-    <PackageReference Include="postgrest-csharp" Version="3.5.1" />
-    <PackageReference Include="supabase-csharp" Version="0.16.2" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls.DataGrid" Version="7.1.2" />
+		<PackageReference Include="Microsoft.MixedReality.WebRTC" Version="2.0.2" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260317003" />
+		<PackageReference Include="postgrest-csharp" Version="3.5.1" />
+		<PackageReference Include="supabase-csharp" Version="0.16.2" />
+	</ItemGroup>
 
-  <Target Name="CopyMRWebRTCDllToRoot" BeforeTargets="PrepareForBuild">
-    <Copy SourceFiles="$(PkgMicrosoft_MixedReality_WebRTC)\runtimes\win10-x64\native\mrwebrtc.dll" DestinationFolder="$(MSBuildProjectDirectory)" Condition="'$(Platform)' == 'x64' And !Exists('$(MSBuildProjectDirectory)\mrwebrtc.dll')" />
-    <Copy SourceFiles="$(PkgMicrosoft_MixedReality_WebRTC)\runtimes\win10-x86\native\mrwebrtc.dll" DestinationFolder="$(MSBuildProjectDirectory)" Condition="('$(Platform)' == 'x86' or '$(Platform)' == 'AnyCPU') And !Exists('$(MSBuildProjectDirectory)\mrwebrtc.dll')" />
-  </Target>
+	<ItemGroup>
+		<None Remove="UI\Auth\ForgotPasswordPage.xaml" />
+		<None Remove="UI\Auth\LoginPage.xaml" />
+		<None Remove="UI\Auth\RegisterPage.xaml" />
+		<None Remove="UI\Components\ChatControl.xaml" />
+		<None Remove="UI\Components\VideoCallControl.xaml" />
+		<None Remove="UI\Doctor\DoctorHomePage.xaml" />
+		<None Remove="UI\Doctor\ExaminationPage.xaml" />
+		<None Remove="UI\Doctor\ManageSchedulePage.xaml" />
+		<None Remove="UI\Doctor\PatientHistoryPage.xaml" />
+		<None Remove="UI\Doctor\RevenuePage.xaml" />
+		<None Remove="UI\Patient\HealthMetricsPage.xaml" />
+		<None Remove="UI\Patient\LabResultsPage.xaml" />
+		<None Remove="UI\Patient\MyRecordsPage.xaml" />
+		<None Remove="UI\Patient\PaymentCheckoutPage.xaml" />
+		<None Remove="UI\Shell\DoctorShell.xaml" />
+	</ItemGroup>
 
-  <Target Name="CopyMRWebRTCDllToAppXDir" AfterTargets="Build">
-    <Copy SourceFiles="$(MSBuildProjectDirectory)\mrwebrtc.dll" DestinationFolder="$(MSBuildProjectDirectory)\bin\$(Platform)\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\AppX" Condition="Exists('$(MSBuildProjectDirectory)\mrwebrtc.dll')" />
-  </Target>
+	<ItemGroup>
+		<Page Remove="UI\App.xaml" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Include="mrwebrtc.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="UI\Components\NotificationPannel.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Remove="UI\Auth\ForgotPasswordPage.xaml" />
-    <None Remove="UI\Auth\LoginPage.xaml" />
-    <None Remove="UI\Auth\RegisterPage.xaml" />
-    <None Remove="UI\Components\ChatControl.xaml" />
-    <None Remove="UI\Components\VideoCallControl.xaml" />
-    <None Remove="UI\Doctor\DoctorHomePage.xaml" />
-    <None Remove="UI\Doctor\ExaminationPage.xaml" />
-    <None Remove="UI\Doctor\ManageSchedulePage.xaml" />
-    <None Remove="UI\Doctor\PatientHistoryPage.xaml" />
-    <None Remove="UI\Doctor\RevenuePage.xaml" />
-    <None Remove="UI\Patient\HealthMetricsPage.xaml" />
-    <None Remove="UI\Patient\LabResultsPage.xaml" />
-    <None Remove="UI\Patient\MyRecordsPage.xaml" />
-    <None Remove="UI\Patient\PaymentCheckoutPage.xaml" />
-    <None Remove="UI\Shell\DoctorShell.xaml" />
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="UI\Patient\LabResultsPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Remove="UI\App.xaml" />
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="UI\Patient\HealthMetricsPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="UI\Components\NotificationPannel.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="UI\Patient\MyRecordsPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="UI\Patient\LabResultsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="UI\Patient\PaymentCheckoutPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="UI\Patient\UploadPrescriptionPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="UI\Patient\HealthMetricsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="UI\Components\ChatControl.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="UI\Patient\MyRecordsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="UI\Doctor\RevenuePage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="UI\Patient\PaymentCheckoutPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="UI\Patient\UploadPrescriptionPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="UI\Doctor\PatientHistoryPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="UI\Components\ChatControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="UI\Doctor\ExaminationPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="UI\Doctor\RevenuePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="UI\Doctor\ManageSchedulePage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="UI\Doctor\PatientHistoryPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="UI\Auth\RegisterPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="UI\Auth\ForgotPasswordPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="UI\Auth\LoginPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="UI\Doctor\ExaminationPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+	<ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+		<ProjectCapability Include="Msix" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="UI\Doctor\ManageSchedulePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="UI\Admin\AdminPageHome.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="UI\Auth\RegisterPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="UI\Auth\ForgotPasswordPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="UI\Auth\LoginPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="UI\Shell\DoctorShell.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
-    <ProjectCapability Include="Msix" />
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="UI\Doctor\DoctorHomePage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="UI\Admin\AdminPageHome.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="UI\Components\VideoCallControl.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="UI\Shell\DoctorShell.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+	<PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+		<HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Page Update="UI\Doctor\DoctorHomePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="UI\Components\VideoCallControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
-    <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
-    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
-    <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
-    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
-  </PropertyGroup>
+	<PropertyGroup>
+		<PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
+		<PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
+		<PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
+		<PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
+	</PropertyGroup>
 </Project>
