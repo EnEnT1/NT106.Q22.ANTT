@@ -69,8 +69,8 @@ namespace Healthcare.Client.UI.Components
 
                 var response = await client
                     .From<ChatMessageItem>()
-                    .Where(x => (x.SenderId == _currentUserId && x.ReceiverId == _patientId) || 
-                                (x.SenderId == _patientId && x.ReceiverId == _currentUserId))
+                    .Filter("sender_id", Postgrest.Constants.Operator.In, new List<string> { _currentUserId, _patientId })
+                    .Filter("receiver_id", Postgrest.Constants.Operator.In, new List<string> { _currentUserId, _patientId })
                     .Order("created_at", Postgrest.Constants.Ordering.Ascending)
                     .Get();
 

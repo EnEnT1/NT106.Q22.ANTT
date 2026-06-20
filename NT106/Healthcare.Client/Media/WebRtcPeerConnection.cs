@@ -22,6 +22,8 @@ namespace Healthcare.Client.Communication
         private DeviceVideoTrackSource _videoSource;
         private LocalVideoTrack _localVideoTrack;
         private Transceiver _videoTransceiver;
+        private bool _isRemoteDescriptionSet = false;
+        private readonly List<IceCandidate> _queuedIceCandidates = new List<IceCandidate>();
         public delegate void Argb32VideoFrameDelegate(Argb32VideoFrame frame);
 
         public event Argb32VideoFrameDelegate OnLocalFrameReady;
@@ -51,6 +53,11 @@ namespace Healthcare.Client.Communication
                 {
                     string json = $"{{\"candidate\":\"{candidate.Content}\",\"sdpMid\":\"{candidate.SdpMid}\",\"sdpMLineIndex\":{candidate.SdpMlineIndex}}}";
                     OnSignalingGenerated?.Invoke("ice-candidate", json);
+                };
+
+                _peerConnection.LocalSdpReadytoSend += (SdpMessage message) =>
+                {
+                    OnSignalingGenerated?.Invoke(message.Type.ToString().ToLower(), message.Content);
                 };
 
                 _peerConnection.VideoTrackAdded += (RemoteVideoTrack track) =>
@@ -95,11 +102,6 @@ namespace Healthcare.Client.Communication
 
         public void StartCall()
         {
-            _peerConnection.LocalSdpReadytoSend += (SdpMessage message) =>
-            {
-                OnSignalingGenerated?.Invoke(message.Type.ToString().ToLower(), message.Content);
-            };
-
             _peerConnection.CreateOffer();
         }
 
@@ -109,15 +111,15 @@ namespace Healthcare.Client.Communication
             {
                 case "offer":
                     await _peerConnection.SetRemoteDescriptionAsync(new SdpMessage { Type = SdpMessageType.Offer, Content = data });
-                    _peerConnection.LocalSdpReadytoSend += (SdpMessage answer) =>
-                    {
-                        OnSignalingGenerated?.Invoke("answer", answer.Content);
-                    };
+                    _isRemoteDescriptionSet = true;
+                    FlushQueuedIceCandidates();
                     _peerConnection.CreateAnswer();
                     break;
 
                 case "answer":
                     await _peerConnection.SetRemoteDescriptionAsync(new SdpMessage { Type = SdpMessageType.Answer, Content = data });
+                    _isRemoteDescriptionSet = true;
+                    FlushQueuedIceCandidates();
                     break;
 
                 case "ice-candidate":
@@ -132,7 +134,20 @@ namespace Healthcare.Client.Communication
                                 SdpMid = candidateInit.sdpMid,
                                 SdpMlineIndex = candidateInit.sdpMLineIndex
                             };
-                            _peerConnection.AddIceCandidate(candidate);
+
+                            lock (_queuedIceCandidates)
+                            {
+                                if (_isRemoteDescriptionSet)
+                                {
+                                    _peerConnection.AddIceCandidate(candidate);
+                                    Debug.WriteLine($"[WebRTC] Added ICE candidate: {candidate.SdpMid}");
+                                }
+                                else
+                                {
+                                    _queuedIceCandidates.Add(candidate);
+                                    Debug.WriteLine($"[WebRTC] Queued ICE candidate because remote description is not set yet.");
+                                }
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -140,6 +155,26 @@ namespace Healthcare.Client.Communication
                         Debug.WriteLine($"Lỗi phân tích hoặc thêm ICE Candidate: {ex.Message}");
                     }
                     break;
+            }
+        }
+
+        private void FlushQueuedIceCandidates()
+        {
+            lock (_queuedIceCandidates)
+            {
+                foreach (var candidate in _queuedIceCandidates)
+                {
+                    try
+                    {
+                        _peerConnection.AddIceCandidate(candidate);
+                        Debug.WriteLine($"[WebRTC] Flushed queued ICE candidate: {candidate.SdpMid}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[WebRTC] Error adding flushed ICE candidate: {ex.Message}");
+                    }
+                }
+                _queuedIceCandidates.Clear();
             }
         }
 
@@ -155,6 +190,12 @@ namespace Healthcare.Client.Communication
 
         public void Dispose()
         {
+            _isRemoteDescriptionSet = false;
+            lock (_queuedIceCandidates)
+            {
+                _queuedIceCandidates.Clear();
+            }
+
             _localVideoTrack?.Dispose();
             _videoSource?.Dispose();
 

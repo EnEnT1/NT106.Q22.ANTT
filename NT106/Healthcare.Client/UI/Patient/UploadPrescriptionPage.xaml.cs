@@ -22,6 +22,7 @@ namespace Healthcare.Client.UI.Patient
         private string _selectedFilePath;
         private PatientShell _shell;
         private PrescriptionData _currentPrescription;
+        private string _generatedHtmlContent;
 
         public UploadPrescriptionPage()
         {
@@ -84,8 +85,10 @@ namespace Healthcare.Client.UI.Patient
             LoadingOverlay.Visibility = Visibility.Visible;
             EmptyResultState.Visibility = Visibility.Collapsed;
             ListMedicines.Visibility = Visibility.Collapsed;
+            ActionButtonsPanel.Visibility = Visibility.Collapsed;
             BtnAnalyze.IsEnabled = false;
             BtnSelectFile.IsEnabled = false;
+            _generatedHtmlContent = string.Empty;
 
             try
             {
@@ -202,10 +205,11 @@ namespace Healthcare.Client.UI.Patient
         <p>• Tái khám sau 7 ngày hoặc ngay khi có các triệu chứng bất thường như khó thở, sốt cao liên tục không giảm.</p>";
                 }
 
-                // 4. Tạo HTML hoàn chỉnh từ template
+                // 4. Tạo HTML hoàn chỉnh từ template (Đơn giản hóa, có lịch uống thuốc, không có chữ ký)
                 string prescriptionCode = "DT-" + DateTime.Now.ToString("yyyyMMdd") + "-" + new Random().Next(100, 999);
                 string currentDateString = "Ngày " + DateTime.Now.Day + " tháng " + DateTime.Now.Month + " năm " + DateTime.Now.Year;
                 string currentTimeString = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
+                string scheduleHtml = GenerateMedicationScheduleHtml(_currentPrescription.Medicines);
 
                 string htmlContent = $@"<!DOCTYPE html>
 <html lang=""vi"">
@@ -294,7 +298,7 @@ namespace Healthcare.Client.UI.Patient
             color: #1e3a8a;
             border-left: 4px solid #2563eb;
             padding-left: 10px;
-            margin: 20px 0 15px 0;
+            margin: 25px 0 15px 0;
             text-transform: uppercase;
         }}
         .patient-grid {{
@@ -364,51 +368,27 @@ namespace Healthcare.Client.UI.Patient
             border-left: 4px solid #d97706;
             padding: 15px 20px;
             border-radius: 12px;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
         }}
         .notes-box p {{
             margin: 5px 0;
             font-size: 13.5px;
             color: #78350f;
         }}
-        .footer-signatures {{
-            display: flex;
-            justify-content: space-between;
-            margin-top: 50px;
-            page-break-inside: avoid;
+        .schedule-grid {{
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 12px;
         }}
-        .signature-item {{
-            text-align: center;
-            width: 250px;
-        }}
-        .signature-item .date {{
-            font-size: 13px;
-            color: #64748b;
-            font-style: italic;
-            margin-bottom: 15px;
-        }}
-        .signature-item .role {{
-            font-size: 14px;
-            font-weight: bold;
-            color: #334155;
-            margin-bottom: 60px;
-        }}
-        .signature-item .name {{
-            font-size: 15px;
-            font-weight: bold;
-            color: #1e3a8a;
-        }}
-        .digital-sig {{
-            border: 2px dashed #10b981;
-            padding: 8px;
+        .schedule-card {{
+            padding: 12px;
             border-radius: 8px;
-            color: #047857;
-            font-size: 11px;
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 10px;
-            background-color: #ecfdf5;
+            font-size: 13px;
         }}
+        .morning-card {{ background-color: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }}
+        .noon-card {{ background-color: #fef3c7; border: 1px solid #fde68a; color: #92400e; }}
+        .evening-card {{ background-color: #f3e8ff; border: 1px solid #e9d5ff; color: #6b21a8; }}
     </style>
 </head>
 <body>
@@ -471,109 +451,19 @@ namespace Healthcare.Client.UI.Patient
         </tbody>
     </table>
 
-    <div class=""section-title"">Lời dặn của Bác sĩ</div>
+    <div class=""section-title"">Lịch uống thuốc hàng ngày</div>
+    {scheduleHtml}
+
+    <div class=""section-title"" style=""margin-top: 30px;"">Lời dặn của Bác sĩ</div>
     <div class=""notes-box"">
         {doctorAdviceHtml}
-    </div>
-
-    <div class=""footer-signatures"">
-        <div class=""signature-item"">
-            <div class=""date"">&nbsp;</div>
-            <div class=""role"">BỆNH NHÂN / NGƯỜI NHÀ</div>
-            <div class=""name"">(Ký và ghi rõ họ tên)</div>
-        </div>
-        <div class=""signature-item"">
-            <div class=""date"">{currentDateString}</div>
-            <div class=""role"">BÁC SĨ ĐIỀU TRỊ</div>
-            <div class=""name"">{doctorName}</div>
-            <div class=""digital-sig"">
-                ✓ ĐÃ KÝ ĐIỆN TỬ<br>
-                Healthcare System<br>
-                Thời gian: {currentTimeString}
-            </div>
-        </div>
     </div>
 
 </body>
 </html>";
 
-                // 5. Ghi ra file HTML tạm thời
-                string tempHtmlPath = Path.Combine(Path.GetTempPath(), "DonThuoc_AI_Temp.html");
-                File.WriteAllText(tempHtmlPath, htmlContent, Encoding.UTF8);
-
-                // 6. Chuyển đổi HTML sang ảnh PNG bằng Edge Headless Screenshot
-                string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                string pngFileName = $"don_thuoc_{timestamp}.png";
-                string tempPngPath = Path.Combine(Path.GetTempPath(), pngFileName);
-                bool pngGenerated = false;
-
-                try
-                {
-                    string edgePath = @"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe";
-                    if (!File.Exists(edgePath))
-                    {
-                        edgePath = @"C:\Program Files\Microsoft\Edge\Application\msedge.exe";
-                    }
-
-                    if (File.Exists(edgePath))
-                    {
-                        var psi = new System.Diagnostics.ProcessStartInfo
-                        {
-                            FileName = edgePath,
-                            Arguments = $"--headless --disable-gpu --window-size=950,1350 --screenshot=\"{tempPngPath}\" \"{tempHtmlPath}\"",
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        };
-                        using var process = System.Diagnostics.Process.Start(psi);
-                        if (process != null)
-                        {
-                            // Đợi tối đa 8 giây để Edge chụp màn hình
-                            bool exited = process.WaitForExit(8000);
-                            if (exited && File.Exists(tempPngPath))
-                            {
-                                pngGenerated = true;
-                            }
-                        }
-                    }
-                }
-                catch (Exception pngEx)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[Edge PNG conversion error]: {pngEx.Message}");
-                }
-
-                // 7. Mở file đầu ra (Ưu tiên ảnh PNG, nếu Edge lỗi thì mở HTML trực tiếp bằng Browser)
-                try
-                {
-                    if (pngGenerated && File.Exists(tempPngPath))
-                    {
-                        var storageFile = await Windows.Storage.StorageFile.GetFileFromPathAsync(tempPngPath);
-                        await Windows.System.Launcher.LaunchFileAsync(storageFile);
-                    }
-                    else
-                    {
-                        // Fallback: Mở HTML trực tiếp trên Browser
-                        var storageFile = await Windows.Storage.StorageFile.GetFileFromPathAsync(tempHtmlPath);
-                        await Windows.System.Launcher.LaunchFileAsync(storageFile);
-                    }
-                }
-                catch (Exception launchEx)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[Launch File Error]: {launchEx.Message}");
-                    // Fallback cuối cùng bằng Process.Start
-                    try
-                    {
-                        var psi = new System.Diagnostics.ProcessStartInfo
-                        {
-                            FileName = pngGenerated ? tempPngPath : tempHtmlPath,
-                            UseShellExecute = true
-                        };
-                        System.Diagnostics.Process.Start(psi);
-                    }
-                    catch (Exception lastEx)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"[Final Fallback Error]: {lastEx.Message}");
-                    }
-                }
+                _generatedHtmlContent = htmlContent;
+                ActionButtonsPanel.Visibility = Visibility.Visible;
 
                 // Nếu chạy fallback, hiển thị thông báo nhỏ cho người dùng
                 if (isFallback)
@@ -608,43 +498,186 @@ namespace Healthcare.Client.UI.Patient
             }
         }
 
-        private async void BtnBook_Click(object sender, RoutedEventArgs e)
+        private async void BtnSavePrescription_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentPrescription == null || _currentPrescription.Medicines == null || _currentPrescription.Medicines.Count == 0)
+            if (string.IsNullOrEmpty(_generatedHtmlContent))
             {
-                _shell?.NavigateToPage(typeof(BookAppointmentPage));
+                var warningDialog = new ContentDialog
+                {
+                    Title = "Thông báo",
+                    Content = "Vui lòng phân tích đơn thuốc trước khi lưu.",
+                    CloseButtonText = "Đóng",
+                    XamlRoot = this.XamlRoot
+                };
+                await warningDialog.ShowAsync();
                 return;
             }
 
-            var dialog = new ContentDialog
+            try
             {
-                Title = "Nhắc nhở uống thuốc",
-                Content = "Bạn có muốn thêm các thuốc này vào danh sách nhắc nhở uống thuốc hàng ngày không?",
-                PrimaryButtonText = "Thêm và tiếp tục",
-                SecondaryButtonText = "Bỏ qua",
-                CloseButtonText = "Hủy",
-                DefaultButton = ContentDialogButton.Primary,
-                XamlRoot = this.XamlRoot
-            };
-
-            var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                LoadingOverlay.Visibility = Visibility.Visible;
-                if (LoadingOverlay.Children[1] is TextBlock textBlock)
+                var savePicker = new FileSavePicker();
+                
+                var window = MainWindow.Instance;
+                if (window != null)
                 {
-                    textBlock.Text = "Đang lưu nhắc nhở uống thuốc...";
+                    var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+                    WinRT.Interop.InitializeWithWindow.Initialize(savePicker, hwnd);
                 }
 
-                await SaveMedicinesAndRemindersAsync(_currentPrescription.Medicines);
+                savePicker.SuggestedStartLocation = PickerLocationId.Downloads;
+                savePicker.FileTypeChoices.Add("HTML Document", new List<string>() { ".html" });
+                savePicker.SuggestedFileName = "DonThuoc_Healthcare_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
 
-                LoadingOverlay.Visibility = Visibility.Collapsed;
-                _shell?.NavigateToPage(typeof(BookAppointmentPage));
+                var file = await savePicker.PickSaveFileAsync();
+                if (file != null)
+                {
+                    await Windows.Storage.FileIO.WriteTextAsync(file, _generatedHtmlContent, Windows.Storage.Streams.UnicodeEncoding.Utf8);
+                    
+                    var successDialog = new ContentDialog
+                    {
+                        Title = "Lưu thành công",
+                        Content = $"Đã lưu đơn thuốc vào đường dẫn:\n{file.Path}\n\nBạn có muốn mở file này ngay không?",
+                        PrimaryButtonText = "Mở file",
+                        CloseButtonText = "Đóng",
+                        DefaultButton = ContentDialogButton.Primary,
+                        XamlRoot = this.XamlRoot
+                    };
+
+                    if (await successDialog.ShowAsync() == ContentDialogResult.Primary)
+                    {
+                        await Windows.System.Launcher.LaunchFileAsync(file);
+                    }
+                }
             }
-            else if (result == ContentDialogResult.Secondary)
+            catch (Exception ex)
             {
-                _shell?.NavigateToPage(typeof(BookAppointmentPage));
+                var errorDialog = new ContentDialog
+                {
+                    Title = "Lỗi khi lưu",
+                    Content = "Không thể lưu file đơn thuốc: " + ex.Message,
+                    CloseButtonText = "Đóng",
+                    XamlRoot = this.XamlRoot
+                };
+                await errorDialog.ShowAsync();
             }
+        }
+
+        private async void BtnAddReminder_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentPrescription == null || _currentPrescription.Medicines == null || _currentPrescription.Medicines.Count == 0)
+            {
+                var d = new ContentDialog
+                {
+                    Title = "Thông báo",
+                    Content = "Chưa có đơn thuốc nào được phân tích để thêm nhắc nhở.",
+                    CloseButtonText = "Đóng",
+                    XamlRoot = this.XamlRoot
+                };
+                await d.ShowAsync();
+                return;
+            }
+
+            LoadingOverlay.Visibility = Visibility.Visible;
+            if (LoadingOverlay.Children[1] is TextBlock textBlock)
+            {
+                textBlock.Text = "Đang lưu nhắc nhở uống thuốc...";
+            }
+
+            await SaveMedicinesAndRemindersAsync(_currentPrescription.Medicines);
+
+            LoadingOverlay.Visibility = Visibility.Collapsed;
+
+            var successDialog = new ContentDialog
+            {
+                Title = "Thành công",
+                Content = "Đã thêm lịch nhắc nhở uống thuốc thành công vào phần thông báo nhắc nhở uống thuốc!",
+                CloseButtonText = "Đóng",
+                XamlRoot = this.XamlRoot
+            };
+            await successDialog.ShowAsync();
+        }
+
+        private string GenerateMedicationScheduleHtml(List<MedicineItem> medicines)
+        {
+            var morningMeds = new List<string>();
+            var noonMeds = new List<string>();
+            var eveningMeds = new List<string>();
+
+            foreach (var med in medicines)
+            {
+                string name = med.Name;
+                string usage = $"Uống {med.QuantityPerTime}";
+                string medDisplay = $"{name} ({usage})";
+
+                string noteLower = med.Note?.ToLower() ?? "";
+                string timesStr = med.TimesPerDay ?? "1";
+                int times = 1;
+                int.TryParse(timesStr, out times);
+
+                bool assigned = false;
+                if (noteLower.Contains("sáng")) { morningMeds.Add(medDisplay); assigned = true; }
+                if (noteLower.Contains("trưa") || noteLower.Contains("chiều")) { noonMeds.Add(medDisplay); assigned = true; }
+                if (noteLower.Contains("tối") || noteLower.Contains("đêm")) { eveningMeds.Add(medDisplay); assigned = true; }
+
+                if (!assigned)
+                {
+                    if (times == 1)
+                    {
+                        morningMeds.Add(medDisplay);
+                    }
+                    else if (times == 2)
+                    {
+                        morningMeds.Add(medDisplay);
+                        eveningMeds.Add(medDisplay);
+                    }
+                    else if (times >= 3)
+                    {
+                        morningMeds.Add(medDisplay);
+                        noonMeds.Add(medDisplay);
+                        eveningMeds.Add(medDisplay);
+                    }
+                }
+            }
+
+            string morningMedsHtml = morningMeds.Count > 0 
+                ? string.Join("", morningMeds.ConvertAll(m => $"<li>{m}</li>")) 
+                : "<li style=\"list-style: none; margin-left: -16px; color: #94a3b8; font-style: italic;\">Không có thuốc</li>";
+
+            string noonMedsHtml = noonMeds.Count > 0 
+                ? string.Join("", noonMeds.ConvertAll(m => $"<li>{m}</li>")) 
+                : "<li style=\"list-style: none; margin-left: -16px; color: #94a3b8; font-style: italic;\">Không có thuốc</li>";
+
+            string eveningMedsHtml = eveningMeds.Count > 0 
+                ? string.Join("", eveningMeds.ConvertAll(m => $"<li>{m}</li>")) 
+                : "<li style=\"list-style: none; margin-left: -16px; color: #94a3b8; font-style: italic;\">Không có thuốc</li>";
+
+            var sb = new StringBuilder();
+            sb.AppendLine("  <div class=\"schedule-grid\">");
+            
+            sb.AppendLine("    <div class=\"schedule-card morning-card\">");
+            sb.AppendLine("      <div style=\"font-weight: bold; margin-bottom: 6px;\">☀️ Sáng (08:00)</div>");
+            sb.AppendLine("      <ul style=\"margin: 0; padding-left: 16px;\">");
+            sb.AppendLine(morningMedsHtml);
+            sb.AppendLine("      </ul>");
+            sb.AppendLine("    </div>");
+
+            sb.AppendLine("    <div class=\"schedule-card noon-card\">");
+            sb.AppendLine("      <div style=\"font-weight: bold; margin-bottom: 6px;\">☀️ Trưa (12:00)</div>");
+            sb.AppendLine("      <ul style=\"margin: 0; padding-left: 16px;\">");
+            sb.AppendLine(noonMedsHtml);
+            sb.AppendLine("      </ul>");
+            sb.AppendLine("    </div>");
+
+            sb.AppendLine("    <div class=\"schedule-card evening-card\">");
+            sb.AppendLine("      <div style=\"font-weight: bold; margin-bottom: 6px;\">🌙 Tối (20:00)</div>");
+            sb.AppendLine("      <ul style=\"margin: 0; padding-left: 16px;\">");
+            sb.AppendLine(eveningMedsHtml);
+            sb.AppendLine("      </ul>");
+            sb.AppendLine("    </div>");
+
+            sb.AppendLine("  </div>");
+
+            return sb.ToString();
         }
 
         private async Task SaveMedicinesAndRemindersAsync(List<MedicineItem> medicines)

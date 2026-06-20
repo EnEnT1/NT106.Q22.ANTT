@@ -8,7 +8,7 @@ namespace Healthcare.Client.Models.Communication
     public class WebrtcSignal : BaseModel
     {
         [PrimaryKey("id", false)]
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         [Column("room_code")]
         public string RoomCode { get; set; }

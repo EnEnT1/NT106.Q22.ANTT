@@ -18,6 +18,7 @@ using Supabase.Realtime;
 using Supabase.Realtime.PostgresChanges;
 using Postgrest;
 using Microsoft.MixedReality.WebRTC;
+using Windows.Media.Capture;
 
 namespace Healthcare.Client.UI.Components
 {
@@ -74,6 +75,9 @@ namespace Healthcare.Client.UI.Components
                 _isDisposed = false;
 
                 ResetUiToWaitingState();
+
+                // Yêu cầu quyền truy cập Camera và Micro trước khi bắt đầu kết nối
+                await RequestCameraAndMicrophonePermissionsAsync();
 
                 // Dọn dẹp cũ nến có
                 if (_rtc != null) { _rtc.Dispose(); }
@@ -339,6 +343,30 @@ namespace Healthcare.Client.UI.Components
                 flyout.ShowAt(BtnMore);
             }
             catch { }
+        }
+
+        private async Task RequestCameraAndMicrophonePermissionsAsync()
+        {
+            try
+            {
+                var settings = new MediaCaptureInitializationSettings
+                {
+                    StreamingCaptureMode = StreamingCaptureMode.AudioAndVideo
+                };
+                using (var mediaCapture = new MediaCapture())
+                {
+                    await mediaCapture.InitializeAsync(settings);
+                }
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                throw new Exception("Ứng dụng chưa được cấp quyền truy cập Camera hoặc Micro. Vui lòng bật quyền truy cập trong Settings > Privacy của Windows.", ex);
+            }
+            catch (Exception ex)
+            {
+                // Bỏ qua lỗi nếu không có phần cứng thực tế (chỉ kiểm tra quyền truy cập)
+                Debug.WriteLine($"[Permission Request] Thiết bị không sẵn sàng: {ex.Message}");
+            }
         }
 
         private async Task ShowDetailedErrorAsync(string title, string message)
