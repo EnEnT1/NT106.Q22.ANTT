@@ -2,160 +2,201 @@ using Microsoft.MixedReality.WebRTC;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Healthcare.Client.Communication
 {
-    /// <summary>
-    /// Xử lý lõi WebRTC: Quản lý thiết bị, kết nối P2P và truyền nhận tín hiệu.
-    /// Đã cập nhật tương thích 100% với Microsoft.MixedReality.WebRTC phiên bản 2.x
-    /// </summary>
     public class WebRtcPeerConnection : IDisposable
     {
-        private PeerConnection _peerConnection;
+        private PeerConnection _peerConnection = new PeerConnection();
 
-        //  Api  yêu cầu quản lý Source và Track tách biệt ---
-        private DeviceAudioTrackSource _audioSource;
-        private LocalAudioTrack _localAudioTrack;
-        private Transceiver _audioTransceiver;
+        private DeviceAudioTrackSource? _audioSource;
+        private LocalAudioTrack? _localAudioTrack;
+        private Transceiver? _audioTransceiver;
 
-        private DeviceVideoTrackSource _videoSource;
-        private LocalVideoTrack _localVideoTrack;
-        private Transceiver _videoTransceiver;
+        private DeviceVideoTrackSource? _videoSource;
+        private LocalVideoTrack? _localVideoTrack;
+        private Transceiver? _videoTransceiver;
+
         private bool _isRemoteDescriptionSet = false;
         private readonly List<IceCandidate> _queuedIceCandidates = new List<IceCandidate>();
+
         public delegate void Argb32VideoFrameDelegate(Argb32VideoFrame frame);
 
-        public event Argb32VideoFrameDelegate OnLocalFrameReady;
-        public event Argb32VideoFrameDelegate OnRemoteFrameReady;
-
-        public event Action<string, string> OnSignalingGenerated;
-
-        public WebRtcPeerConnection()
-        {
-            _peerConnection = new PeerConnection();
-        }
+        public event Argb32VideoFrameDelegate? OnLocalFrameReady;
+        public event Argb32VideoFrameDelegate? OnRemoteFrameReady;
+        public event Action<string, string>? OnSignalingGenerated;
 
         public async Task InitializeAsync()
         {
-            try
+            var config = new PeerConnectionConfiguration
             {
-                var config = new PeerConnectionConfiguration
+                IceServers = new List<IceServer>
                 {
-                    IceServers = new List<IceServer> {
-                        new IceServer { Urls = { "stun:stun.l.google.com:19302" } }
-                    }
-                };
-
-                await _peerConnection.InitializeAsync(config);
-
-                _peerConnection.IceCandidateReadytoSend += (IceCandidate candidate) =>
-                {
-                    string json = $"{{\"candidate\":\"{candidate.Content}\",\"sdpMid\":\"{candidate.SdpMid}\",\"sdpMLineIndex\":{candidate.SdpMlineIndex}}}";
-                    OnSignalingGenerated?.Invoke("ice-candidate", json);
-                };
-
-                _peerConnection.LocalSdpReadytoSend += (SdpMessage message) =>
-                {
-                    OnSignalingGenerated?.Invoke(message.Type.ToString().ToLower(), message.Content);
-                };
-
-                _peerConnection.VideoTrackAdded += (RemoteVideoTrack track) =>
-                {
-                    // Đổi sang Argb32 để xử lý ảnh màu trực tiếp
-                    track.Argb32VideoFrameReady += (Argb32VideoFrame frame) =>
+                    new IceServer
                     {
-                        OnRemoteFrameReady?.Invoke(frame);
-                    };
-                };
+                        Urls = { "stun:stun.l.google.com:19302" }
+                    }
+                }
+            };
 
-                await SetupLocalMedia();
-            }
-            catch (Exception ex)
+            await _peerConnection.InitializeAsync(config);
+
+            _peerConnection.IceCandidateReadytoSend += candidate =>
             {
-                Debug.WriteLine($"Lỗi khởi tạo WebRTC: {ex.Message}");
-                throw;
-            }
+                var json = JsonSerializer.Serialize(new IceCandidateData
+                {
+                    candidate = candidate.Content,
+                    sdpMid = candidate.SdpMid,
+                    sdpMLineIndex = candidate.SdpMlineIndex
+                });
+
+                Debug.WriteLine("[WebRTC] Send ICE candidate");
+                OnSignalingGenerated?.Invoke("ice-candidate", json);
+            };
+
+            _peerConnection.LocalSdpReadytoSend += message =>
+            {
+                Debug.WriteLine($"[WebRTC] Send SDP: {message.Type}");
+                OnSignalingGenerated?.Invoke(message.Type.ToString().ToLower(), message.Content);
+            };
+
+            _peerConnection.VideoTrackAdded += track =>
+            {
+                Debug.WriteLine("[WebRTC] Remote video track added");
+
+                track.Argb32VideoFrameReady += frame =>
+                {
+                    OnRemoteFrameReady?.Invoke(frame);
+                };
+            };
+
+            await SetupLocalMediaAsync();
+
+            Debug.WriteLine("[WebRTC] Initialized");
         }
-        private async Task SetupLocalMedia()
+
+        private async Task SetupLocalMediaAsync()
         {
-            _audioSource = await Task.Run(async () => await DeviceAudioTrackSource.CreateAsync());
-            var audioConfig = new LocalAudioTrackInitConfig { trackName = "local_audio_track" };
-            _localAudioTrack = LocalAudioTrack.CreateFromSource(_audioSource, audioConfig);
+            _audioSource = await DeviceAudioTrackSource.CreateAsync();
+
+            _localAudioTrack = LocalAudioTrack.CreateFromSource(
+                _audioSource,
+                new LocalAudioTrackInitConfig
+                {
+                    trackName = "local_audio_track"
+                });
+
             _audioTransceiver = _peerConnection.AddTransceiver(MediaKind.Audio);
             _audioTransceiver.DesiredDirection = Transceiver.Direction.SendReceive;
             _audioTransceiver.LocalAudioTrack = _localAudioTrack;
 
-            _videoSource = await Task.Run(async () => await DeviceVideoTrackSource.CreateAsync());
-            var videoConfig = new LocalVideoTrackInitConfig { trackName = "local_video_track" };
-            _localVideoTrack = LocalVideoTrack.CreateFromSource(_videoSource, videoConfig);
+            _videoSource = await DeviceVideoTrackSource.CreateAsync();
 
-            // Đổi sang Argb32 cho local preview
-            _videoSource.Argb32VideoFrameReady += (Argb32VideoFrame frame) =>
+            _videoSource.Argb32VideoFrameReady += frame =>
             {
                 OnLocalFrameReady?.Invoke(frame);
             };
 
+            _localVideoTrack = LocalVideoTrack.CreateFromSource(
+                _videoSource,
+                new LocalVideoTrackInitConfig
+                {
+                    trackName = "local_video_track"
+                });
+
             _videoTransceiver = _peerConnection.AddTransceiver(MediaKind.Video);
             _videoTransceiver.DesiredDirection = Transceiver.Direction.SendReceive;
             _videoTransceiver.LocalVideoTrack = _localVideoTrack;
+
+            Debug.WriteLine("[WebRTC] Local camera and microphone ready");
         }
 
         public void StartCall()
         {
+            Debug.WriteLine("[WebRTC] Create offer");
             _peerConnection.CreateOffer();
         }
 
         public async Task HandleIncomingSignal(string type, string data)
         {
-            switch (type.ToLower())
+            if (string.IsNullOrWhiteSpace(type) || string.IsNullOrWhiteSpace(data))
             {
-                case "offer":
-                    await _peerConnection.SetRemoteDescriptionAsync(new SdpMessage { Type = SdpMessageType.Offer, Content = data });
-                    _isRemoteDescriptionSet = true;
-                    FlushQueuedIceCandidates();
-                    _peerConnection.CreateAnswer();
-                    break;
+                return;
+            }
 
-                case "answer":
-                    await _peerConnection.SetRemoteDescriptionAsync(new SdpMessage { Type = SdpMessageType.Answer, Content = data });
-                    _isRemoteDescriptionSet = true;
-                    FlushQueuedIceCandidates();
-                    break;
+            try
+            {
+                switch (type.ToLower())
+                {
+                    case "offer":
+                        Debug.WriteLine("[WebRTC] Receive offer");
 
-                case "ice-candidate":
-                    try
-                    {
-                        var candidateInit = System.Text.Json.JsonSerializer.Deserialize<IceCandidateData>(data);
-                        if (candidateInit != null)
+                        await _peerConnection.SetRemoteDescriptionAsync(new SdpMessage
                         {
-                            var candidate = new IceCandidate
-                            {
-                                Content = candidateInit.candidate,
-                                SdpMid = candidateInit.sdpMid,
-                                SdpMlineIndex = candidateInit.sdpMLineIndex
-                            };
+                            Type = SdpMessageType.Offer,
+                            Content = data
+                        });
 
-                            lock (_queuedIceCandidates)
+                        _isRemoteDescriptionSet = true;
+                        FlushQueuedIceCandidates();
+
+                        Debug.WriteLine("[WebRTC] Create answer");
+                        _peerConnection.CreateAnswer();
+                        break;
+
+                    case "answer":
+                        Debug.WriteLine("[WebRTC] Receive answer");
+
+                        await _peerConnection.SetRemoteDescriptionAsync(new SdpMessage
+                        {
+                            Type = SdpMessageType.Answer,
+                            Content = data
+                        });
+
+                        _isRemoteDescriptionSet = true;
+                        FlushQueuedIceCandidates();
+                        break;
+
+                    case "ice-candidate":
+                        Debug.WriteLine("[WebRTC] Receive ICE candidate");
+
+                        var candidateData = JsonSerializer.Deserialize<IceCandidateData>(data);
+
+                        if (candidateData == null || string.IsNullOrWhiteSpace(candidateData.candidate))
+                        {
+                            Debug.WriteLine("[WebRTC] Invalid ICE candidate");
+                            return;
+                        }
+
+                        var candidate = new IceCandidate
+                        {
+                            Content = candidateData.candidate,
+                            SdpMid = candidateData.sdpMid,
+                            SdpMlineIndex = candidateData.sdpMLineIndex
+                        };
+
+                        lock (_queuedIceCandidates)
+                        {
+                            if (_isRemoteDescriptionSet)
                             {
-                                if (_isRemoteDescriptionSet)
-                                {
-                                    _peerConnection.AddIceCandidate(candidate);
-                                    Debug.WriteLine($"[WebRTC] Added ICE candidate: {candidate.SdpMid}");
-                                }
-                                else
-                                {
-                                    _queuedIceCandidates.Add(candidate);
-                                    Debug.WriteLine($"[WebRTC] Queued ICE candidate because remote description is not set yet.");
-                                }
+                                _peerConnection.AddIceCandidate(candidate);
+                                Debug.WriteLine("[WebRTC] ICE candidate added");
+                            }
+                            else
+                            {
+                                _queuedIceCandidates.Add(candidate);
+                                Debug.WriteLine("[WebRTC] ICE candidate queued");
                             }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"Lỗi phân tích hoặc thêm ICE Candidate: {ex.Message}");
-                    }
-                    break;
+
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[WebRTC] HandleIncomingSignal error: {ex.Message}");
             }
         }
 
@@ -168,30 +209,38 @@ namespace Healthcare.Client.Communication
                     try
                     {
                         _peerConnection.AddIceCandidate(candidate);
-                        Debug.WriteLine($"[WebRTC] Flushed queued ICE candidate: {candidate.SdpMid}");
+                        Debug.WriteLine("[WebRTC] Queued ICE flushed");
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"[WebRTC] Error adding flushed ICE candidate: {ex.Message}");
+                        Debug.WriteLine($"[WebRTC] Flush ICE error: {ex.Message}");
                     }
                 }
+
                 _queuedIceCandidates.Clear();
             }
         }
 
         public void ToggleMic(bool isMuted)
         {
-            if (_localAudioTrack != null) _localAudioTrack.Enabled = !isMuted;
+            if (_localAudioTrack != null)
+            {
+                _localAudioTrack.Enabled = !isMuted;
+            }
         }
 
         public void ToggleCamera(bool isOff)
         {
-            if (_localVideoTrack != null) _localVideoTrack.Enabled = !isOff;
+            if (_localVideoTrack != null)
+            {
+                _localVideoTrack.Enabled = !isOff;
+            }
         }
 
         public void Dispose()
         {
             _isRemoteDescriptionSet = false;
+
             lock (_queuedIceCandidates)
             {
                 _queuedIceCandidates.Clear();

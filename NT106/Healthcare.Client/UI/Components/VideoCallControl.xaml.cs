@@ -239,18 +239,25 @@ namespace Healthcare.Client.UI.Components
 
         public async Task StartCallAsync()
         {
-            if (_isCallActive || _rtc == null) return;
+            if (_rtc == null)
+            {
+                Debug.WriteLine("[VideoCallControl] Cannot start call because RTC is null.");
+                return;
+            }
+
             try
             {
                 SetConnectingState(true);
-                _rtc.StartCall(); 
-                await Task.Delay(1000);
-                SetConnectingState(false);
-                SetCallActive(true);
+
+                Debug.WriteLine("[VideoCallControl] Starting call...");
+                _rtc.StartCall();
+
+                TxtWaitingStatus.Text = "Đang gọi bệnh nhân...";
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[VideoCallControl] StartCallAsync Error: {ex.Message}");
+                await ShowDetailedErrorAsync("Lỗi bắt đầu cuộc gọi", ex.Message);
             }
         }
 
