@@ -22,11 +22,26 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls.DataGrid" Version="7.1.2" />
-    <PackageReference Include="Microsoft.MixedReality.WebRTC" Version="2.0.2" />
+    <PackageReference Include="Microsoft.MixedReality.WebRTC" Version="2.0.2" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260317003" />
     <PackageReference Include="postgrest-csharp" Version="3.5.1" />
     <PackageReference Include="supabase-csharp" Version="0.16.2" />
+  </ItemGroup>
+
+  <Target Name="CopyMRWebRTCDllToRoot" BeforeTargets="PrepareForBuild">
+    <Copy SourceFiles="$(PkgMicrosoft_MixedReality_WebRTC)\runtimes\win10-x64\native\mrwebrtc.dll" DestinationFolder="$(MSBuildProjectDirectory)" Condition="'$(Platform)' == 'x64' And !Exists('$(MSBuildProjectDirectory)\mrwebrtc.dll')" />
+    <Copy SourceFiles="$(PkgMicrosoft_MixedReality_WebRTC)\runtimes\win10-x86\native\mrwebrtc.dll" DestinationFolder="$(MSBuildProjectDirectory)" Condition="('$(Platform)' == 'x86' or '$(Platform)' == 'AnyCPU') And !Exists('$(MSBuildProjectDirectory)\mrwebrtc.dll')" />
+  </Target>
+
+  <Target Name="CopyMRWebRTCDllToAppXDir" AfterTargets="Build">
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\mrwebrtc.dll" DestinationFolder="$(MSBuildProjectDirectory)\bin\$(Platform)\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\AppX" Condition="Exists('$(MSBuildProjectDirectory)\mrwebrtc.dll')" />
+  </Target>
+
+  <ItemGroup>
+    <Content Include="mrwebrtc.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
