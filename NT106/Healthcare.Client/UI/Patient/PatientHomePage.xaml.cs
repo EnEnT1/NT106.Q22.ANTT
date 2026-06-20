@@ -21,6 +21,7 @@ namespace Healthcare.Client.UI.Patient
     public sealed partial class PatientHomePage : Page
     {
         private PatientShell? _shell;
+        private string _upcomingAppointmentId = string.Empty;
 
         private readonly ObservableCollection<SuggestedDoctorViewModel> _suggestedDoctors = new();
 
@@ -54,10 +55,11 @@ namespace Healthcare.Client.UI.Patient
         {
             var user = SessionStorage.CurrentUser;
             var hour = DateTime.Now.Hour;
+
             string greeting = hour < 12 ? "Chào buổi sáng"
                 : hour < 18 ? "Chào buổi chiều"
                 : "Chào buổi tối";
-            
+
             WelcomeTextBlock.Text = $"{greeting}, {(user != null ? (user.FullName ?? "Bệnh nhân") : "Bệnh nhân")}";
         }
 
@@ -68,6 +70,7 @@ namespace Healthcare.Client.UI.Patient
                 var user = SessionStorage.CurrentUser;
                 if (user == null || string.IsNullOrWhiteSpace(user.Id))
                 {
+                    _upcomingAppointmentId = string.Empty;
                     AppointmentActiveState.Visibility = Visibility.Collapsed;
                     AppointmentEmptyState.Visibility = Visibility.Visible;
                     return;
@@ -83,8 +86,8 @@ namespace Healthcare.Client.UI.Patient
                 var appointments = apptResponse.Models ?? new List<Appointment>();
 
                 var upcomingAppt = appointments
-                    .Where(x => x.AppointmentDate.Date >= DateTime.Today && 
-                                x.Status != "Completed" && 
+                    .Where(x => x.AppointmentDate.Date >= DateTime.Today &&
+                                x.Status != "Completed" &&
                                 x.Status != "Cancelled")
                     .OrderBy(x => x.AppointmentDate)
                     .ThenBy(x => x.StartTime)
@@ -92,10 +95,13 @@ namespace Healthcare.Client.UI.Patient
 
                 if (upcomingAppt == null)
                 {
+                    _upcomingAppointmentId = string.Empty;
                     AppointmentActiveState.Visibility = Visibility.Collapsed;
                     AppointmentEmptyState.Visibility = Visibility.Visible;
                     return;
                 }
+
+                _upcomingAppointmentId = upcomingAppt.Id;
 
                 string doctorName = "Bác sĩ";
                 string specialty = "Chuyên khoa";
@@ -107,7 +113,7 @@ namespace Healthcare.Client.UI.Patient
                         .From<User>()
                         .Where(x => x.Id == upcomingAppt.DoctorId)
                         .Get();
-                    
+
                     var doctorUser = doctorUserResponse.Models?.FirstOrDefault();
                     if (doctorUser != null)
                     {
@@ -116,6 +122,7 @@ namespace Healthcare.Client.UI.Patient
                         {
                             doctorName = "BS. " + doctorName;
                         }
+
                         initials = GetInitials(doctorUser.FullName);
                     }
 
@@ -123,7 +130,7 @@ namespace Healthcare.Client.UI.Patient
                         .From<DoctorProfile>()
                         .Where(x => x.DoctorId == upcomingAppt.DoctorId)
                         .Get();
-                    
+
                     var doctorProfile = doctorProfileResponse.Models?.FirstOrDefault();
                     if (doctorProfile != null)
                     {
@@ -138,10 +145,10 @@ namespace Healthcare.Client.UI.Patient
                 var apptDate = upcomingAppt.AppointmentDate;
                 string[] dayNames = { "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy" };
                 string dayOfWeekStr = dayNames[(int)apptDate.DayOfWeek];
-                
+
                 AppointmentDateTextBlock.Text = $"{dayOfWeekStr}, {apptDate:dd} Tháng {apptDate:MM}";
                 AppointmentTimeTextBlock.Text = DateTime.Today.Add(upcomingAppt.StartTime).ToString("hh:mm tt");
-                
+
                 AppointmentDoctorNameTextBlock.Text = doctorName;
                 AppointmentDoctorSpecialtyTextBlock.Text = specialty;
                 AppointmentDoctorPicture.Initials = initials;
@@ -152,6 +159,7 @@ namespace Healthcare.Client.UI.Patient
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error loading upcoming appointment: " + ex.Message);
+                _upcomingAppointmentId = string.Empty;
                 AppointmentActiveState.Visibility = Visibility.Collapsed;
                 AppointmentEmptyState.Visibility = Visibility.Visible;
             }
@@ -210,6 +218,7 @@ namespace Healthcare.Client.UI.Patient
 
                     var latestTime = healthMetrics.Max(x => x.MeasuredAt);
                     var timeDiff = DateTime.UtcNow - latestTime.ToUniversalTime();
+
                     string timeDiffStr;
                     if (timeDiff.TotalMinutes < 60)
                     {
@@ -235,14 +244,10 @@ namespace Healthcare.Client.UI.Patient
                             .OrderByDescending(x => x.MeasuredAt)
                             .FirstOrDefault();
 
-                        if (diastolic != null)
-                        {
-                            BloodPressureValueTextBlock.Text = $"{(int)latestBp.Value}/{(int)diastolic.Value}";
-                        }
-                        else
-                        {
-                            BloodPressureValueTextBlock.Text = $"{(int)latestBp.Value}/80";
-                        }
+                        BloodPressureValueTextBlock.Text = diastolic != null
+                            ? $"{(int)latestBp.Value}/{(int)diastolic.Value}"
+                            : $"{(int)latestBp.Value}/80";
+
                         BloodPressureStatusTextBlock.Text = EvaluateBloodPressure(BloodPressureValueTextBlock.Text);
                     }
                     else
@@ -281,6 +286,7 @@ namespace Healthcare.Client.UI.Patient
             if (sys < 120 && dia < 80) return "Bình thường";
             if (sys < 130 && dia < 80) return "Cao - GĐ 1";
             if (sys < 140 || dia < 90) return "Cao - GĐ 2";
+
             return "Tăng huyết áp";
         }
 
@@ -410,9 +416,22 @@ namespace Healthcare.Client.UI.Patient
             _shell?.NavigateToPage(typeof(BookAppointmentPage));
         }
 
-        private void QuickAccess_OnlineConsult_Click(object sender, RoutedEventArgs e)
+        private async void QuickAccess_OnlineConsult_Click(object sender, RoutedEventArgs e)
         {
-            _shell?.NavigateToPage(typeof(OnlineConsultationPage));
+            if (string.IsNullOrWhiteSpace(_upcomingAppointmentId))
+            {
+                await new ContentDialog
+                {
+                    Title = "Chưa có lịch khám online",
+                    Content = "Bạn cần có một lịch khám online sắp tới để tham gia cuộc gọi.",
+                    CloseButtonText = "Đóng",
+                    XamlRoot = this.XamlRoot
+                }.ShowAsync();
+
+                return;
+            }
+
+            Frame.Navigate(typeof(OnlineConsultationPage), _upcomingAppointmentId);
         }
 
         private void QuickAccess_Records_Click(object sender, RoutedEventArgs e)
@@ -451,7 +470,7 @@ namespace Healthcare.Client.UI.Patient
                 XamlRoot = this.XamlRoot,
                 DefaultButton = ContentDialogButton.Close
             };
-        
+
             await dialog.ShowAsync();
         }
 
@@ -479,15 +498,10 @@ namespace Healthcare.Client.UI.Patient
     public class SuggestedDoctorViewModel
     {
         public string DoctorId { get; set; } = string.Empty;
-
         public string FullName { get; set; } = string.Empty;
-
         public string DisplayName { get; set; } = string.Empty;
-
         public string Initials { get; set; } = "BS";
-
         public string Specialty { get; set; } = "Chưa cập nhật chuyên khoa";
-
         public Brush StatusColor { get; set; } = new SolidColorBrush(Microsoft.UI.Colors.LightGray);
     }
 }
