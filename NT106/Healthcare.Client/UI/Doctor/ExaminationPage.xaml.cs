@@ -64,24 +64,54 @@ namespace Healthcare.Client.UI.Doctor
             try
             {
                 var client = Healthcare.Client.SupabaseIntegration.SupabaseManager.Instance.Client;
-                var appointmentResponse = await client.From<Appointment>().Where(a => a.Id == _appointmentId).Single();
-                
+
+                var appointmentResponse = await client
+                    .From<Appointment>()
+                    .Where(a => a.Id == _appointmentId)
+                    .Single();
+
                 if (appointmentResponse != null)
                 {
                     _patientId = appointmentResponse.PatientId;
+
+                    string roomCode = appointmentResponse.RoomCode;
+
+                    if (string.IsNullOrWhiteSpace(roomCode))
+                    {
+                        roomCode = "room_" + _appointmentId;
+                    }
+
                     await LoadPatientInfoAsync();
-                    
-                    await VideoCall.InitializeAsync(_appointmentId, _patientId, appointmentResponse.RoomCode);
+
+                    await VideoCall.InitializeAsync(_appointmentId, _patientId, roomCode);
+
+                    // Bác sĩ là người gọi nên phải StartCallAsync()
+                    await VideoCall.StartCallAsync();
+
                     await Chat.InitializeAsync(_appointmentId, _currentUserId, _patientId);
                 }
                 else
                 {
-                    await new ContentDialog { Title = "Lỗi", Content = "Không tìm thấy thông tin lịch hẹn này.", CloseButtonText = "Đóng", XamlRoot = this.XamlRoot }.ShowAsync();
+                    await new ContentDialog
+                    {
+                        Title = "Lỗi",
+                        Content = "Không tìm thấy thông tin lịch hẹn này.",
+                        CloseButtonText = "Đóng",
+                        XamlRoot = this.XamlRoot
+                    }.ShowAsync();
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[DoctorExam] Init Error: {ex.Message}");
+                Debug.WriteLine($"[DoctorExam] Init Error: {ex}");
+
+                await new ContentDialog
+                {
+                    Title = "Lỗi khởi tạo phiên khám",
+                    Content = ex.Message,
+                    CloseButtonText = "Đóng",
+                    XamlRoot = this.XamlRoot
+                }.ShowAsync();
             }
         }
 
