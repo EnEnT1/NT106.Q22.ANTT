@@ -20,11 +20,11 @@
                 BorderThickness="0,0,0,1"
                 Padding="16">
             <StackPanel Spacing="4">
-                <TextBlock Text="Chatbot AI hỗ trợ sức khỏe"
+                <TextBlock Text="Hộp thoại tư vấn trực tuyến"
                            FontSize="18"
                            FontWeight="Bold"
                            Foreground="#1E293B"/>
-                <TextBlock Text="Nhập câu hỏi để nhận tư vấn sức khỏe cơ bản"
+                <TextBlock Text="Trao đổi trực tiếp giữa Bác sĩ và Bệnh nhân"
                            FontSize="12"
                            Foreground="#64748B"/>
             </StackPanel>

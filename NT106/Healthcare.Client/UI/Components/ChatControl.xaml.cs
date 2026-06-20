@@ -159,8 +159,22 @@ namespace Healthcare.Client.UI.Components
 
             try
             {
-                var client = SupabaseManager.Instance.Client;
-                await client.From<ChatMessageItem>().Insert(msg);
+                // Gọi API Server để lưu tin nhắn bằng quyền ServiceRole (bỏ qua RLS của Supabase)
+                var response = await _httpClient.PostAsJsonAsync("api/chat/send", new
+                {
+                    Id = msg.Id,
+                    SenderId = msg.SenderId,
+                    ReceiverId = msg.ReceiverId,
+                    MessageText = msg.MessageText,
+                    IsRead = msg.IsRead,
+                    CreatedAt = msg.CreatedAt
+                });
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorMsg = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Server API error: {errorMsg}");
+                }
 
                 await SendMessageToAiAsync(text);
             }
