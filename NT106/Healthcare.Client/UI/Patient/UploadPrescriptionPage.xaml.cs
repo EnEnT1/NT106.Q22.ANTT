@@ -191,18 +191,17 @@ namespace Healthcare.Client.UI.Patient
                 string doctorAdviceHtml = "";
                 if (!string.IsNullOrWhiteSpace(_currentPrescription.DoctorAdvice))
                 {
+                    var sbAdvice = new StringBuilder();
+                    sbAdvice.AppendLine(@"    <div class=""section-title"" style=""margin-top: 30px;"">Lời dặn của Bác sĩ</div>");
+                    sbAdvice.AppendLine(@"    <div class=""notes-box"">");
                     var adviceLines = _currentPrescription.DoctorAdvice.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var line in adviceLines)
                     {
                         var cleanLine = line.Trim().TrimStart('•', '-', '*', ' ');
-                        doctorAdviceHtml += $"<p>• {cleanLine}</p>\n";
+                        sbAdvice.AppendLine($"        <p>• {cleanLine}</p>");
                     }
-                }
-                else
-                {
-                    doctorAdviceHtml = @"<p>• Uống nhiều nước ấm, súc họng bằng nước muối sinh lý ấm ít nhất 3 lần/ngày.</p>
-        <p>• Nghỉ ngơi hợp lý, tránh làm việc quá sức, tránh thức ăn cay nóng, đồ uống lạnh.</p>
-        <p>• Tái khám sau 7 ngày hoặc ngay khi có các triệu chứng bất thường như khó thở, sốt cao liên tục không giảm.</p>";
+                    sbAdvice.AppendLine(@"    </div>");
+                    doctorAdviceHtml = sbAdvice.ToString();
                 }
 
                 // 4. Tạo HTML hoàn chỉnh từ template (Đơn giản hóa, có lịch uống thuốc, không có chữ ký)
@@ -454,10 +453,7 @@ namespace Healthcare.Client.UI.Patient
     <div class=""section-title"">Lịch uống thuốc hàng ngày</div>
     {scheduleHtml}
 
-    <div class=""section-title"" style=""margin-top: 30px;"">Lời dặn của Bác sĩ</div>
-    <div class=""notes-box"">
-        {doctorAdviceHtml}
-    </div>
+    {doctorAdviceHtml}
 
 </body>
 </html>";

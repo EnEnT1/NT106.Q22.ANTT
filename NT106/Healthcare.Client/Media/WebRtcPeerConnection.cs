@@ -74,23 +74,24 @@ namespace Healthcare.Client.Communication
             catch (Exception ex)
             {
                 Debug.WriteLine($"Lỗi khởi tạo WebRTC: {ex.Message}");
+                throw;
             }
         }
         private async Task SetupLocalMedia()
         {
-            _audioSource = await DeviceAudioTrackSource.CreateAsync();
+            _audioSource = await Task.Run(async () => await DeviceAudioTrackSource.CreateAsync());
             var audioConfig = new LocalAudioTrackInitConfig { trackName = "local_audio_track" };
             _localAudioTrack = LocalAudioTrack.CreateFromSource(_audioSource, audioConfig);
             _audioTransceiver = _peerConnection.AddTransceiver(MediaKind.Audio);
             _audioTransceiver.DesiredDirection = Transceiver.Direction.SendReceive;
             _audioTransceiver.LocalAudioTrack = _localAudioTrack;
 
-            _videoSource = await DeviceVideoTrackSource.CreateAsync();
+            _videoSource = await Task.Run(async () => await DeviceVideoTrackSource.CreateAsync());
             var videoConfig = new LocalVideoTrackInitConfig { trackName = "local_video_track" };
             _localVideoTrack = LocalVideoTrack.CreateFromSource(_videoSource, videoConfig);
 
             // Đổi sang Argb32 cho local preview
-            _localVideoTrack.Argb32VideoFrameReady += (Argb32VideoFrame frame) =>
+            _videoSource.Argb32VideoFrameReady += (Argb32VideoFrame frame) =>
             {
                 OnLocalFrameReady?.Invoke(frame);
             };
