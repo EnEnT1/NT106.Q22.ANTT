@@ -158,6 +158,21 @@
                                      TextWrapping="Wrap"
                                      MinHeight="100"/>
 
+                            <!-- Nút gửi chẩn đoán dạng giọng nói cho bệnh nhân -->
+                            <Button Click="BtnSendVoice_Click"
+                                    Background="#0F172A"
+                                    Foreground="White"
+                                    CornerRadius="10"
+                                    Padding="14,8"
+                                    HorizontalAlignment="Left"
+                                    BorderThickness="0"
+                                    ToolTipService.ToolTip="Bệnh nhân sẽ thấy nút phát giọng nói trong chat">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE720;" FontSize="14" Foreground="#7DD3FC"/>
+                                    <TextBlock Text="Gửi chẩn đoán dạng giọng nói" FontSize="12" FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Button>
+
                             <StackPanel Spacing="12">
                                 <Grid>
                                     <TextBlock Text="Ghi chú nhanh" FontWeight="Bold" VerticalAlignment="Center"/>
@@ -179,12 +194,30 @@
                         <StackPanel Spacing="20">
                             <Grid>
                                 <TextBlock Text="Đơn thuốc" FontSize="18" FontWeight="Bold" Foreground="#1E293B"/>
-                                <Button Click="BtnAddMedicine_Click" HorizontalAlignment="Right" Content="Thêm thuốc" Padding="12,6" Background="#F0FDF4" Foreground="#16A34A" BorderThickness="0" CornerRadius="8"/>
+                                <Button Click="BtnAddMedicine_Click" HorizontalAlignment="Right" Padding="12,6" Background="#F0FDF4" Foreground="#16A34A" BorderThickness="0" CornerRadius="8">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <FontIcon Glyph="&#xE710;" FontSize="12" Foreground="#16A34A"/>
+                                        <TextBlock Text="Thêm thuốc" FontSize="12" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Button>
                             </Grid>
-                            <StackPanel x:Name="PrescriptionList" Spacing="8"/>
+
+                            <!-- Column headers -->
+                            <Grid Padding="10,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="24"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="#" FontSize="11" FontWeight="Bold" Foreground="#94A3B8"/>
+                                <TextBlock Grid.Column="1" Text="Tên thuốc" FontSize="11" FontWeight="Bold" Foreground="#94A3B8"/>
+                                <TextBlock Grid.Column="2" Text="Liều dùng" FontSize="11" FontWeight="Bold" Foreground="#94A3B8"/>
+                            </Grid>
+
+                            <StackPanel x:Name="PrescriptionList" Spacing="6"/>
                             
-                            <TextBlock Text="Ghi chú đơn thuốc" FontSize="14" FontWeight="Bold" Margin="0,12,0,0"/>
-                            <TextBox PlaceholderText="Dặn dò bệnh nhân về liều dùng..." AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80"/>
+                            <TextBlock Text="Ghi chú đơn thuốc" FontSize="14" FontWeight="Bold" Margin="0,8,0,0"/>
+                            <TextBox x:Name="PrescriptionNoteBox" PlaceholderText="Dặn dò bệnh nhân về liều dùng..." AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80"/>
                         </StackPanel>
                     </ScrollViewer>
                 </Border>

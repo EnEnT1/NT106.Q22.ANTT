@@ -12,6 +12,9 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using Windows.Media.Core;
+using Windows.Media.Playback;
+using Windows.Media.SpeechSynthesis;
 using Windows.UI;
 using Supabase.Realtime;
 using Supabase.Realtime.PostgresChanges;
@@ -27,6 +30,8 @@ namespace Healthcare.Client.UI.Components
         private string _patientId = string.Empty;
 
         private RealtimeChannel? _chatChannel;
+
+        private MediaPlayer? _ttsPlayer;
 
         private readonly List<string> _quickNotes = new();
 
@@ -159,21 +164,30 @@ namespace Healthcare.Client.UI.Components
 
             try
             {
-                // Gọi API Server để lưu tin nhắn bằng quyền ServiceRole (bỏ qua RLS của Supabase)
-                var response = await _httpClient.PostAsJsonAsync("api/chat/send", new
+                bool sentViaHttp = false;
+                try
                 {
-                    Id = msg.Id,
-                    SenderId = msg.SenderId,
-                    ReceiverId = msg.ReceiverId,
-                    MessageText = msg.MessageText,
-                    IsRead = msg.IsRead,
-                    CreatedAt = msg.CreatedAt
-                });
+                    var response = await _httpClient.PostAsJsonAsync("api/chat/send", new
+                    {
+                        Id       = msg.Id,
+                        SenderId = msg.SenderId,
+                        ReceiverId = msg.ReceiverId,
+                        MessageText = msg.MessageText,
+                        IsRead   = msg.IsRead,
+                        CreatedAt = msg.CreatedAt
+                    });
+                    sentViaHttp = response.IsSuccessStatusCode;
+                }
+                catch (Exception httpEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[Chat HTTP] Failed: {httpEx.Message}");
+                }
 
-                if (!response.IsSuccessStatusCode)
+                // Fallback: insert directly into Supabase when HTTP server is unavailable
+                if (!sentViaHttp)
                 {
-                    string errorMsg = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Server API error: {errorMsg}");
+                    var supabase = SupabaseManager.Instance.Client;
+                    await supabase.From<ChatMessageItem>().Insert(msg);
                 }
 
                 await SendMessageToAiAsync(text);
@@ -237,6 +251,13 @@ namespace Healthcare.Client.UI.Components
 
         private UIElement BuildBubble(ChatMessageItem msg, bool isSelf, string? displayName = null)
         {
+            // TTS messages get a special play-button bubble
+            if (msg.MessageText?.StartsWith("[TTS] ") == true)
+            {
+                string ttsText = msg.MessageText.Substring(6); // strip "[TTS] "
+                return BuildTtsBubble(ttsText, msg.CreatedAt, isSelf);
+            }
+
             var wrapper = new StackPanel
             {
                 Spacing = 3,
@@ -273,6 +294,90 @@ namespace Healthcare.Client.UI.Components
             });
 
             return wrapper;
+        }
+
+        /// <summary>
+        /// Builds a TTS voice-message bubble with a play button.
+        /// isSelf = doctor sent (shows "Đã gửi"), !isSelf = patient receives (shows play button).
+        /// </summary>
+        private UIElement BuildTtsBubble(string text, DateTime createdAt, bool isSelf)
+        {
+            var time = createdAt.ToLocalTime();
+
+            var wrapper = new StackPanel
+            {
+                Spacing = 4,
+                HorizontalAlignment = isSelf ? HorizontalAlignment.Right : HorizontalAlignment.Left,
+                MaxWidth = 260,
+                Margin = new Thickness(0, 4, 0, 4)
+            };
+
+            wrapper.Children.Add(new TextBlock
+            {
+                Text = isSelf ? $"Giọng nói bác sĩ • {time:HH:mm}" : $"Bác sĩ • {time:HH:mm}",
+                FontSize = 9,
+                FontWeight = FontWeights.Bold,
+                Foreground = new SolidColorBrush(HexToColor("#64748B")),
+                HorizontalAlignment = isSelf ? HorizontalAlignment.Right : HorizontalAlignment.Left
+            });
+
+            // Play button (only interactive on patient side)
+            var btn = new Button
+            {
+                Background = new SolidColorBrush(isSelf ? HexToColor("#0F172A") : HexToColor("#0059BB")),
+                Foreground = new SolidColorBrush(Colors.White),
+                CornerRadius = new CornerRadius(isSelf ? 12 : 2, isSelf ? 2 : 12, 12, 12),
+                Padding = new Thickness(14, 9, 14, 9),
+                BorderThickness = new Thickness(0),
+                IsEnabled = !isSelf  // doctor side is just an indicator, not clickable
+            };
+
+            var btnContent = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+            btnContent.Children.Add(new FontIcon
+            {
+                FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                Glyph = isSelf ? "\uE8F4" : "\uE768",   // sent icon / speaker
+                FontSize = 14,
+                Foreground = new SolidColorBrush(Colors.White)
+            });
+            btnContent.Children.Add(new TextBlock
+            {
+                Text = isSelf ? "Đã gửi giọng nói" : "▶ Nghe giọng bác sĩ",
+                FontSize = 12,
+                FontWeight = FontWeights.SemiBold,
+                Foreground = new SolidColorBrush(Colors.White)
+            });
+            btn.Content = btnContent;
+
+            if (!isSelf)
+            {
+                string ttsText = text; // capture for closure
+                btn.Click += (s, e) => PlayTtsAsync(ttsText);
+            }
+
+            wrapper.Children.Add(btn);
+            return wrapper;
+        }
+
+        private async void PlayTtsAsync(string text)
+        {
+            try
+            {
+                // Stop any currently playing audio
+                _ttsPlayer?.Pause();
+                _ttsPlayer = null;
+
+                using var synth = new SpeechSynthesizer();
+                var stream = await synth.SynthesizeTextToStreamAsync(text);
+
+                _ttsPlayer = new MediaPlayer();
+                _ttsPlayer.Source = MediaSource.CreateFromStream(stream, stream.ContentType);
+                _ttsPlayer.Play();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[TTS] Playback error: {ex.Message}");
+            }
         }
 
         private void ScrollToBottom()

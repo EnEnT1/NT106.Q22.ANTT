@@ -13,6 +13,8 @@ using Microsoft.UI.Xaml.Navigation;
 
 using System;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Windows.Media.SpeechRecognition;
@@ -27,6 +29,11 @@ namespace Healthcare.Client.UI.Doctor
         private string _currentUserId = string.Empty;
         private string _activeNav = "video";
         private readonly System.Collections.Generic.List<string> _quickNotes = new();
+
+        // Prescription
+        private readonly System.Collections.Generic.List<PrescriptionEntry> _prescriptions = new();
+        private record PrescriptionEntry(string Medicine, string Dosage);
+        private HttpClient? _ttsHttpClient;
 
         // Speech-to-text
         private SpeechRecognizer? _speechRecognizer;
@@ -304,7 +311,191 @@ namespace Healthcare.Client.UI.Doctor
             }
         }
 
-        private void BtnAddMedicine_Click(object sender, RoutedEventArgs e) { /* Picker DB Logic logic here */ }
+        private void BtnAddMedicine_Click(object sender, RoutedEventArgs e)
+        {
+            _ = AddMedicineDialogAsync();
+        }
+
+        private async Task AddMedicineDialogAsync()
+        {
+            var medicineBox = new TextBox
+            {
+                Header = "Tên thuốc",
+                PlaceholderText = "Ví dụ: Paracetamol 500mg",
+                Margin = new Thickness(0, 0, 0, 0)
+            };
+
+            var dosageBox = new TextBox
+            {
+                Header = "Liều dùng / Cách dùng",
+                PlaceholderText = "Ví dụ: 1 viên × 3 lần/ngày × 5 ngày"
+            };
+
+            var panel = new StackPanel { Spacing = 12, Width = 300 };
+            panel.Children.Add(medicineBox);
+            panel.Children.Add(dosageBox);
+
+            var dialog = new ContentDialog
+            {
+                Title = "Thêm thuốc vào đơn",
+                Content = panel,
+                PrimaryButtonText = "Thêm",
+                CloseButtonText = "Huỷ",
+                DefaultButton = ContentDialogButton.Primary,
+                XamlRoot = this.XamlRoot
+            };
+
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary
+                && !string.IsNullOrWhiteSpace(medicineBox.Text))
+            {
+                _prescriptions.Add(new PrescriptionEntry(
+                    medicineBox.Text.Trim(),
+                    dosageBox.Text.Trim()));
+                RenderPrescriptions();
+            }
+        }
+
+        private void RenderPrescriptions()
+        {
+            PrescriptionList.Children.Clear();
+
+            if (_prescriptions.Count == 0)
+            {
+                PrescriptionList.Children.Add(new TextBlock
+                {
+                    Text = "Chưa có thuốc nào được thêm",
+                    FontSize = 12,
+                    FontStyle = Windows.UI.Text.FontStyle.Italic,
+                    Foreground = new SolidColorBrush(HexToColor("#94A3B8"))
+                });
+                return;
+            }
+
+            for (int i = 0; i < _prescriptions.Count; i++)
+            {
+                var entry = _prescriptions[i];
+
+                var row = new Border
+                {
+                    Background = new SolidColorBrush(HexToColor("#F8FAFC")),
+                    CornerRadius = new CornerRadius(8),
+                    BorderBrush = new SolidColorBrush(HexToColor("#E2E8F0")),
+                    BorderThickness = new Thickness(1),
+                    Padding = new Thickness(10, 8, 10, 8)
+                };
+
+                var grid = new Grid();
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(24) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+                var idx = new TextBlock
+                {
+                    Text = $"{i + 1}",
+                    FontSize = 11,
+                    FontWeight = FontWeights.Bold,
+                    Foreground = new SolidColorBrush(HexToColor("#94A3B8")),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                Grid.SetColumn(idx, 0);
+
+                var name = new TextBlock
+                {
+                    Text = entry.Medicine,
+                    FontSize = 12,
+                    FontWeight = FontWeights.SemiBold,
+                    Foreground = new SolidColorBrush(HexToColor("#1E293B")),
+                    TextWrapping = TextWrapping.Wrap,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(4, 0, 4, 0)
+                };
+                Grid.SetColumn(name, 1);
+
+                var dosage = new TextBlock
+                {
+                    Text = string.IsNullOrEmpty(entry.Dosage) ? "–" : entry.Dosage,
+                    FontSize = 11,
+                    Foreground = new SolidColorBrush(HexToColor("#64748B")),
+                    TextWrapping = TextWrapping.Wrap,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                Grid.SetColumn(dosage, 2);
+
+                grid.Children.Add(idx);
+                grid.Children.Add(name);
+                grid.Children.Add(dosage);
+                row.Child = grid;
+                PrescriptionList.Children.Add(row);
+            }
+        }
+
+        private async void BtnSendVoice_Click(object sender, RoutedEventArgs e)
+        {
+            var text = DiagnosisBox.Text?.Trim();
+            if (string.IsNullOrEmpty(text))
+            {
+                await ShowErrorAsync("Vui lòng nhập chẩn đoán trước khi gửi.");
+                return;
+            }
+
+            await SendDoctorVoiceToChatAsync(text);
+
+            await new ContentDialog
+            {
+                Title = "Đã gửi",
+                Content = "Bệnh nhân có thể bấm nút nghe chẩn đoán dạng giọng nói trong màn hình Chat.",
+                CloseButtonText = "Đóng",
+                XamlRoot = this.XamlRoot
+            }.ShowAsync();
+        }
+
+        /// <summary>
+        /// Gửi văn bản dưới dạng tin nhắn "[TTS] text" cho bệnh nhân.
+        /// Bệnh nhân sẽ thấy nút phát giọng nói trong ChatControl.
+        /// </summary>
+        private async Task SendDoctorVoiceToChatAsync(string text)
+        {
+            try
+            {
+                _ttsHttpClient ??= new HttpClient
+                {
+                    BaseAddress = new Uri(APIClient.BaseHttpClient.ServerBaseUrl)
+                };
+
+                await _ttsHttpClient.PostAsJsonAsync("api/chat/send", new
+                {
+                    Id          = Guid.NewGuid().ToString(),
+                    SenderId    = _currentUserId,
+                    ReceiverId  = _patientId,
+                    MessageText = "[TTS] " + text,
+                    IsRead      = false,
+                    CreatedAt   = DateTime.UtcNow
+                });
+            }
+            catch (Exception httpEx)
+            {
+                Debug.WriteLine($"[TTS Send HTTP] Failed: {httpEx.Message}");
+
+                // Fallback: direct Supabase insert
+                try
+                {
+                    var client = SupabaseIntegration.SupabaseManager.Instance.Client;
+                    await client.From<ChatMessageItem>().Insert(new ChatMessageItem
+                    {
+                        Id          = Guid.NewGuid().ToString(),
+                        SenderId    = _currentUserId,
+                        ReceiverId  = _patientId,
+                        MessageText = "[TTS] " + text,
+                        IsRead      = false,
+                        CreatedAt   = DateTime.UtcNow
+                    });
+                }
+                catch (Exception ex2)
+                {
+                    Debug.WriteLine($"[TTS Send Fallback] Error: {ex2.Message}");
+                }
+            }
+        }
 
         // ─────────────────────────────────────────────────────────────
         // SPEECH-TO-TEXT  (Windows.Media.SpeechRecognition)
@@ -510,14 +701,21 @@ namespace Healthcare.Client.UI.Doctor
             try
             {
                 var client = Healthcare.Client.SupabaseIntegration.SupabaseManager.Instance.Client;
-                var record = new MedicalRecord {
+
+                // Merge quick notes + prescriptions into AiMedicines
+                var medicines = new System.Collections.Generic.List<string>(_quickNotes);
+                foreach (var p in _prescriptions)
+                    medicines.Add(string.IsNullOrEmpty(p.Dosage) ? p.Medicine : $"{p.Medicine} — {p.Dosage}");
+
+                var record = new MedicalRecord
+                {
                     Id = Guid.NewGuid().ToString(),
                     AppointmentId = _appointmentId,
                     DoctorId = _currentUserId,
                     PatientId = _patientId,
                     Diagnosis = DiagnosisBox.Text ?? string.Empty,
                     PrescriptionImageUrl = string.Empty,
-                    AiMedicines = _quickNotes.ToList(),
+                    AiMedicines = medicines,
                     CreatedAt = DateTime.Now
                 };
                 await client.From<MedicalRecord>().Insert(record);
@@ -547,7 +745,16 @@ namespace Healthcare.Client.UI.Doctor
                 {
                     var client = Healthcare.Client.SupabaseIntegration.SupabaseManager.Instance.Client;
                     
-                    // 1. Lưu hồ sơ bệnh án
+                    // 1. Lưu hồ sơ bệnh án (bao gồm cả đơn thuốc)
+                    var medicines = new System.Collections.Generic.List<string>(_quickNotes);
+                    foreach (var p in _prescriptions)
+                        medicines.Add(string.IsNullOrEmpty(p.Dosage) ? p.Medicine : $"{p.Medicine} — {p.Dosage}");
+
+                    // Thêm ghi chú đơn thuốc nếu có
+                    string prescNote = PrescriptionNoteBox.Text?.Trim() ?? string.Empty;
+                    if (!string.IsNullOrEmpty(prescNote))
+                        medicines.Add("[Ghi chú] " + prescNote);
+
                     var medicalRecord = new MedicalRecord
                     {
                         Id = Guid.NewGuid().ToString(),
@@ -555,7 +762,7 @@ namespace Healthcare.Client.UI.Doctor
                         PatientId = _patientId,
                         DoctorId = _currentUserId,
                         Diagnosis = DiagnosisBox.Text ?? string.Empty,
-                        AiMedicines = _quickNotes.ToList(),
+                        AiMedicines = medicines,
                         CreatedAt = DateTime.Now
                     };
 
