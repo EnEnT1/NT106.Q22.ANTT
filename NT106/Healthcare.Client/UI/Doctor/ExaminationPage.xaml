@@ -158,18 +158,19 @@
                                      TextWrapping="Wrap"
                                      MinHeight="100"/>
 
-                            <!-- Nút gửi chẩn đoán dạng giọng nói cho bệnh nhân -->
-                            <Button Click="BtnSendVoice_Click"
+                            <!-- Nút ghi âm chẩn đoán giọng nói cho bệnh nhân -->
+                            <Button x:Name="BtnSendVoice"
+                                    Click="BtnSendVoice_Click"
                                     Background="#0F172A"
                                     Foreground="White"
                                     CornerRadius="10"
                                     Padding="14,8"
                                     HorizontalAlignment="Left"
                                     BorderThickness="0"
-                                    ToolTipService.ToolTip="Bệnh nhân sẽ thấy nút phát giọng nói trong chat">
+                                    ToolTipService.ToolTip="Ghi âm giọng nói chẩn đoán để bệnh nhân tải về">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE720;" FontSize="14" Foreground="#7DD3FC"/>
-                                    <TextBlock Text="Gửi chẩn đoán dạng giọng nói" FontSize="12" FontWeight="SemiBold"/>
+                                    <FontIcon x:Name="BtnSendVoiceIcon" Glyph="&#xE720;" FontSize="14" Foreground="#7DD3FC"/>
+                                    <TextBlock x:Name="BtnSendVoiceText" Text="Ghi âm chẩn đoán giọng nói" FontSize="12" FontWeight="SemiBold"/>
                                 </StackPanel>
                             </Button>
 

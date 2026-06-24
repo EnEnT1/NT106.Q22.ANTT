@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Windows.UI;
 
+
 namespace Healthcare.Client.UI.Patient
 {
     public sealed partial class PatientHomePage : Page
@@ -29,8 +30,14 @@ namespace Healthcare.Client.UI.Patient
         {
             this.InitializeComponent();
             this.Loaded += PatientHomePage_Loaded;
+            this.Unloaded += PatientHomePage_Unloaded;
 
             SuggestedDoctorsListView.ItemsSource = _suggestedDoctors;
+        }
+
+        private void PatientHomePage_Unloaded(object sender, RoutedEventArgs e)
+        {
+            DeviceTestCardControl.StopDeviceTesting();
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -504,4 +511,4 @@ namespace Healthcare.Client.UI.Patient
         public string Specialty { get; set; } = "Chưa cập nhật chuyên khoa";
         public Brush StatusColor { get; set; } = new SolidColorBrush(Microsoft.UI.Colors.LightGray);
     }
-}
+}

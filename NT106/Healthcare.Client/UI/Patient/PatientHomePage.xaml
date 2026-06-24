@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Healthcare.Client.UI.Patient"
+    xmlns:components="using:Healthcare.Client.UI.Components"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -15,6 +16,7 @@
         <SolidColorBrush x:Key="SlateGray100" Color="#F1F5F9"/>
         <SolidColorBrush x:Key="SlateGray400" Color="#94A3B8"/>
         <SolidColorBrush x:Key="SlateGray500" Color="#64748B"/>
+        <SolidColorBrush x:Key="SlateGray700" Color="#334155"/>
         <SolidColorBrush x:Key="SlateGray800" Color="#1E293B"/>
         <SolidColorBrush x:Key="SlateGray900" Color="#0F172A"/>
         <SolidColorBrush x:Key="EmeraldBrush" Color="#10B981"/>
@@ -112,112 +114,118 @@
                         <ColumnDefinition Width="3*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- UPCOMING APPOINTMENT -->
-                    <Border x:Name="UpcomingAppointmentCard" Grid.Column="0"
-                            Background="{StaticResource PrimaryBrush}"
-                            CornerRadius="16"
-                            Padding="32"
-                            MinHeight="220">
-                        <Grid>
-                            <FontIcon Glyph="&#xEAD4;"
-                                      FontSize="160"
-                                      FontFamily="Segoe Fluent Icons"
-                                      Foreground="#1AFFFFFF"
-                                      HorizontalAlignment="Right"
-                                      VerticalAlignment="Bottom"
-                                      Margin="0,0,-24,-24"/>
+                    <!-- COLUMN 0: APPOINTMENT & DEVICE TEST -->
+                    <StackPanel Grid.Column="0" Spacing="24">
+                        <!-- UPCOMING APPOINTMENT -->
+                        <Border x:Name="UpcomingAppointmentCard"
+                                Background="{StaticResource PrimaryBrush}"
+                                CornerRadius="16"
+                                Padding="32"
+                                MinHeight="220">
+                            <Grid>
+                                <FontIcon Glyph="&#xEAD4;"
+                                          FontSize="160"
+                                          FontFamily="Segoe Fluent Icons"
+                                          Foreground="#1AFFFFFF"
+                                          HorizontalAlignment="Right"
+                                          VerticalAlignment="Bottom"
+                                          Margin="0,0,-24,-24"/>
 
-                            <!-- Active State -->
-                            <StackPanel x:Name="AppointmentActiveState" Spacing="0" Visibility="Collapsed">
-                                <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,24">
-                                    <FontIcon Glyph="&#xE787;"
-                                              FontSize="18"
-                                              Foreground="#CCFFFFFF"
-                                              FontFamily="Segoe Fluent Icons"/>
-                                    <TextBlock Text="Lịch hẹn sắp tới"
-                                               FontSize="14"
-                                               FontWeight="Bold"
-                                               Foreground="#CCFFFFFF"/>
-                                </StackPanel>
-
-                                <TextBlock x:Name="AppointmentTimeTextBlock"
-                                           Text="09:30 AM"
-                                           FontSize="36"
-                                           FontWeight="ExtraBold"
-                                           Foreground="White"
-                                           CharacterSpacing="-10"
-                                           Margin="0,0,0,4"/>
-
-                                <TextBlock x:Name="AppointmentDateTextBlock"
-                                           Text="Thứ Tư, 26 Tháng 5"
-                                           FontSize="14"
-                                           FontWeight="Medium"
-                                           Foreground="#CCFFFFFF"
-                                           Margin="0,0,0,24"/>
-
-                                <Border Background="#1AFFFFFF"
-                                        CornerRadius="16"
-                                        Padding="16">
-                                    <StackPanel Orientation="Horizontal" Spacing="16">
-                                        <PersonPicture x:Name="AppointmentDoctorPicture"
-                                                       Width="48"
-                                                       Height="48"
-                                                       Initials="NB"/>
-
-                                        <StackPanel VerticalAlignment="Center" Spacing="2">
-                                            <TextBlock x:Name="AppointmentDoctorNameTextBlock"
-                                                       Text="BS. Nguyễn Văn B"
-                                                       FontSize="13"
-                                                       FontWeight="Bold"
-                                                       Foreground="White"/>
-                                            <TextBlock x:Name="AppointmentDoctorSpecialtyTextBlock"
-                                                       Text="Chuyên khoa Nội"
-                                                       FontSize="12"
-                                                       Foreground="#99FFFFFF"/>
-                                        </StackPanel>
+                                <!-- Active State -->
+                                <StackPanel x:Name="AppointmentActiveState" Spacing="0" Visibility="Collapsed">
+                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,24">
+                                        <FontIcon Glyph="&#xE787;"
+                                                  FontSize="18"
+                                                  Foreground="#CCFFFFFF"
+                                                  FontFamily="Segoe Fluent Icons"/>
+                                        <TextBlock Text="Lịch hẹn sắp tới"
+                                                   FontSize="14"
+                                                   FontWeight="Bold"
+                                                   Foreground="#CCFFFFFF"/>
                                     </StackPanel>
-                                </Border>
-                            </StackPanel>
 
-                            <!-- Empty State -->
-                            <StackPanel x:Name="AppointmentEmptyState" Spacing="12" VerticalAlignment="Center" Visibility="Visible">
-                                <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
-                                    <FontIcon Glyph="&#xE787;"
-                                              FontSize="18"
-                                              Foreground="#CCFFFFFF"
-                                              FontFamily="Segoe Fluent Icons"/>
-                                    <TextBlock Text="Lịch hẹn sắp tới"
+                                    <TextBlock x:Name="AppointmentTimeTextBlock"
+                                               Text="09:30 AM"
+                                               FontSize="36"
+                                               FontWeight="ExtraBold"
+                                               Foreground="White"
+                                               CharacterSpacing="-10"
+                                               Margin="0,0,0,4"/>
+
+                                    <TextBlock x:Name="AppointmentDateTextBlock"
+                                               Text="Thứ Tư, 26 Tháng 5"
                                                FontSize="14"
-                                               FontWeight="Bold"
-                                               Foreground="#CCFFFFFF"/>
+                                               FontWeight="Medium"
+                                               Foreground="#CCFFFFFF"
+                                               Margin="0,0,0,24"/>
+
+                                    <Border Background="#1AFFFFFF"
+                                            CornerRadius="16"
+                                            Padding="16">
+                                        <StackPanel Orientation="Horizontal" Spacing="16">
+                                            <PersonPicture x:Name="AppointmentDoctorPicture"
+                                                           Width="48"
+                                                           Height="48"
+                                                           Initials="NB"/>
+
+                                            <StackPanel VerticalAlignment="Center" Spacing="2">
+                                                <TextBlock x:Name="AppointmentDoctorNameTextBlock"
+                                                           Text="BS. Nguyễn Văn B"
+                                                           FontSize="13"
+                                                           FontWeight="Bold"
+                                                           Foreground="White"/>
+                                                <TextBlock x:Name="AppointmentDoctorSpecialtyTextBlock"
+                                                           Text="Chuyên khoa Nội"
+                                                           FontSize="12"
+                                                           Foreground="#99FFFFFF"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
                                 </StackPanel>
 
-                                <TextBlock Text="Không có lịch hẹn"
-                                           FontSize="24"
-                                           FontWeight="ExtraBold"
-                                           Foreground="White"
-                                           CharacterSpacing="-10"
-                                           Margin="0,0,0,2"/>
+                                <!-- Empty State -->
+                                <StackPanel x:Name="AppointmentEmptyState" Spacing="12" VerticalAlignment="Center" Visibility="Visible">
+                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
+                                        <FontIcon Glyph="&#xE787;"
+                                                  FontSize="18"
+                                                  Foreground="#CCFFFFFF"
+                                                  FontFamily="Segoe Fluent Icons"/>
+                                        <TextBlock Text="Lịch hẹn sắp tới"
+                                                   FontSize="14"
+                                                   FontWeight="Bold"
+                                                   Foreground="#CCFFFFFF"/>
+                                    </StackPanel>
 
-                                <TextBlock Text="Bạn không có lịch hẹn nào sắp tới. Hãy chủ động chăm sóc sức khỏe nhé!"
-                                           FontSize="12"
-                                           Foreground="#CCFFFFFF"
-                                           TextWrapping="Wrap"
-                                           Margin="0,0,0,16"/>
+                                    <TextBlock Text="Không có lịch hẹn"
+                                               FontSize="24"
+                                               FontWeight="ExtraBold"
+                                               Foreground="White"
+                                               CharacterSpacing="-10"
+                                               Margin="0,0,0,2"/>
 
-                                <Button Content="Đặt lịch ngay"
-                                        Background="White"
-                                        Foreground="{StaticResource PrimaryBrush}"
-                                        CornerRadius="8"
-                                        Padding="16,6"
-                                        FontWeight="Bold"
-                                        FontSize="12"
-                                        BorderThickness="0"
-                                        HorizontalAlignment="Left"
-                                        Click="QuickAccess_BookAppointment_Click"/>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
+                                    <TextBlock Text="Bạn không có lịch hẹn nào sắp tới. Hãy chủ động chăm sóc sức khỏe nhé!"
+                                               FontSize="12"
+                                               Foreground="#CCFFFFFF"
+                                               TextWrapping="Wrap"
+                                               Margin="0,0,0,16"/>
+
+                                    <Button Content="Đặt lịch ngay"
+                                            Background="White"
+                                            Foreground="{StaticResource PrimaryBrush}"
+                                            CornerRadius="8"
+                                            Padding="16,6"
+                                            FontWeight="Bold"
+                                            FontSize="12"
+                                            BorderThickness="0"
+                                            HorizontalAlignment="Left"
+                                            Click="QuickAccess_BookAppointment_Click"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <!-- DEVICE TEST CARD -->
+                        <components:DeviceTestCard x:Name="DeviceTestCard" />
+
+                    </StackPanel>
 
                     <!-- HEALTH INDICATORS -->
                     <Border x:Name="HealthIndicatorsCard" Grid.Column="1" Style="{StaticResource CardStyle}">
@@ -696,7 +704,13 @@
                     </Border>
                 </Grid>
 
+
+                <!-- DEVICE TEST CARD -->
+                <components:DeviceTestCard x:Name="DeviceTestCardControl"/>
+
             </StackPanel>
         </ScrollViewer>
     </Grid>
+
 </Page>
+

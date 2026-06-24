@@ -25,7 +25,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls.DataGrid" Version="7.1.2" />
-		<PackageReference Include="Microsoft.MixedReality.WebRTC" Version="2.0.2" />
+		<PackageReference Include="Microsoft.MixedReality.WebRTC" Version="2.0.2" GeneratePathProperty="true" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260317003" />
 		<PackageReference Include="postgrest-csharp" Version="3.5.1" />
@@ -168,8 +168,16 @@
 		<PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
 	</PropertyGroup>
 
-	<Target Name="CopyMrWebRtc" AfterTargets="Build">
-		<Copy SourceFiles="$(ProjectDir)mrwebrtc.dll" DestinationFolder="$(TargetDir)" ContinueOnError="true" />
-		<Copy SourceFiles="$(ProjectDir)mrwebrtc.dll" DestinationFolder="$(TargetDir)AppX" ContinueOnError="true" />
+	<Target Name="CopyMrWebRtc" AfterTargets="Build;Publish">
+		<!-- Copy from NuGet package if it exists -->
+		<Copy SourceFiles="$(PkgMicrosoft_MixedReality_WebRTC)\runtimes\win10-x64\native\mrwebrtc.dll" DestinationFolder="$(TargetDir)" Condition="Exists('$(PkgMicrosoft_MixedReality_WebRTC)\runtimes\win10-x64\native\mrwebrtc.dll')" ContinueOnError="true" />
+		<Copy SourceFiles="$(PkgMicrosoft_MixedReality_WebRTC)\runtimes\win10-x64\native\mrwebrtc.dll" DestinationFolder="$(TargetDir)AppX" Condition="Exists('$(PkgMicrosoft_MixedReality_WebRTC)\runtimes\win10-x64\native\mrwebrtc.dll')" ContinueOnError="true" />
+		<Copy SourceFiles="$(PkgMicrosoft_MixedReality_WebRTC)\runtimes\win10-x64\native\mrwebrtc.dll" DestinationFolder="$(PublishDir)" Condition="Exists('$(PkgMicrosoft_MixedReality_WebRTC)\runtimes\win10-x64\native\mrwebrtc.dll') And '$(PublishDir)' != ''" ContinueOnError="true" />
+
+		<!-- Fallback from local project root if NuGet property is empty or not resolved -->
+		<Copy SourceFiles="$(MSBuildProjectDirectory)\mrwebrtc.dll" DestinationFolder="$(TargetDir)" Condition="!Exists('$(PkgMicrosoft_MixedReality_WebRTC)\runtimes\win10-x64\native\mrwebrtc.dll') And Exists('$(MSBuildProjectDirectory)\mrwebrtc.dll')" ContinueOnError="true" />
+		<Copy SourceFiles="$(MSBuildProjectDirectory)\mrwebrtc.dll" DestinationFolder="$(TargetDir)AppX" Condition="!Exists('$(PkgMicrosoft_MixedReality_WebRTC)\runtimes\win10-x64\native\mrwebrtc.dll') And Exists('$(MSBuildProjectDirectory)\mrwebrtc.dll')" ContinueOnError="true" />
+		<Copy SourceFiles="$(MSBuildProjectDirectory)\mrwebrtc.dll" DestinationFolder="$(PublishDir)" Condition="!Exists('$(PkgMicrosoft_MixedReality_WebRTC)\runtimes\win10-x64\native\mrwebrtc.dll') And Exists('$(MSBuildProjectDirectory)\mrwebrtc.dll') And '$(PublishDir)' != ''" ContinueOnError="true" />
 	</Target>
 </Project>
+

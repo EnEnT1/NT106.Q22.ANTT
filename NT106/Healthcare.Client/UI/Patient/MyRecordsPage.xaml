@@ -99,6 +99,8 @@
                                         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" Margin="0,15,0,0">
                                             <Button Style="{StaticResource AccentButtonStyle}" Content="Xem đơn thuốc" Padding="15,6" CornerRadius="6" FontSize="13" Click="BtnViewPrescription_Click"/>
                                             <Button Content="Tải về file PDF" Padding="15,6" CornerRadius="6" FontSize="13" Background="Transparent" BorderBrush="#CBD5E1" Click="BtnDownloadPrescription_Click"/>
+                                            <Button Content="Tải chẩn đoán (TXT)" Padding="15,6" CornerRadius="6" FontSize="13" Background="#F0FDF4" BorderBrush="#BBF7D0" Foreground="#166534" Click="BtnDownloadVoice_Click" Visibility="{Binding VoiceDiagnosisVisibility}"/>
+                                            <Button Content="Tải file ghi âm (M4A)" Padding="15,6" CornerRadius="6" FontSize="13" Background="#EEF2FF" BorderBrush="#C7D2FE" Foreground="#4F46E5" Click="BtnDownloadAudio_Click" Visibility="{Binding VoiceAudioVisibility}"/>
                                         </StackPanel>
                                     </Grid>
                                 </Border>

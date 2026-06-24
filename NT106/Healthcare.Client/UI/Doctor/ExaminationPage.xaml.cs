@@ -19,6 +19,9 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using Windows.Media.SpeechRecognition;
 using Windows.UI;
+using Windows.Media.Capture;
+using Windows.Media.MediaProperties;
+using Windows.Storage;
 
 namespace Healthcare.Client.UI.Doctor
 {
@@ -28,6 +31,7 @@ namespace Healthcare.Client.UI.Doctor
         private string _patientId = string.Empty;
         private string _currentUserId = string.Empty;
         private string _activeNav = "video";
+        private string _voiceDiagnosisText = string.Empty;
         private readonly System.Collections.Generic.List<string> _quickNotes = new();
 
         // Prescription
@@ -39,6 +43,12 @@ namespace Healthcare.Client.UI.Doctor
         private SpeechRecognizer? _speechRecognizer;
         private bool _isRecording = false;
         private System.Threading.CancellationTokenSource? _toastCts;
+
+        // Audio recording (Actual voice diagnosis)
+        private MediaCapture? _audioMediaCapture;
+        private StorageFile? _tempRecordingFile;
+        private bool _isRecordingAudio = false;
+        private string _voiceAudioBase64 = string.Empty;
 
         public ExaminationPage()
         {
@@ -64,6 +74,7 @@ namespace Healthcare.Client.UI.Doctor
             VideoCall.Cleanup();
             Chat.Cleanup();
             CleanupSpeechRecognizer();
+            CleanupAudioRecording();
         }
 
         private async Task InitializePageAsync()
@@ -431,22 +442,112 @@ namespace Healthcare.Client.UI.Doctor
 
         private async void BtnSendVoice_Click(object sender, RoutedEventArgs e)
         {
-            var text = DiagnosisBox.Text?.Trim();
-            if (string.IsNullOrEmpty(text))
+            if (_isRecordingAudio)
             {
-                await ShowErrorAsync("Vui lòng nhập chẩn đoán trước khi gửi.");
-                return;
+                await StopAudioRecordingAsync();
             }
-
-            await SendDoctorVoiceToChatAsync(text);
-
-            await new ContentDialog
+            else
             {
-                Title = "Đã gửi",
-                Content = "Bệnh nhân có thể bấm nút nghe chẩn đoán dạng giọng nói trong màn hình Chat.",
-                CloseButtonText = "Đóng",
-                XamlRoot = this.XamlRoot
-            }.ShowAsync();
+                await StartAudioRecordingAsync();
+            }
+        }
+
+        private async Task StartAudioRecordingAsync()
+        {
+            try
+            {
+                var settings = new MediaCaptureInitializationSettings
+                {
+                    StreamingCaptureMode = StreamingCaptureMode.Audio,
+                    MediaCategory = MediaCategory.Speech
+                };
+
+                _audioMediaCapture = new MediaCapture();
+                await _audioMediaCapture.InitializeAsync(settings);
+
+                var localFolder = ApplicationData.Current.TemporaryFolder;
+                _tempRecordingFile = await localFolder.CreateFileAsync("voice_diagnosis.m4a", CreationCollisionOption.GenerateUniqueName);
+
+                var profile = MediaEncodingProfile.CreateM4a(AudioEncodingQuality.Low);
+                await _audioMediaCapture.StartRecordToStorageFileAsync(profile, _tempRecordingFile);
+
+                _isRecordingAudio = true;
+
+                // Update UI to Recording state
+                BtnSendVoice.Background = new SolidColorBrush(HexToColor("#EF4444")); // Red
+                BtnSendVoiceIcon.Glyph = "\uE71A"; // Stop glyph
+                BtnSendVoiceIcon.Foreground = new SolidColorBrush(Colors.White);
+                BtnSendVoiceText.Text = "Đang ghi âm... (Bấm để dừng)";
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[AudioRecord] Start Error: {ex.Message}");
+                await ShowErrorAsync("Lỗi khởi động ghi âm: " + ex.Message);
+                CleanupAudioRecording();
+            }
+        }
+
+        private async Task StopAudioRecordingAsync()
+        {
+            try
+            {
+                if (_audioMediaCapture != null && _isRecordingAudio)
+                {
+                    await _audioMediaCapture.StopRecordAsync();
+                    _isRecordingAudio = false;
+
+                    if (_tempRecordingFile != null)
+                    {
+                        using (var stream = await _tempRecordingFile.OpenReadAsync())
+                        {
+                            using (var reader = new Windows.Storage.Streams.DataReader(stream))
+                            {
+                                await reader.LoadAsync((uint)stream.Size);
+                                byte[] bytes = new byte[stream.Size];
+                                reader.ReadBytes(bytes);
+                                _voiceAudioBase64 = Convert.ToBase64String(bytes);
+                            }
+                        }
+                    }
+
+                    // Update UI to Recorded state
+                    BtnSendVoice.Background = new SolidColorBrush(HexToColor("#16A34A")); // Green
+                    BtnSendVoiceIcon.Glyph = "\uE8FB"; // Checkmark glyph
+                    BtnSendVoiceIcon.Foreground = new SolidColorBrush(Colors.White);
+                    BtnSendVoiceText.Text = "Đã ghi âm (Bấm để ghi lại)";
+
+                    await new ContentDialog
+                    {
+                        Title = "Ghi âm hoàn tất",
+                        Content = "Đã ghi âm chẩn đoán thành công. Bản ghi âm này sẽ tự động được gửi kèm khi bạn lưu hồ sơ khám bệnh hoặc kết thúc phiên khám.",
+                        CloseButtonText = "Đóng",
+                        XamlRoot = this.XamlRoot
+                    }.ShowAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[AudioRecord] Stop Error: {ex.Message}");
+                await ShowErrorAsync("Lỗi dừng ghi âm: " + ex.Message);
+            }
+            finally
+            {
+                CleanupAudioRecording();
+            }
+        }
+
+        private void CleanupAudioRecording()
+        {
+            if (_audioMediaCapture != null)
+            {
+                try
+                {
+                    _audioMediaCapture.Dispose();
+                }
+                catch { }
+                _audioMediaCapture = null;
+            }
+            _isRecordingAudio = false;
         }
 
         /// <summary>
@@ -707,6 +808,12 @@ namespace Healthcare.Client.UI.Doctor
                 foreach (var p in _prescriptions)
                     medicines.Add(string.IsNullOrEmpty(p.Dosage) ? p.Medicine : $"{p.Medicine} — {p.Dosage}");
 
+                if (!string.IsNullOrEmpty(_voiceDiagnosisText))
+                    medicines.Add("[VoiceDiagnosis] " + _voiceDiagnosisText);
+
+                if (!string.IsNullOrEmpty(_voiceAudioBase64))
+                    medicines.Add("[VoiceAudio] " + _voiceAudioBase64);
+
                 var record = new MedicalRecord
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -754,6 +861,12 @@ namespace Healthcare.Client.UI.Doctor
                     string prescNote = PrescriptionNoteBox.Text?.Trim() ?? string.Empty;
                     if (!string.IsNullOrEmpty(prescNote))
                         medicines.Add("[Ghi chú] " + prescNote);
+
+                    if (!string.IsNullOrEmpty(_voiceDiagnosisText))
+                        medicines.Add("[VoiceDiagnosis] " + _voiceDiagnosisText);
+
+                    if (!string.IsNullOrEmpty(_voiceAudioBase64))
+                        medicines.Add("[VoiceAudio] " + _voiceAudioBase64);
 
                     var medicalRecord = new MedicalRecord
                     {

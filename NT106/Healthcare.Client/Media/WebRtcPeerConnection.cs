@@ -79,36 +79,58 @@ namespace Healthcare.Client.Communication
 
         private async Task SetupLocalMediaAsync()
         {
-            _audioSource = await DeviceAudioTrackSource.CreateAsync();
-
-            _localAudioTrack = LocalAudioTrack.CreateFromSource(
-                _audioSource,
-                new LocalAudioTrackInitConfig
-                {
-                    trackName = "local_audio_track"
-                });
-
-            _audioTransceiver = _peerConnection.AddTransceiver(MediaKind.Audio);
-            _audioTransceiver.DesiredDirection = Transceiver.Direction.SendReceive;
-            _audioTransceiver.LocalAudioTrack = _localAudioTrack;
-
-            _videoSource = await DeviceVideoTrackSource.CreateAsync();
-
-            _videoSource.Argb32VideoFrameReady += frame =>
+            try
             {
-                OnLocalFrameReady?.Invoke(frame);
-            };
+                _audioSource = await DeviceAudioTrackSource.CreateAsync();
 
-            _localVideoTrack = LocalVideoTrack.CreateFromSource(
-                _videoSource,
-                new LocalVideoTrackInitConfig
+                _localAudioTrack = LocalAudioTrack.CreateFromSource(
+                    _audioSource,
+                    new LocalAudioTrackInitConfig
+                    {
+                        trackName = "local_audio_track"
+                    });
+
+                _audioTransceiver = _peerConnection.AddTransceiver(MediaKind.Audio);
+                _audioTransceiver.DesiredDirection = Transceiver.Direction.SendReceive;
+                _audioTransceiver.LocalAudioTrack = _localAudioTrack;
+                Debug.WriteLine("[WebRTC] Audio track initialized successfully.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[WebRTC] Audio device not found or inaccessible: {ex.Message}");
+                // Add transceiver anyway to receive remote audio
+                _audioTransceiver = _peerConnection.AddTransceiver(MediaKind.Audio);
+                _audioTransceiver.DesiredDirection = Transceiver.Direction.ReceiveOnly;
+            }
+
+            try
+            {
+                _videoSource = await DeviceVideoTrackSource.CreateAsync();
+
+                _videoSource.Argb32VideoFrameReady += frame =>
                 {
-                    trackName = "local_video_track"
-                });
+                    OnLocalFrameReady?.Invoke(frame);
+                };
 
-            _videoTransceiver = _peerConnection.AddTransceiver(MediaKind.Video);
-            _videoTransceiver.DesiredDirection = Transceiver.Direction.SendReceive;
-            _videoTransceiver.LocalVideoTrack = _localVideoTrack;
+                _localVideoTrack = LocalVideoTrack.CreateFromSource(
+                    _videoSource,
+                    new LocalVideoTrackInitConfig
+                    {
+                        trackName = "local_video_track"
+                    });
+
+                _videoTransceiver = _peerConnection.AddTransceiver(MediaKind.Video);
+                _videoTransceiver.DesiredDirection = Transceiver.Direction.SendReceive;
+                _videoTransceiver.LocalVideoTrack = _localVideoTrack;
+                Debug.WriteLine("[WebRTC] Video track initialized successfully.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[WebRTC] Video device not found or inaccessible: {ex.Message}");
+                // Add transceiver anyway to receive remote video
+                _videoTransceiver = _peerConnection.AddTransceiver(MediaKind.Video);
+                _videoTransceiver.DesiredDirection = Transceiver.Direction.ReceiveOnly;
+            }
 
             Debug.WriteLine("[WebRTC] Local camera and microphone ready");
         }

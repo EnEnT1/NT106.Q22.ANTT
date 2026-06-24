@@ -23,6 +23,10 @@ namespace Healthcare.Client.UI.Patient
         public string Prescription { get; set; }
         public string AppointmentId { get; set; }
         public List<string> AiMedicines { get; set; } = new();
+        public string VoiceDiagnosis { get; set; } = "";
+        public Visibility VoiceDiagnosisVisibility => string.IsNullOrEmpty(VoiceDiagnosis) ? Visibility.Collapsed : Visibility.Visible;
+        public string VoiceAudioBase64 { get; set; } = "";
+        public Visibility VoiceAudioVisibility => string.IsNullOrEmpty(VoiceAudioBase64) ? Visibility.Collapsed : Visibility.Visible;
     }
 
     public sealed partial class MyRecordsPage : Page
@@ -72,9 +76,31 @@ namespace Healthcare.Client.UI.Patient
                         var docName = await GetDoctorName(rec.DoctorId);
                         
                         string medList = "Không có đơn thuốc";
+                        string voiceDiag = "";
+                        string voiceAudio = "";
+                        var actualMeds = new List<string>();
+
                         if (rec.AiMedicines != null && rec.AiMedicines.Count > 0)
                         {
-                            medList = string.Join(", ", rec.AiMedicines);
+                            foreach (var item in rec.AiMedicines)
+                            {
+                                if (item.StartsWith("[VoiceDiagnosis] "))
+                                {
+                                    voiceDiag = item.Substring("[VoiceDiagnosis] ".Length);
+                                }
+                                else if (item.StartsWith("[VoiceAudio] "))
+                                {
+                                    voiceAudio = item.Substring("[VoiceAudio] ".Length);
+                                }
+                                else
+                                {
+                                    actualMeds.Add(item);
+                                }
+                            }
+                            if (actualMeds.Count > 0)
+                            {
+                                medList = string.Join(", ", actualMeds);
+                            }
                         }
 
                         _records.Add(new RecordViewModel
@@ -85,7 +111,9 @@ namespace Healthcare.Client.UI.Patient
                             Diagnosis = rec.Diagnosis,
                             Prescription = string.IsNullOrEmpty(rec.PrescriptionImageUrl) ? medList : "Ghi chú: Xem ảnh đơn thuốc",
                             AppointmentId = rec.AppointmentId,
-                            AiMedicines = rec.AiMedicines ?? new List<string>()
+                            AiMedicines = actualMeds,
+                            VoiceDiagnosis = voiceDiag,
+                            VoiceAudioBase64 = voiceAudio
                         });
                     }
                 }
@@ -276,6 +304,121 @@ namespace Healthcare.Client.UI.Patient
                     {
                         Title = "Lỗi khi lưu",
                         Content = "Không thể lưu file đơn thuốc: " + ex.Message,
+                        CloseButtonText = "Đóng",
+                        XamlRoot = this.XamlRoot
+                    };
+                    await errorDialog.ShowAsync();
+                }
+            }
+        }
+
+        private async void BtnDownloadVoice_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is RecordViewModel record)
+            {
+                if (string.IsNullOrEmpty(record.VoiceDiagnosis)) return;
+
+                try
+                {
+                    var savePicker = new FileSavePicker();
+                    var window = MainWindow.Instance;
+                    if (window != null)
+                    {
+                        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+                        WinRT.Interop.InitializeWithWindow.Initialize(savePicker, hwnd);
+                    }
+
+                    savePicker.SuggestedStartLocation = PickerLocationId.Downloads;
+                    savePicker.FileTypeChoices.Add("Text Document", new List<string>() { ".txt" });
+                    savePicker.SuggestedFileName = "ChanDoanGiongNoi_" + record.DateStr.Replace("/", "").Replace(":", "").Replace(" ", "_");
+
+                    var file = await savePicker.PickSaveFileAsync();
+                    if (file != null)
+                    {
+                        string content = $"HỆ THỐNG Y TẾ HEALTHCARE CLINIC\n" +
+                                         $"CHẨN ĐOÁN DẠNG GIỌNG NÓI CỦA BÁC SĨ\n" +
+                                         $"====================================\n\n" +
+                                         $"Bác sĩ kê đơn: {record.DoctorName}\n" +
+                                         $"Ngày khám: {record.DateStr}\n" +
+                                         $"Chẩn đoán xác định: {record.Diagnosis}\n\n" +
+                                         $"Nội dung chẩn đoán bằng giọng nói:\n" +
+                                         $"------------------------------------\n" +
+                                         $"{record.VoiceDiagnosis}\n";
+
+                        await Windows.Storage.FileIO.WriteTextAsync(file, content, Windows.Storage.Streams.UnicodeEncoding.Utf8);
+                        
+                        var successDialog = new ContentDialog
+                        {
+                            Title = "Lưu thành công",
+                            Content = $"Đã tải và lưu chẩn đoán giọng nói vào:\n{file.Path}",
+                            CloseButtonText = "Đóng",
+                            XamlRoot = this.XamlRoot
+                        };
+                        await successDialog.ShowAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var errorDialog = new ContentDialog
+                    {
+                        Title = "Lỗi khi lưu",
+                        Content = "Không thể lưu file chẩn đoán: " + ex.Message,
+                        CloseButtonText = "Đóng",
+                        XamlRoot = this.XamlRoot
+                    };
+                    await errorDialog.ShowAsync();
+                }
+            }
+        }
+
+        private async void BtnDownloadAudio_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is RecordViewModel record)
+            {
+                if (string.IsNullOrEmpty(record.VoiceAudioBase64)) return;
+
+                try
+                {
+                    var savePicker = new FileSavePicker();
+                    var window = MainWindow.Instance;
+                    if (window != null)
+                    {
+                        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+                        WinRT.Interop.InitializeWithWindow.Initialize(savePicker, hwnd);
+                    }
+
+                    savePicker.SuggestedStartLocation = PickerLocationId.Downloads;
+                    savePicker.FileTypeChoices.Add("M4A Audio", new List<string>() { ".m4a" });
+                    savePicker.SuggestedFileName = "GhiAmCuocGoi_" + record.DateStr.Replace("/", "").Replace(":", "").Replace(" ", "_");
+
+                    var file = await savePicker.PickSaveFileAsync();
+                    if (file != null)
+                    {
+                        byte[] bytes = Convert.FromBase64String(record.VoiceAudioBase64);
+                        await Windows.Storage.FileIO.WriteBytesAsync(file, bytes);
+
+                        var successDialog = new ContentDialog
+                        {
+                            Title = "Lưu thành công",
+                            Content = $"Đã tải và lưu file ghi âm vào:\n{file.Path}\n\nBạn có muốn phát file ghi âm này không?",
+                            PrimaryButtonText = "Phát file",
+                            CloseButtonText = "Đóng",
+                            DefaultButton = ContentDialogButton.Primary,
+                            XamlRoot = this.XamlRoot
+                        };
+
+                        if (await successDialog.ShowAsync() == ContentDialogResult.Primary)
+                        {
+                            await Windows.System.Launcher.LaunchFileAsync(file);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var errorDialog = new ContentDialog
+                    {
+                        Title = "Lỗi khi lưu",
+                        Content = "Không thể lưu file ghi âm: " + ex.Message,
                         CloseButtonText = "Đóng",
                         XamlRoot = this.XamlRoot
                     };

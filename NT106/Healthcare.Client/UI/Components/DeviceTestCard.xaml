@@ -1,0 +1,160 @@
+<UserControl
+    x:Class="Healthcare.Client.UI.Components.DeviceTestCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="SlateGray400" Color="#94A3B8"/>
+        <SolidColorBrush x:Key="SlateGray500" Color="#64748B"/>
+        <SolidColorBrush x:Key="SlateGray700" Color="#334155"/>
+        <SolidColorBrush x:Key="SlateGray900" Color="#0F172A"/>
+    </UserControl.Resources>
+
+    <Border Background="White"
+            CornerRadius="16"
+            BorderBrush="#F1F5F9"
+            BorderThickness="1"
+            Padding="32">
+        <StackPanel Spacing="20">
+
+            <!-- Header -->
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Border Background="#EFF4FD" CornerRadius="10" Padding="8">
+                    <FontIcon Glyph="&#xE722;" FontFamily="Segoe Fluent Icons" FontSize="18" Foreground="#2D6CDF"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Kiem tra thiet bi"
+                               FontSize="17" FontWeight="Bold" Foreground="#0F172A"/>
+                    <TextBlock Text="Kiem tra camera va microphone truoc khi tham gia cuoc hop truc tuyen"
+                               FontSize="12" Foreground="#64748B" TextWrapping="Wrap"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Start/Stop button -->
+            <Button x:Name="BtnRunDeviceTest"
+                    Click="BtnRunDeviceTest_Click"
+                    HorizontalAlignment="Left"
+                    Background="#EFF4FD"
+                    Foreground="#2D6CDF"
+                    CornerRadius="12"
+                    Padding="20,10"
+                    FontWeight="SemiBold">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon x:Name="BtnTestIcon" Glyph="&#xE722;" FontFamily="Segoe Fluent Icons" FontSize="14"/>
+                    <TextBlock x:Name="BtnTestText" Text="Bat dau kiem tra thiet bi" FontSize="14"/>
+                </StackPanel>
+            </Button>
+
+            <!-- Status indicators -->
+            <StackPanel x:Name="DeviceTestStatusPanel" Spacing="10" Visibility="Collapsed">
+
+                <Border x:Name="CamStatusIndicator" Background="#F1F5F9" CornerRadius="12" Padding="14,10">
+                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <FontIcon x:Name="CamStatusIcon" Glyph="&#xE722;" FontFamily="Segoe Fluent Icons" FontSize="16" Foreground="#64748B"/>
+                        <TextBlock x:Name="CamStatusText" Text="Camera: Dang ket noi..."
+                                   FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="#334155"/>
+                    </StackPanel>
+                </Border>
+
+                <Border x:Name="MicStatusIndicator" Background="#F1F5F9" CornerRadius="12" Padding="14,10">
+                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <FontIcon x:Name="MicStatusIcon" Glyph="&#xE720;" FontFamily="Segoe Fluent Icons" FontSize="16" Foreground="#64748B"/>
+                        <TextBlock x:Name="MicStatusText" Text="Micro: Dang ket noi..."
+                                   FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="#334155"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- Live preview panel -->
+            <Grid x:Name="DeviceTestLivePanel" Visibility="Collapsed">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="240"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Camera preview -->
+                <Border Grid.Column="0"
+                        Background="#0F172A"
+                        CornerRadius="16"
+                        Height="240"
+                        Margin="0,0,16,0">
+                    <Grid>
+                        <FontIcon Glyph="&#xE722;"
+                                  FontFamily="Segoe Fluent Icons"
+                                  FontSize="48"
+                                  Foreground="#334155"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                        <Image x:Name="VideoPreviewImage"
+                               Stretch="UniformToFill"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"/>
+                        <Border Background="#CC000000"
+                                VerticalAlignment="Bottom"
+                                CornerRadius="0,0,16,16"
+                                Padding="12,6">
+                            <TextBlock Text="Xem truoc Camera"
+                                       FontSize="11" Foreground="#94A3B8" FontWeight="Medium"/>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Mic volume meter -->
+                <StackPanel Grid.Column="1" Spacing="12" VerticalAlignment="Center">
+                    <StackPanel Spacing="4">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE720;" FontFamily="Segoe Fluent Icons" FontSize="14" Foreground="#2D6CDF"/>
+                            <TextBlock Text="Muc am luong microphone"
+                                       FontSize="12" FontWeight="SemiBold" Foreground="#334155"/>
+                        </StackPanel>
+                        <TextBlock Text="Noi thu de kiem tra microphone cua ban"
+                                   FontSize="11" Foreground="#64748B"/>
+                    </StackPanel>
+
+                    <ProgressBar x:Name="MicVolumeProgress"
+                                 Minimum="0"
+                                 Maximum="100"
+                                 Value="0"
+                                 Height="16"
+                                 Foreground="#2D6CDF"
+                                 Background="#E2E8F0"/>
+
+                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                        <TextBlock Text="Am luong:" FontSize="12" Foreground="#64748B" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="VolumeValueText" Text="0%"
+                                   FontSize="14" FontWeight="Bold" Foreground="#2D6CDF" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Visual mic level bars -->
+                    <Grid Height="60" Margin="0,4,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Background="#2D6CDF" CornerRadius="4" Opacity="0.25" Margin="2,0" VerticalAlignment="Bottom" Height="12"/>
+                        <Border Grid.Column="1" Background="#2D6CDF" CornerRadius="4" Opacity="0.35" Margin="2,0" VerticalAlignment="Bottom" Height="20"/>
+                        <Border Grid.Column="2" Background="#2D6CDF" CornerRadius="4" Opacity="0.45" Margin="2,0" VerticalAlignment="Bottom" Height="30"/>
+                        <Border Grid.Column="3" Background="#2D6CDF" CornerRadius="4" Opacity="0.55" Margin="2,0" VerticalAlignment="Bottom" Height="42"/>
+                        <Border Grid.Column="4" Background="#2D6CDF" CornerRadius="4" Opacity="0.65" Margin="2,0" VerticalAlignment="Bottom" Height="54"/>
+                        <Border Grid.Column="5" Background="#10B981" CornerRadius="4" Opacity="0.7" Margin="2,0" VerticalAlignment="Bottom" Height="42"/>
+                        <Border Grid.Column="6" Background="#10B981" CornerRadius="4" Opacity="0.85" Margin="2,0" VerticalAlignment="Bottom" Height="30"/>
+                        <Border Grid.Column="7" Background="#10B981" CornerRadius="4" Opacity="1" Margin="2,0" VerticalAlignment="Bottom" Height="18"/>
+                    </Grid>
+
+                    <TextBlock Text="Thanh mau xanh se tang khi ban noi vao micro"
+                               FontSize="10" Foreground="#94A3B8" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Grid>
+
+        </StackPanel>
+    </Border>
+</UserControl>
