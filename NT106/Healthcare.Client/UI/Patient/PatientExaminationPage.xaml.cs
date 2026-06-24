@@ -58,9 +58,31 @@ namespace Healthcare.Client.UI.Patient
                 {
                     _doctorId = appointmentResponse.DoctorId;
                     await LoadDoctorInfoAsync();
-                    
-                    await VideoCall.InitializeAsync(_appointmentId, _doctorId, appointmentResponse.RoomCode);
-                    await Chat.InitializeAsync(_appointmentId, _currentUserId, _doctorId);
+
+                    // Fallback: if DB has no room_code, generate the same way the doctor does
+                    string roomCode = appointmentResponse.RoomCode;
+                    if (string.IsNullOrWhiteSpace(roomCode))
+                        roomCode = "room_" + _appointmentId;
+
+                    try
+                    {
+                        await VideoCall.InitializeAsync(_appointmentId, _doctorId, roomCode);
+                        // Patient does NOT call StartCallAsync - they wait for the doctor's offer
+                    }
+                    catch (Exception videoEx)
+                    {
+                        Debug.WriteLine($"[PatientExam] Video init failed (non-fatal): {videoEx.Message}");
+                    }
+
+                    try
+                    {
+                        await Chat.InitializeAsync(_appointmentId, _currentUserId, _doctorId);
+                    }
+                    catch (Exception chatEx)
+                    {
+                        Debug.WriteLine($"[PatientExam] Chat init failed: {chatEx.Message}");
+                    }
+
                     await LoadMedicalDataAsync();
                 }
                 else

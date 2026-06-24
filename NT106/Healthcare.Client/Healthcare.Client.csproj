@@ -18,6 +18,9 @@
 	<ItemGroup>
 		<Content Include="Assets\**" />
 		<Manifest Include="$(ApplicationManifest)" />
+		<None Include="mrwebrtc.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -164,4 +167,9 @@
 		<PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
 		<PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
 	</PropertyGroup>
+
+	<Target Name="CopyMrWebRtc" AfterTargets="Build">
+		<Copy SourceFiles="$(ProjectDir)mrwebrtc.dll" DestinationFolder="$(TargetDir)" ContinueOnError="true" />
+		<Copy SourceFiles="$(ProjectDir)mrwebrtc.dll" DestinationFolder="$(TargetDir)AppX" ContinueOnError="true" />
+	</Target>
 </Project>
