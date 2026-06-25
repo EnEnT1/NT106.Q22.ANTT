@@ -1,4 +1,4 @@
-﻿using Microsoft.UI;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -337,8 +337,8 @@ namespace Healthcare.Client.UI.Doctor
             HighlightTodayColumn();
 
             var weekAppts = _allAppointments
-                .Where(a => a.AppointmentDate.Date >= _currentWeekSunday.Date
-                         && a.AppointmentDate.Date <= endOfWeek.Date)
+                .Where(a => a.AppointmentDate.ToLocalTime().Date >= _currentWeekSunday.Date
+                         && a.AppointmentDate.ToLocalTime().Date <= endOfWeek.Date)
                 .OrderBy(a => a.StartTime)
                 .ToList();
 
@@ -347,7 +347,7 @@ namespace Healthcare.Client.UI.Doctor
                 var patient = _allPatients.FirstOrDefault(u => u.Id == appt.PatientId);
                 var trans = _allTransactions.FirstOrDefault(t => t.AppointmentId == appt.Id);
                 var vm = new AppointmentViewModel(appt, patient?.FullName ?? "Bệnh nhân (ẩn danh)", trans?.PaymentMethod);
-                int dow = (int)appt.AppointmentDate.DayOfWeek;
+                int dow = (int)appt.AppointmentDate.ToLocalTime().DayOfWeek;
 
                 if (dow == 0) SundayList.Add(vm);
                 if (dow == 1) MondayList.Add(vm);
@@ -373,7 +373,7 @@ namespace Healthcare.Client.UI.Doctor
                 int col = (startDayOfWeek + i - 1) % 7;
                 DateTime cellDate = new DateTime(_currentMonthDate.Year, _currentMonthDate.Month, i);
 
-                int apptCount = _allAppointments.Count(a => a.AppointmentDate.Date == cellDate.Date);
+                int apptCount = _allAppointments.Count(a => a.AppointmentDate.ToLocalTime().Date == cellDate.Date);
                 bool isToday = cellDate.Date == DateTime.Today;
 
                 Border cell = new Border
@@ -576,7 +576,7 @@ namespace Healthcare.Client.UI.Doctor
                 var query = _supabase.From<TimeSlot>()
                     .Where(x => x.DoctorId == SessionStorage.CurrentUser.Id);
 
-                var filterDate = DateTime.SpecifyKind(FilterSlotDatePicker.Date.DateTime.Date, DateTimeKind.Utc);
+                var filterDate = FilterSlotDatePicker.Date.DateTime.Date.ToUniversalTime();
                 query = query.Where(s => s.SlotDate == filterDate);
 
                 var response = await query.Get();
@@ -630,7 +630,7 @@ namespace Healthcare.Client.UI.Doctor
             {
                 var existingSlotsResponse = await _supabase.From<TimeSlot>()
                     .Where(x => x.DoctorId == SessionStorage.CurrentUser.Id)
-                    .Where(x => x.SlotDate == DateTime.SpecifyKind(date, DateTimeKind.Utc))
+                    .Where(x => x.SlotDate == date.ToUniversalTime())
                     .Get();
                 existingSlots = existingSlotsResponse.Models ?? new List<TimeSlot>();
             }
@@ -656,7 +656,7 @@ namespace Healthcare.Client.UI.Doctor
                     slotsToCreate.Add(new TimeSlot
                     {
                         DoctorId = SessionStorage.CurrentUser.Id,
-                        SlotDate = DateTime.SpecifyKind(date, DateTimeKind.Utc),
+                        SlotDate = date.ToUniversalTime(),
                         StartTime = slotStart,
                         EndTime = slotEnd,
                         Status = "Available"
@@ -868,7 +868,7 @@ namespace Healthcare.Client.UI.Doctor
         {
             Id = model.Id ?? string.Empty;
             TimeRange = $"{model.StartTime:hh\\:mm} - {model.EndTime:hh\\:mm}";
-            DateFormatted = model.SlotDate.ToString("dd/MM/yyyy");
+            DateFormatted = model.SlotDate.ToLocalTime().ToString("dd/MM/yyyy");
             Status = model.Status ?? string.Empty;
 
             StatusText = Status switch
@@ -950,7 +950,7 @@ namespace Healthcare.Client.UI.Doctor
             PatientName = name ?? "Bệnh nhân (ẩn danh)";
             Time = $"{model.StartTime:hh\\:mm} - {model.EndTime:hh\\:mm}";
             BaseStatus = model.Status ?? string.Empty;
-            DateFormatted = model.AppointmentDate.ToString("dd/MM/yyyy");
+            DateFormatted = model.AppointmentDate.ToLocalTime().ToString("dd/MM/yyyy");
             TypeText = model.ExaminationType ?? "Offline";
 
             PaymentText = paymentMethod == "Online"
