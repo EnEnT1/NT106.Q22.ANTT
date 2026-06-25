@@ -107,6 +107,15 @@ namespace Healthcare.Client.UI.Components
             try 
             {
                 var client = SupabaseManager.Instance.Client;
+                try
+                {
+                    await client.Realtime.ConnectAsync();
+                }
+                catch (Exception connEx)
+                {
+                    Debug.WriteLine($"[VideoCallControl] Realtime Connect failed: {connEx.Message}");
+                }
+
                 _signalChannel = client.Realtime.Channel("webrtc_" + _roomCode, "public", "webrtc_signals");
 
                 _signalChannel.AddPostgresChangeHandler(

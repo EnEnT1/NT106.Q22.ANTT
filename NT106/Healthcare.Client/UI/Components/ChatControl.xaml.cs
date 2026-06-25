@@ -18,6 +18,7 @@ using Windows.Media.SpeechSynthesis;
 using Windows.UI;
 using Supabase.Realtime;
 using Supabase.Realtime.PostgresChanges;
+using System.Linq;
 
 namespace Healthcare.Client.UI.Components
 {
@@ -59,11 +60,26 @@ namespace Healthcare.Client.UI.Components
 
             await LoadChatHistoryAsync();
             await SubscribeRealtimeAsync();
+            InitializeAiChat();
         }
 
         public void Cleanup()
         {
             _chatChannel?.Unsubscribe();
+        }
+
+        private void InitializeAiChat()
+        {
+            AiMessageList.Children.Clear();
+            var welcome = new ChatMessageItem
+            {
+                Id = Guid.NewGuid().ToString(),
+                SenderId = "AI",
+                ReceiverId = _currentUserId,
+                MessageText = "Xin chào! Tôi là Trợ lý Y tế AI. Tôi có thể hỗ trợ giải đáp các câu hỏi cơ bản về sức khỏe và triệu chứng của bạn.",
+                CreatedAt = DateTime.UtcNow
+            };
+            AiMessageList.Children.Add(BuildBubble(welcome, false, "Trợ lý AI"));
         }
 
         private async Task LoadChatHistoryAsync()
@@ -79,15 +95,15 @@ namespace Healthcare.Client.UI.Components
                     .Order("created_at", Postgrest.Constants.Ordering.Ascending)
                     .Get();
 
-                MessageList.Children.Clear();
+                DoctorMessageList.Children.Clear();
 
                 foreach (var msg in response.Models)
                 {
                     bool isSelf = msg.SenderId == _currentUserId;
-                    MessageList.Children.Add(BuildBubble(msg, isSelf));
+                    DoctorMessageList.Children.Add(BuildBubble(msg, isSelf));
                 }
 
-                ScrollToBottom();
+                ScrollDoctorToBottom();
             }
             catch (Exception ex)
             {
@@ -100,6 +116,12 @@ namespace Healthcare.Client.UI.Components
             try
             {
                 var client = SupabaseManager.Instance.Client;
+                try
+                {
+                    await client.Realtime.ConnectAsync();
+                }
+                catch { }
+
                 _chatChannel = client.Realtime.Channel("chat_" + _appointmentId, "public", "chat_messages");
 
                 _chatChannel.AddPostgresChangeHandler(
@@ -114,7 +136,7 @@ namespace Healthcare.Client.UI.Components
                         {
                             DispatcherQueue.TryEnqueue(() =>
                             {
-                                AppendBubble(msg, false);
+                                AppendDoctorBubble(msg, false);
                             });
                         }
                     });
@@ -127,28 +149,70 @@ namespace Healthcare.Client.UI.Components
             }
         }
 
-        private async void BtnSend_Click(object sender, RoutedEventArgs e)
+        // Tab Switching Logic
+        private void BtnTabDoctor_Click(object sender, RoutedEventArgs e)
         {
-            await SendMessageAsync();
+            PanelDoctorChat.Visibility = Visibility.Visible;
+            PanelAiChat.Visibility = Visibility.Collapsed;
+
+            // Highlight Doctor Tab
+            BtnTabDoctor.BorderBrush = new SolidColorBrush(HexToColor("#0059BB"));
+            BtnTabDoctor.BorderThickness = new Thickness(0, 0, 0, 2);
+            IconTabDoctor.Foreground = new SolidColorBrush(HexToColor("#0059BB"));
+            TextTabDoctor.Foreground = new SolidColorBrush(HexToColor("#0059BB"));
+            TextTabDoctor.FontWeight = FontWeights.Bold;
+
+            // Unhighlight AI Tab
+            BtnTabAi.BorderBrush = new SolidColorBrush(Colors.Transparent);
+            BtnTabAi.BorderThickness = new Thickness(0);
+            IconTabAi.Foreground = new SolidColorBrush(HexToColor("#64748B"));
+            TextTabAi.Foreground = new SolidColorBrush(HexToColor("#64748B"));
+            TextTabAi.FontWeight = FontWeights.Medium;
         }
 
-        private async void ChatInput_KeyDown(object sender, KeyRoutedEventArgs e)
+        private void BtnTabAi_Click(object sender, RoutedEventArgs e)
+        {
+            PanelDoctorChat.Visibility = Visibility.Collapsed;
+            PanelAiChat.Visibility = Visibility.Visible;
+
+            // Highlight AI Tab
+            BtnTabAi.BorderBrush = new SolidColorBrush(HexToColor("#10B981"));
+            BtnTabAi.BorderThickness = new Thickness(0, 0, 0, 2);
+            IconTabAi.Foreground = new SolidColorBrush(HexToColor("#10B981"));
+            TextTabAi.Foreground = new SolidColorBrush(HexToColor("#10B981"));
+            TextTabAi.FontWeight = FontWeights.Bold;
+
+            // Unhighlight Doctor Tab
+            BtnTabDoctor.BorderBrush = new SolidColorBrush(Colors.Transparent);
+            BtnTabDoctor.BorderThickness = new Thickness(0);
+            IconTabDoctor.Foreground = new SolidColorBrush(HexToColor("#64748B"));
+            TextTabDoctor.Foreground = new SolidColorBrush(HexToColor("#64748B"));
+            TextTabDoctor.FontWeight = FontWeights.Medium;
+        }
+
+        // Send Doctor Message
+        private async void BtnSendDoctor_Click(object sender, RoutedEventArgs e)
+        {
+            await SendDoctorMessageAsync();
+        }
+
+        private async void DoctorChatInput_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             if (e.Key == Windows.System.VirtualKey.Enter)
             {
-                await SendMessageAsync();
+                await SendDoctorMessageAsync();
             }
         }
 
-        private async Task SendMessageAsync()
+        private async Task SendDoctorMessageAsync()
         {
-            var text = ChatInput.Text.Trim();
+            var text = DoctorChatInput.Text.Trim();
 
             if (string.IsNullOrEmpty(text))
                 return;
 
-            ChatInput.Text = string.Empty;
-            BtnSend.IsEnabled = false;
+            DoctorChatInput.Text = string.Empty;
+            BtnSendDoctor.IsEnabled = false;
 
             var msg = new ChatMessageItem
             {
@@ -160,7 +224,7 @@ namespace Healthcare.Client.UI.Components
                 CreatedAt = DateTime.UtcNow
             };
 
-            AppendBubble(msg, true);
+            AppendDoctorBubble(msg, true);
 
             try
             {
@@ -183,14 +247,11 @@ namespace Healthcare.Client.UI.Components
                     System.Diagnostics.Debug.WriteLine($"[Chat HTTP] Failed: {httpEx.Message}");
                 }
 
-                // Fallback: insert directly into Supabase when HTTP server is unavailable
                 if (!sentViaHttp)
                 {
                     var supabase = SupabaseManager.Instance.Client;
                     await supabase.From<ChatMessageItem>().Insert(msg);
                 }
-
-                await SendMessageToAiAsync(text);
             }
             catch (Exception ex)
             {
@@ -198,7 +259,57 @@ namespace Healthcare.Client.UI.Components
             }
             finally
             {
-                BtnSend.IsEnabled = true;
+                BtnSendDoctor.IsEnabled = true;
+            }
+        }
+
+        // Send AI Message
+        private async void BtnSendAi_Click(object sender, RoutedEventArgs e)
+        {
+            await SendAiMessageAsync();
+        }
+
+        private async void AiChatInput_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == Windows.System.VirtualKey.Enter)
+            {
+                await SendAiMessageAsync();
+            }
+        }
+
+        private async Task SendAiMessageAsync()
+        {
+            var text = AiChatInput.Text.Trim();
+
+            if (string.IsNullOrEmpty(text))
+                return;
+
+            AiChatInput.Text = string.Empty;
+            BtnSendAi.IsEnabled = false;
+
+            var msg = new ChatMessageItem
+            {
+                Id = Guid.NewGuid().ToString(),
+                SenderId = _currentUserId,
+                ReceiverId = "AI",
+                MessageText = text,
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            AppendAiBubble(msg, true);
+
+            try
+            {
+                await SendMessageToAiAsync(text);
+            }
+            catch (Exception ex)
+            {
+                await ShowDialogAsync("Lỗi", "Không kết nối được trợ lý AI: " + ex.Message);
+            }
+            finally
+            {
+                BtnSendAi.IsEnabled = true;
             }
         }
 
@@ -213,22 +324,34 @@ namespace Healthcare.Client.UI.Components
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    AppendAiMessage("AI hiện chưa phản hồi được. Vui lòng thử lại sau.");
+                    AppendAiResponseBubble("AI hiện chưa phản hồi được. Vui lòng thử lại sau.");
                     return;
                 }
 
                 var result = await response.Content.ReadFromJsonAsync<AiChatResponse>();
 
-                AppendAiMessage(result?.Reply ?? "AI chưa có câu trả lời phù hợp.");
+                AppendAiResponseBubble(result?.Reply ?? "AI chưa có câu trả lời phù hợp.");
             }
             catch (Exception ex)
             {
-                AppendAiMessage("Không kết nối được với hệ thống hỗ trợ. Vui lòng kiểm tra lại kết nối mạng.");
+                AppendAiResponseBubble("Không kết nối được với hệ thống hỗ trợ. Vui lòng kiểm tra lại kết nối mạng.");
                 System.Diagnostics.Debug.WriteLine($"[Ai Chat Error]: {ex.Message}");
             }
         }
 
-        private void AppendAiMessage(string content)
+        private void AppendDoctorBubble(ChatMessageItem msg, bool isSelf)
+        {
+            DoctorMessageList.Children.Add(BuildBubble(msg, isSelf));
+            ScrollDoctorToBottom();
+        }
+
+        private void AppendAiBubble(ChatMessageItem msg, bool isSelf)
+        {
+            AiMessageList.Children.Add(BuildBubble(msg, isSelf, isSelf ? "Bạn" : "Trợ lý AI"));
+            ScrollAiToBottom();
+        }
+
+        private void AppendAiResponseBubble(string content)
         {
             var msg = new ChatMessageItem
             {
@@ -239,19 +362,24 @@ namespace Healthcare.Client.UI.Components
                 CreatedAt = DateTime.UtcNow
             };
 
-            MessageList.Children.Add(BuildBubble(msg, false, "AI"));
-            ScrollToBottom();
+            AiMessageList.Children.Add(BuildBubble(msg, false, "Trợ lý AI"));
+            ScrollAiToBottom();
         }
 
-        private void AppendBubble(ChatMessageItem msg, bool isSelf)
+        private void ScrollDoctorToBottom()
         {
-            MessageList.Children.Add(BuildBubble(msg, isSelf));
-            ScrollToBottom();
+            DoctorScrollViewer.UpdateLayout();
+            DoctorScrollViewer.ChangeView(null, DoctorScrollViewer.ScrollableHeight, null);
+        }
+
+        private void ScrollAiToBottom()
+        {
+            AiScrollViewer.UpdateLayout();
+            AiScrollViewer.ChangeView(null, AiScrollViewer.ScrollableHeight, null);
         }
 
         private UIElement BuildBubble(ChatMessageItem msg, bool isSelf, string? displayName = null)
         {
-            // TTS messages get a special play-button bubble
             if (msg.MessageText?.StartsWith("[TTS] ") == true)
             {
                 string ttsText = msg.MessageText.Substring(6); // strip "[TTS] "
@@ -296,10 +424,6 @@ namespace Healthcare.Client.UI.Components
             return wrapper;
         }
 
-        /// <summary>
-        /// Builds a TTS voice-message bubble with a play button.
-        /// isSelf = doctor sent (shows "Đã gửi"), !isSelf = patient receives (shows play button).
-        /// </summary>
         private UIElement BuildTtsBubble(string text, DateTime createdAt, bool isSelf)
         {
             var time = createdAt.ToLocalTime();
@@ -321,7 +445,6 @@ namespace Healthcare.Client.UI.Components
                 HorizontalAlignment = isSelf ? HorizontalAlignment.Right : HorizontalAlignment.Left
             });
 
-            // Play button (only interactive on patient side)
             var btn = new Button
             {
                 Background = new SolidColorBrush(isSelf ? HexToColor("#0F172A") : HexToColor("#0059BB")),
@@ -329,14 +452,14 @@ namespace Healthcare.Client.UI.Components
                 CornerRadius = new CornerRadius(isSelf ? 12 : 2, isSelf ? 2 : 12, 12, 12),
                 Padding = new Thickness(14, 9, 14, 9),
                 BorderThickness = new Thickness(0),
-                IsEnabled = !isSelf  // doctor side is just an indicator, not clickable
+                IsEnabled = !isSelf
             };
 
             var btnContent = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
             btnContent.Children.Add(new FontIcon
             {
                 FontFamily = new FontFamily("Segoe MDL2 Assets"),
-                Glyph = isSelf ? "\uE8F4" : "\uE768",   // sent icon / speaker
+                Glyph = isSelf ? "\uE8F4" : "\uE768",
                 FontSize = 14,
                 Foreground = new SolidColorBrush(Colors.White)
             });
@@ -351,7 +474,7 @@ namespace Healthcare.Client.UI.Components
 
             if (!isSelf)
             {
-                string ttsText = text; // capture for closure
+                string ttsText = text;
                 btn.Click += (s, e) => PlayTtsAsync(ttsText);
             }
 
@@ -363,7 +486,6 @@ namespace Healthcare.Client.UI.Components
         {
             try
             {
-                // Stop any currently playing audio
                 _ttsPlayer?.Pause();
                 _ttsPlayer = null;
 
@@ -378,12 +500,6 @@ namespace Healthcare.Client.UI.Components
             {
                 System.Diagnostics.Debug.WriteLine($"[TTS] Playback error: {ex.Message}");
             }
-        }
-
-        private void ScrollToBottom()
-        {
-            ChatScrollViewer.UpdateLayout();
-            ChatScrollViewer.ChangeView(null, ChatScrollViewer.ScrollableHeight, null);
         }
 
         private async Task ShowDialogAsync(string title, string message)

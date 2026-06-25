@@ -1,4 +1,4 @@
-﻿using Healthcare.Client.Models.Communication;
+using Healthcare.Client.Models.Communication;
 using Healthcare.Client.Cryptography;
 using Healthcare.Client.Models.Identity; 
 using System;
@@ -52,6 +52,12 @@ namespace Healthcare.Client.SupabaseIntegration
         public async Task StartListeningForMessages(string myUserId, string myPrivateKey)
         {
             Console.WriteLine("[WebSockets] Lang nghe tin nhan...");
+
+            try
+            {
+                await _client.Realtime.ConnectAsync();
+            }
+            catch { }
 
             // 2.1 Tạo kênh và đăng ký theo dõi trực tiếp bảng "chat_messages" ở schema "public"
             _chatChannel = _client.Realtime.Channel("realtime", "public", "chat_messages");
