@@ -10,9 +10,10 @@ using Windows.Media.Capture;
 using Windows.Foundation;
 using System;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Microsoft.MixedReality.WebRTC;
+using WinRT;
 
 namespace Healthcare.Client.UI.Components
 {
@@ -24,12 +25,12 @@ namespace Healthcare.Client.UI.Components
         private AudioDeviceInputNode? _deviceInputNode;
         private AudioFrameOutputNode? _frameOutputNode;
         private volatile bool _isTesting = false;
-        private Microsoft.UI.Dispatching.DispatcherQueue? _uiDispatcher;
+        private volatile bool _isRenderingFrame = false;
+        private DateTime _lastVolumeUpdateTime = DateTime.MinValue;
 
         public DeviceTestCard()
         {
             this.InitializeComponent();
-            _uiDispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
             this.Unloaded += (s, e) => StopDeviceTesting();
         }
 
@@ -52,6 +53,7 @@ namespace Healthcare.Client.UI.Components
             }
 
             _isTesting = true;
+            _frameCount = 0;
 
             // Re-create source so frames can be rendered
             _testVideoSource = new SoftwareBitmapSource();
@@ -198,20 +200,48 @@ namespace Healthcare.Client.UI.Components
             _frameOutputNode = null;
         }
 
+        private volatile int _frameCount = 0;
+
         private void OnTestLocalFrameReceived(Argb32VideoFrame frame)
         {
+            _frameCount++;
+            if (_frameCount % 15 == 0)
+            {
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    if (_isTesting)
+                    {
+                        CamStatusText.Text = $"Camera: Kết nối tốt (Đang nhận: {_frameCount} frames)";
+                    }
+                });
+            }
+
+            // Drop frames if previous frame is still rendering to avoid queue buildup
+            if (_isRenderingFrame)
+            {
+                return;
+            }
+
             var bitmap = ProcessFrameSync(frame);
             if (bitmap != null)
             {
-                _uiDispatcher?.TryEnqueue(async () =>
+                _isRenderingFrame = true;
+                DispatcherQueue.TryEnqueue(async () =>
                 {
                     try
                     {
                         if (_isTesting)
                             await _testVideoSource.SetBitmapAsync(bitmap);
                     }
-                    catch { }
-                    finally { bitmap.Dispose(); }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[DeviceTestCard] SetBitmapAsync error: {ex.Message}");
+                    }
+                    finally 
+                    { 
+                        bitmap.Dispose(); 
+                        _isRenderingFrame = false;
+                    }
                 });
             }
         }
@@ -228,10 +258,16 @@ namespace Healthcare.Client.UI.Components
                     unsafe
                     {
                         byte* dataPtr; uint capacity;
-                        ((IMemoryBufferByteAccess)reference).GetBuffer(out dataPtr, out capacity);
-                        long requiredSize = (long)frame.width * frame.height * 4;
-                        if (capacity >= requiredSize)
-                            System.Buffer.MemoryCopy((void*)frame.data, (void*)dataPtr, capacity, requiredSize);
+                        if (TryGetBuffer(reference, out dataPtr, out capacity))
+                        {
+                            long requiredSize = (long)frame.width * frame.height * 4;
+                            if (capacity >= requiredSize)
+                                System.Buffer.MemoryCopy((void*)frame.data, (void*)dataPtr, capacity, requiredSize);
+                        }
+                        else
+                        {
+                            throw new Exception("COM interface IMemoryBufferByteAccess not supported on this reference.");
+                        }
                     }
                 }
                 return softwareBitmap;
@@ -239,6 +275,10 @@ namespace Healthcare.Client.UI.Components
             catch (Exception ex)
             {
                 Debug.WriteLine($"[DeviceTestCard] ProcessFrameSync error: {ex.Message}");
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    CamStatusText.Text = $"Camera Proc Exception: {ex.Message}";
+                });
                 return null;
             }
         }
@@ -246,6 +286,14 @@ namespace Healthcare.Client.UI.Components
         private void AudioGraph_QuantumStarted(AudioGraph sender, object args)
         {
             if (!_isTesting || _frameOutputNode == null) return;
+
+            // Throttle volume update to at most once per 60 milliseconds to avoid clogging dispatcher
+            if ((DateTime.Now - _lastVolumeUpdateTime).TotalMilliseconds < 60)
+            {
+                return;
+            }
+            _lastVolumeUpdateTime = DateTime.Now;
+
             try
             {
                 using (Windows.Media.AudioFrame frame = _frameOutputNode.GetFrame())
@@ -255,32 +303,44 @@ namespace Healthcare.Client.UI.Components
                     unsafe
                     {
                         byte* dataIn; uint capacity;
-                        ((IMemoryBufferByteAccess)reference).GetBuffer(out dataIn, out capacity);
-                        if (capacity == 0) return;
-
-                        float* floatData = (float*)dataIn;
-                        uint sampleCount = capacity / sizeof(float);
-                        float sum = 0;
-                        for (uint i = 0; i < sampleCount; i++)
+                        if (TryGetBuffer(reference, out dataIn, out capacity))
                         {
-                            float s = floatData[i];
-                            sum += s * s;
-                        }
-                        float rms = (float)Math.Sqrt(sum / sampleCount);
-                        float volumePercent = Math.Min(100f, rms * 500f);
+                            if (capacity == 0) return;
 
-                        _uiDispatcher?.TryEnqueue(() =>
-                        {
-                            if (_isTesting)
+                            float* floatData = (float*)dataIn;
+                            uint sampleCount = capacity / sizeof(float);
+                            float sum = 0;
+                            for (uint i = 0; i < sampleCount; i++)
                             {
-                                MicVolumeProgress.Value = volumePercent;
-                                VolumeValueText.Text = $"{(int)volumePercent}%";
+                                float s = floatData[i];
+                                sum += s * s;
                             }
-                        });
+                            float rms = (float)Math.Sqrt(sum / sampleCount);
+                            float volumePercent = Math.Min(100f, rms * 500f);
+
+                            DispatcherQueue.TryEnqueue(() =>
+                            {
+                                if (_isTesting)
+                                {
+                                    MicVolumeProgress.Value = volumePercent;
+                                    VolumeValueText.Text = $"{(int)volumePercent}%";
+                                }
+                            });
+                        }
+                        else
+                        {
+                            throw new Exception("COM interface IMemoryBufferByteAccess not supported on this reference.");
+                        }
                     }
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    MicStatusText.Text = $"Mic Proc Exception: {ex.Message}";
+                });
+            }
         }
 
         private static Windows.UI.Color ParseColor(string hex)
@@ -298,9 +358,47 @@ namespace Healthcare.Client.UI.Components
                 Convert.ToByte(hex.Substring(6, 2), 16));
         }
 
-        [ComImport]
-        [Guid("5B0D3235-4DB7-4044-86A1-10224F10925B")]
-        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        unsafe interface IMemoryBufferByteAccess { void GetBuffer(out byte* buffer, out uint capacity); }
+        private static unsafe bool TryGetBuffer(IMemoryBufferReference reference, out byte* buffer, out uint capacity)
+        {
+            buffer = null;
+            capacity = 0;
+            try
+            {
+                IntPtr pUnk = ((WinRT.IWinRTObject)reference).NativeObject.ThisPtr;
+                if (pUnk == IntPtr.Zero) return false;
+
+                Guid iid = new Guid("5B0D3235-4DBA-4D44-865E-8F1D0E4FD04D");
+                int hr = Marshal.QueryInterface(pUnk, ref iid, out IntPtr pByteAccess);
+                if (hr == 0 && pByteAccess != IntPtr.Zero)
+                {
+                    try
+                    {
+                        IntPtr* vtable = *(IntPtr**)pByteAccess;
+                        IntPtr getBufferPtr = vtable[3];
+                        delegate* unmanaged[Stdcall]<IntPtr, byte**, uint*, int> getBuffer = 
+                            (delegate* unmanaged[Stdcall]<IntPtr, byte**, uint*, int>)getBufferPtr;
+                        
+                        byte* pBuffer = null;
+                        uint size = 0;
+                        int result = getBuffer(pByteAccess, &pBuffer, &size);
+                        if (result == 0)
+                        {
+                            buffer = pBuffer;
+                            capacity = size;
+                            return true;
+                        }
+                    }
+                    finally
+                    {
+                        Marshal.Release(pByteAccess);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[TryGetBuffer] Error: {ex.Message}");
+            }
+            return false;
+        }
     }
 }

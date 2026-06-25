@@ -96,7 +96,7 @@ namespace Healthcare.Client.UI.Doctor
 
                     if (string.IsNullOrWhiteSpace(roomCode))
                     {
-                        roomCode = "room_" + _appointmentId;
+                        roomCode = _appointmentId;
                     }
 
                     await LoadPatientInfoAsync();

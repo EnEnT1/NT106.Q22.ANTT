@@ -19,6 +19,8 @@ using Supabase.Realtime.PostgresChanges;
 using Postgrest;
 using Microsoft.MixedReality.WebRTC;
 using Windows.Media.Capture;
+using WinRT;
+using Windows.Foundation;
 
 namespace Healthcare.Client.UI.Components
 {
@@ -46,6 +48,8 @@ namespace Healthcare.Client.UI.Components
         private bool _isCameraOn = true;
         private bool _isSpeakerOn = true;
         private bool _isDisposed = false;
+        private volatile bool _isLocalRendering = false;
+        private volatile bool _isRemoteRendering = false;
 
         public VideoCallControl()
         {
@@ -147,23 +151,29 @@ namespace Healthcare.Client.UI.Components
 
         private void OnLocalFrameReceived(Argb32VideoFrame frame)
         {
-            if (_isDisposed) return;
+            if (_isDisposed || _isLocalRendering) return;
             var bitmap = ProcessFrameSync(frame);
             if (bitmap != null)
             {
+                _isLocalRendering = true;
                 DispatcherQueue.TryEnqueue(async () => {
                     try { if (!_isDisposed) await _localSource.SetBitmapAsync(bitmap); } catch { }
-                    finally { bitmap.Dispose(); }
+                    finally 
+                    { 
+                        bitmap.Dispose(); 
+                        _isLocalRendering = false;
+                    }
                 });
             }
         }
 
         private void OnRemoteFrameReceived(Argb32VideoFrame frame)
         {
-            if (_isDisposed) return;
+            if (_isDisposed || _isRemoteRendering) return;
             var bitmap = ProcessFrameSync(frame);
             if (bitmap != null)
             {
+                _isRemoteRendering = true;
                 DispatcherQueue.TryEnqueue(async () => {
                     try 
                     { 
@@ -172,7 +182,11 @@ namespace Healthcare.Client.UI.Components
                         await _remoteSource.SetBitmapAsync(bitmap); 
                     } 
                     catch { }
-                    finally { bitmap.Dispose(); }
+                    finally 
+                    { 
+                        bitmap.Dispose(); 
+                        _isRemoteRendering = false;
+                    }
                 });
             }
         }
@@ -191,18 +205,23 @@ namespace Healthcare.Client.UI.Components
                 {
                     unsafe {
                         byte* dataPtr; uint capacity;
-                        ((IMemoryBufferByteAccess)reference).GetBuffer(out dataPtr, out capacity);
-
-                        long requiredSize = (long)frame.width * frame.height * 4;
-                        if (capacity >= requiredSize)
+                        if (TryGetBuffer(reference, out dataPtr, out capacity))
                         {
-                            System.Buffer.MemoryCopy((void*)frame.data, (void*)dataPtr, capacity, requiredSize);
+                            long requiredSize = (long)frame.width * frame.height * 4;
+                            if (capacity >= requiredSize)
+                            {
+                                System.Buffer.MemoryCopy((void*)frame.data, (void*)dataPtr, capacity, requiredSize);
+                            }
+                            else
+                            {
+                                Debug.WriteLine($"[VideoCallControl] Buffer capacity too small: {capacity} < {requiredSize}");
+                                softwareBitmap.Dispose();
+                                return null;
+                            }
                         }
                         else
                         {
-                            Debug.WriteLine($"[VideoCallControl] Buffer capacity too small: {capacity} < {requiredSize}");
-                            softwareBitmap.Dispose();
-                            return null;
+                            throw new Exception("COM interface IMemoryBufferByteAccess not supported on this reference.");
                         }
                     }
                 }
@@ -393,7 +412,47 @@ namespace Healthcare.Client.UI.Components
             return Color.FromArgb(255, Convert.ToByte(hex.Substring(0, 2), 16), Convert.ToByte(hex.Substring(2, 2), 16), Convert.ToByte(hex.Substring(4, 2), 16));
         }
 
-        [ComImport] [Guid("5B0D3235-4DB7-4044-86A1-10224F10925B")] [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        unsafe interface IMemoryBufferByteAccess { void GetBuffer(out byte* buffer, out uint capacity); }
+        private static unsafe bool TryGetBuffer(IMemoryBufferReference reference, out byte* buffer, out uint capacity)
+        {
+            buffer = null;
+            capacity = 0;
+            try
+            {
+                IntPtr pUnk = ((WinRT.IWinRTObject)reference).NativeObject.ThisPtr;
+                if (pUnk == IntPtr.Zero) return false;
+
+                Guid iid = new Guid("5B0D3235-4DBA-4D44-865E-8F1D0E4FD04D");
+                int hr = Marshal.QueryInterface(pUnk, ref iid, out IntPtr pByteAccess);
+                if (hr == 0 && pByteAccess != IntPtr.Zero)
+                {
+                    try
+                    {
+                        IntPtr* vtable = *(IntPtr**)pByteAccess;
+                        IntPtr getBufferPtr = vtable[3];
+                        delegate* unmanaged[Stdcall]<IntPtr, byte**, uint*, int> getBuffer = 
+                            (delegate* unmanaged[Stdcall]<IntPtr, byte**, uint*, int>)getBufferPtr;
+                        
+                        byte* pBuffer = null;
+                        uint size = 0;
+                        int result = getBuffer(pByteAccess, &pBuffer, &size);
+                        if (result == 0)
+                        {
+                            buffer = pBuffer;
+                            capacity = size;
+                            return true;
+                        }
+                    }
+                    finally
+                    {
+                        Marshal.Release(pByteAccess);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[TryGetBuffer] Error: {ex.Message}");
+            }
+            return false;
+        }
     }
 }

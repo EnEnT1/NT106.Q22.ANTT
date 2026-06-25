@@ -493,7 +493,7 @@ namespace Healthcare.Client.UI.Patient
                     Status = paymentMethod == "Online" ? "Pending" : "Confirmed", // Online thì chờ thanh toán mới Confirmed
                     ExaminationType = TypeOnline.IsChecked == true ? "Online" : "Offline",
                     CreatedAt = DateTime.UtcNow,
-                    RoomCode = Guid.NewGuid().ToString().Substring(0, 8).ToUpper()
+                    RoomCode = Guid.NewGuid().ToString()
                 };
 
                 // Nhận lại Object đã insert kèm ID mới từ Supabase

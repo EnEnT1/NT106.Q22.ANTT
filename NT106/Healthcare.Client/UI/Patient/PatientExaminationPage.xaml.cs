@@ -67,7 +67,7 @@ namespace Healthcare.Client.UI.Patient
                     // Fallback: if DB has no room_code, generate the same way the doctor does
                     string roomCode = appointmentResponse.RoomCode;
                     if (string.IsNullOrWhiteSpace(roomCode))
-                        roomCode = "room_" + _appointmentId;
+                        roomCode = _appointmentId;
 
                     try
                     {
