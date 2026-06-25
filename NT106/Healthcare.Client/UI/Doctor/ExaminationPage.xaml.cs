@@ -149,6 +149,7 @@ namespace Healthcare.Client.UI.Doctor
                 if (appointment == null)
                 {
                     TxtPatientName.Text = "Không tìm thấy lịch hẹn";
+                    TxtPatientId.Text = "–";
                     TxtPatientMeta.Text = "–";
                     TxtCondition.Text = "–";
                     return;
@@ -163,6 +164,16 @@ namespace Healthcare.Client.UI.Doctor
                 var patientUser = userResponse.Models
                     .FirstOrDefault(u => u.Id == _patientId);
 
+                if (patientUser != null && patientUser.FullName != null && patientUser.FullName.StartsWith("ệnh nhân", StringComparison.OrdinalIgnoreCase))
+                {
+                    patientUser.FullName = "B" + patientUser.FullName;
+                    try
+                    {
+                        await client.From<User>().Update(patientUser);
+                    }
+                    catch { }
+                }
+
                 var patientProfileResponse = await client
                     .From<PatientProfile>()
                     .Get();
@@ -171,27 +182,27 @@ namespace Healthcare.Client.UI.Doctor
                     .FirstOrDefault(p => p.PatientId == _patientId);
 
                 TxtPatientName.Text = patientUser?.FullName ?? "Bệnh nhân";
-                TxtPatientMeta.Text = BuildPatientMeta(patientUser, patientProfile);
+                TxtPatientId.Text = patientUser != null ? $"#{patientUser.Id.Substring(0, Math.Min(patientUser.Id.Length, 6)).ToUpper()}" : "–";
+                TxtPatientMeta.Text = BuildPatientMeta(patientProfile);
                 TxtCondition.Text = BuildCondition(patientProfile);
             }
             catch
             {
                 TxtPatientName.Text = "Lê Văn Dũng";
-                TxtPatientMeta.Text = "ID: #MD8829  •  45 Tuổi";
+                TxtPatientId.Text = "#MD8829";
+                TxtPatientMeta.Text = "45 tuổi / Nam";
                 TxtCondition.Text = "Cao huyết áp";
                 _patientId = "mock-patient-id";
             }
         }
 
-        private static string BuildPatientMeta(User? user, PatientProfile? profile)
+        private static string BuildPatientMeta(PatientProfile? profile)
         {
-            if (user == null && profile == null)
+            if (profile == null)
                 return "–";
 
-            string idText = user != null ? $"ID: #{user.Id.Substring(0, Math.Min(user.Id.Length, 6)).ToUpper()}" : "ID: –";
-
-            string ageText = "Tuổi: –";
-            if (profile != null && !string.IsNullOrWhiteSpace(profile.DateOfBirth))
+            string ageText = "–";
+            if (!string.IsNullOrWhiteSpace(profile.DateOfBirth))
             {
                 if (DateTime.TryParse(profile.DateOfBirth, out var dob))
                 {
@@ -201,7 +212,9 @@ namespace Healthcare.Client.UI.Doctor
                 }
             }
 
-            return $"{idText}  •  {ageText}";
+            string genderText = !string.IsNullOrWhiteSpace(profile.Gender) ? profile.Gender : "Chưa rõ";
+
+            return $"{ageText} / {genderText}";
         }
 
         private static string BuildCondition(PatientProfile? profile)

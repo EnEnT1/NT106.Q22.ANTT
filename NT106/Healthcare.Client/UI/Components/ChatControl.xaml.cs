@@ -1,4 +1,6 @@
 using Healthcare.Client.SupabaseIntegration;
+using Healthcare.Client.Models.Core;
+using Healthcare.Client.Models.Identity;
 using Microsoft.UI;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
@@ -29,6 +31,8 @@ namespace Healthcare.Client.UI.Components
         private string _appointmentId = string.Empty;
         private string _currentUserId = string.Empty;
         private string _patientId = string.Empty;
+        private string _otherUserName = string.Empty;
+        private bool _isDoctorUser = false;
 
         private RealtimeChannel? _chatChannel;
 
@@ -57,6 +61,52 @@ namespace Healthcare.Client.UI.Components
             _appointmentId = appointmentId;
             _currentUserId = currentUserId;
             _patientId = patientId;
+
+            _isDoctorUser = _currentUserId != _patientId;
+            TextTabDoctor.Text = _isDoctorUser ? "Bệnh nhân" : "Bác sĩ";
+
+            string otherUserId = string.Empty;
+            if (_isDoctorUser)
+            {
+                otherUserId = _patientId;
+            }
+            else
+            {
+                try
+                {
+                    var client = SupabaseManager.Instance.Client;
+                    var apptResult = await client.From<Appointment>().Where(a => a.Id == _appointmentId).Single();
+                    if (apptResult != null)
+                    {
+                        otherUserId = apptResult.DoctorId;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[ChatControl] Failed to fetch doctor ID: {ex.Message}");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(otherUserId))
+            {
+                try
+                {
+                    var client = SupabaseManager.Instance.Client;
+                    var userRes = await client.From<User>().Where(u => u.Id == otherUserId).Single();
+                    if (userRes != null && !string.IsNullOrEmpty(userRes.FullName))
+                    {
+                        _otherUserName = userRes.FullName;
+                        if (_otherUserName.StartsWith("ệnh nhân", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _otherUserName = "B" + _otherUserName;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[ChatControl] Failed to fetch other user name: {ex.Message}");
+                }
+            }
 
             await LoadChatHistoryAsync();
             await SubscribeRealtimeAsync();
@@ -394,13 +444,16 @@ namespace Healthcare.Client.UI.Components
                 Margin = new Thickness(0, 4, 0, 4)
             };
 
-            var time = msg.CreatedAt.ToLocalTime();
+            var time = ParseDateTimeToLocal(msg.CreatedAt);
+
+            string defaultOtherName = _isDoctorUser ? "Bệnh nhân" : "Bác sĩ";
+            string nameToShow = !string.IsNullOrEmpty(_otherUserName) ? _otherUserName : defaultOtherName;
 
             wrapper.Children.Add(new TextBlock
             {
                 Text = isSelf
                     ? $"Bạn • {time:HH:mm}"
-                    : $"{displayName ?? "Bác sĩ/Bệnh nhân"} • {time:HH:mm}",
+                    : $"{displayName ?? nameToShow} • {time:HH:mm}",
                 FontSize = 9,
                 FontWeight = FontWeights.Bold,
                 Foreground = new SolidColorBrush(HexToColor("#64748B")),
@@ -426,7 +479,7 @@ namespace Healthcare.Client.UI.Components
 
         private UIElement BuildTtsBubble(string text, DateTime createdAt, bool isSelf)
         {
-            var time = createdAt.ToLocalTime();
+            var time = ParseDateTimeToLocal(createdAt);
 
             var wrapper = new StackPanel
             {
@@ -526,6 +579,15 @@ namespace Healthcare.Client.UI.Components
                 Convert.ToByte(hex.Substring(2, 2), 16),
                 Convert.ToByte(hex.Substring(4, 2), 16)
             );
+        }
+
+        private static DateTime ParseDateTimeToLocal(DateTime dt)
+        {
+            if (dt.Kind == DateTimeKind.Unspecified)
+            {
+                dt = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
+            }
+            return dt.ToLocalTime();
         }
     }
 

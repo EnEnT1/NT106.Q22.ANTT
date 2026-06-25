@@ -120,16 +120,36 @@
 
                             <StackPanel Spacing="16">
                                 <Grid>
-                                    <TextBlock Text="Tuổi / Giới tính" Foreground="#64748B" FontSize="14"/>
-                                    <TextBlock x:Name="TxtPatientMeta" Text="--" FontWeight="SemiBold" HorizontalAlignment="Right" FontSize="14"/>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Mã bệnh nhân" Foreground="#64748B" FontSize="14"/>
+                                    <TextBlock Grid.Column="1" x:Name="TxtPatientId" Text="--" FontWeight="SemiBold" HorizontalAlignment="Right" FontSize="14"/>
                                 </Grid>
                                 <Grid>
-                                    <TextBlock Text="Cân nặng / Chiều cao" Foreground="#64748B" FontSize="14"/>
-                                    <TextBlock Text="65kg / 170cm" FontWeight="SemiBold" HorizontalAlignment="Right" FontSize="14"/>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Tuổi / Giới tính" Foreground="#64748B" FontSize="14"/>
+                                    <TextBlock Grid.Column="1" x:Name="TxtPatientMeta" Text="--" FontWeight="SemiBold" HorizontalAlignment="Right" FontSize="14"/>
                                 </Grid>
                                 <Grid>
-                                    <TextBlock Text="Nhóm máu" Foreground="#64748B" FontSize="14"/>
-                                    <TextBlock Text="O+" FontWeight="Bold" Foreground="#DC2626" HorizontalAlignment="Right" FontSize="14"/>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Cân nặng / Chiều cao" Foreground="#64748B" FontSize="14"/>
+                                    <TextBlock Grid.Column="1" Text="65kg / 170cm" FontWeight="SemiBold" HorizontalAlignment="Right" FontSize="14"/>
+                                </Grid>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Nhóm máu" Foreground="#64748B" FontSize="14"/>
+                                    <TextBlock Grid.Column="1" Text="O+" FontWeight="Bold" Foreground="#DC2626" HorizontalAlignment="Right" FontSize="14"/>
                                 </Grid>
                             </StackPanel>
 

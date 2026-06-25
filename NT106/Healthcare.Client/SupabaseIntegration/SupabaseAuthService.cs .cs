@@ -1,4 +1,4 @@
-﻿using Healthcare.Client.Cryptography;
+using Healthcare.Client.Cryptography;
 using Healthcare.Client.Helpers;
 using Healthcare.Client.Models.Identity;
 using Healthcare.Client.UI.Doctor;
@@ -33,6 +33,16 @@ namespace Healthcare.Client.SupabaseIntegration
 
                     if (userRecord != null)
                     {
+                        if (userRecord.FullName != null && userRecord.FullName.StartsWith("ệnh nhân", StringComparison.OrdinalIgnoreCase))
+                        {
+                            userRecord.FullName = "B" + userRecord.FullName;
+                            try
+                            {
+                                await client.From<User>().Update(userRecord);
+                            }
+                            catch { }
+                        }
+
                         if (string.IsNullOrEmpty(userRecord.PublicKey))
                         {
                             var keyPair = RSAManager.GenerateKeys();

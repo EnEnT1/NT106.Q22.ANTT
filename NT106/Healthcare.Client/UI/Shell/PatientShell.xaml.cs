@@ -5,6 +5,8 @@ using Healthcare.Client.UI.Patient;
 using Healthcare.Client.UI.Auth;
 using Healthcare.Client.UI.Components;
 using Healthcare.Client.Helpers;
+using Healthcare.Client.Models.Identity;
+using Healthcare.Client.SupabaseIntegration;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -36,8 +38,26 @@ namespace Healthcare.Client.UI.Shell
                 NavUploadPrescription
             };
 
+            ContentFrame.Navigated += ContentFrame_Navigated;
             ContentFrame.Navigate(typeof(PatientHomePage), this);
             SetActiveButton(NavHome);
+        }
+
+        private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
+        {
+            if (e.SourcePageType == typeof(PatientExaminationPage))
+            {
+                ChatbotFabButton.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                ChatbotFabButton.Visibility = Visibility.Visible;
+            }
+        }
+
+        public void SetChatbotFabVisibility(Visibility visibility)
+        {
+            ChatbotFabButton.Visibility = visibility;
         }
 
         // ──────────────────────────────────────────────
@@ -69,14 +89,31 @@ namespace Healthcare.Client.UI.Shell
             if (user == null)
                 return;
 
-            TxtPatientName.Text = user.FullName ?? "Bệnh nhân";
+            string fullName = user.FullName ?? "Bệnh nhân";
+            if (fullName.StartsWith("ệnh nhân", StringComparison.OrdinalIgnoreCase))
+            {
+                fullName = "B" + fullName;
+                user.FullName = fullName;
+                SessionStorage.CurrentUser = user;
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        var client = SupabaseManager.Instance.Client;
+                        await client.From<User>().Update(user);
+                    }
+                    catch { }
+                });
+            }
+
+            TxtPatientName.Text = fullName;
 
             TxtPatientID.Text = "ID: " +
                 (user.Id?.Length > 6
                     ? user.Id.Substring(0, 6).ToUpper()
                     : user.Id?.ToUpper());
 
-            PatientAvatar.DisplayName = user.FullName;
+            PatientAvatar.DisplayName = fullName;
         }
 
         // ──────────────────────────────────────────────
