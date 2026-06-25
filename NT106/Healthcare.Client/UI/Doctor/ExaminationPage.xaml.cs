@@ -836,7 +836,7 @@ namespace Healthcare.Client.UI.Doctor
                     Diagnosis = DiagnosisBox.Text ?? string.Empty,
                     PrescriptionImageUrl = string.Empty,
                     AiMedicines = medicines,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.UtcNow
                 };
                 await client.From<MedicalRecord>().Insert(record);
                 await new ContentDialog { Title = "Đã lưu", Content = "Ghi chú khám bệnh đã được lưu.", CloseButtonText = "Đóng", XamlRoot = this.XamlRoot }.ShowAsync();
@@ -889,7 +889,7 @@ namespace Healthcare.Client.UI.Doctor
                         DoctorId = _currentUserId,
                         Diagnosis = DiagnosisBox.Text ?? string.Empty,
                         AiMedicines = medicines,
-                        CreatedAt = DateTime.Now
+                        CreatedAt = DateTime.UtcNow
                     };
 
                     await client.From<MedicalRecord>().Insert(medicalRecord);

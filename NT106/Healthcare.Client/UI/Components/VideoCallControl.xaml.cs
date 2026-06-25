@@ -36,6 +36,7 @@ namespace Healthcare.Client.UI.Components
 
         private WebRtcPeerConnection? _rtc;
         private RealtimeChannel? _signalChannel;
+        private readonly System.Collections.Generic.HashSet<string> _processedSignalIds = new();
 
         private SoftwareBitmapSource _localSource = new SoftwareBitmapSource();
         private SoftwareBitmapSource _remoteSource = new SoftwareBitmapSource();
@@ -77,6 +78,7 @@ namespace Healthcare.Client.UI.Components
                 _roomCode = roomCode?.Trim().ToLower() ?? string.Empty;
                 _currentUserId = SessionStorage.CurrentUser?.Id ?? string.Empty;
                 _isDisposed = false;
+                _processedSignalIds.Clear();
 
                 ResetUiToWaitingState();
 
@@ -124,25 +126,71 @@ namespace Healthcare.Client.UI.Components
                     {
                         if (_isDisposed) return;
                         var model = change.Model<WebrtcSignal>();
-                        if (model != null && 
-                            string.Equals(model.RoomCode?.Trim(), _roomCode, StringComparison.OrdinalIgnoreCase) && 
-                            model.SenderId != _currentUserId)
+                        if (model != null)
                         {
                             DispatcherQueue.TryEnqueue(async () => {
-                                if (_rtc != null)
-                                {
-                                    await _rtc.HandleIncomingSignal(model.SignalType, model.Payload);
-                                    if (model.SignalType.ToLower() == "offer" && !_isCallActive) SetCallActive(true);
-                                }
+                                await HandleSignalAsync(model);
                             });
                         }
                     });
 
                 await _signalChannel.Subscribe();
+                await ReplayExistingSignalsAsync();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[VideoCallControl] Subscribe Error: {ex.Message}");
+            }
+        }
+
+        private async Task ReplayExistingSignalsAsync()
+        {
+            try
+            {
+                var response = await SupabaseManager.Instance.Client
+                    .From<WebrtcSignal>()
+                    .Where(s => s.RoomCode == _roomCode)
+                    .Order("created_at", Postgrest.Constants.Ordering.Ascending)
+                    .Get();
+
+                foreach (var signal in response.Models)
+                {
+                    await HandleSignalAsync(signal);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[VideoCallControl] Replay signals failed: {ex.Message}");
+            }
+        }
+
+        private async Task HandleSignalAsync(WebrtcSignal model)
+        {
+            if (_isDisposed || _rtc == null || !IsIncomingSignal(model) || !TryMarkSignalProcessed(model))
+                return;
+
+            await _rtc.HandleIncomingSignal(model.SignalType, model.Payload);
+            if (model.SignalType.Equals("offer", StringComparison.OrdinalIgnoreCase) && !_isCallActive)
+            {
+                SetCallActive(true);
+            }
+        }
+
+        private bool IsIncomingSignal(WebrtcSignal model)
+        {
+            return string.Equals(model.RoomCode?.Trim(), _roomCode, StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(model.SenderId, _currentUserId, StringComparison.Ordinal);
+        }
+
+        private bool TryMarkSignalProcessed(WebrtcSignal model)
+        {
+            var key = !string.IsNullOrWhiteSpace(model.Id)
+                ? model.Id
+                : $"{model.SenderId}:{model.SignalType}:{model.CreatedAt:O}:{model.Payload?.GetHashCode()}";
+
+            lock (_processedSignalIds)
+            {
+                return _processedSignalIds.Add(key);
             }
         }
 
@@ -255,6 +303,7 @@ namespace Healthcare.Client.UI.Components
                 StopTimer();
                 _signalChannel?.Unsubscribe();
                 _signalChannel = null;
+                _processedSignalIds.Clear();
                 
                 _rtc?.Dispose();
                 _rtc = null;

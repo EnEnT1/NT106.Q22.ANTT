@@ -80,7 +80,7 @@ namespace Healthcare.Client.UI.Patient
 
                     try
                     {
-                        await Chat.InitializeAsync(_appointmentId, _currentUserId, _doctorId);
+                        await Chat.InitializeAsync(_appointmentId, _currentUserId, _currentUserId);
                     }
                     catch (Exception chatEx)
                     {

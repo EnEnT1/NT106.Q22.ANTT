@@ -193,7 +193,7 @@ namespace Healthcare.Client.UI.Staff
                         if (tx != null)
                         {
                             tx.Status = "Paid";
-                            tx.PaidAt = DateTime.Now;
+                            tx.PaidAt = DateTime.UtcNow;
                             tx.PaymentMethod = "Tiền mặt (tại quầy)";
                             await tx.Update<Transaction>();
                             

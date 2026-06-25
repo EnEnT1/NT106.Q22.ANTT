@@ -31,10 +31,14 @@ namespace Healthcare.Client.UI.Components
         private string _appointmentId = string.Empty;
         private string _currentUserId = string.Empty;
         private string _patientId = string.Empty;
+        private string _otherUserId = string.Empty;
         private string _otherUserName = string.Empty;
         private bool _isDoctorUser = false;
+        private bool _isSendingDoctor = false;
+        private bool _isSendingAi = false;
 
         private RealtimeChannel? _chatChannel;
+        private readonly HashSet<string> _renderedDoctorMessageIds = new();
 
         private MediaPlayer? _ttsPlayer;
 
@@ -61,14 +65,16 @@ namespace Healthcare.Client.UI.Components
             _appointmentId = appointmentId;
             _currentUserId = currentUserId;
             _patientId = patientId;
+            _otherUserId = string.Empty;
+            _otherUserName = string.Empty;
+            _renderedDoctorMessageIds.Clear();
 
             _isDoctorUser = _currentUserId != _patientId;
             TextTabDoctor.Text = _isDoctorUser ? "Bệnh nhân" : "Bác sĩ";
 
-            string otherUserId = string.Empty;
             if (_isDoctorUser)
             {
-                otherUserId = _patientId;
+                _otherUserId = _patientId;
             }
             else
             {
@@ -78,7 +84,7 @@ namespace Healthcare.Client.UI.Components
                     var apptResult = await client.From<Appointment>().Where(a => a.Id == _appointmentId).Single();
                     if (apptResult != null)
                     {
-                        otherUserId = apptResult.DoctorId;
+                        _otherUserId = apptResult.DoctorId;
                     }
                 }
                 catch (Exception ex)
@@ -87,12 +93,12 @@ namespace Healthcare.Client.UI.Components
                 }
             }
 
-            if (!string.IsNullOrEmpty(otherUserId))
+            if (!string.IsNullOrEmpty(_otherUserId))
             {
                 try
                 {
                     var client = SupabaseManager.Instance.Client;
-                    var userRes = await client.From<User>().Where(u => u.Id == otherUserId).Single();
+                    var userRes = await client.From<User>().Where(u => u.Id == _otherUserId).Single();
                     if (userRes != null && !string.IsNullOrEmpty(userRes.FullName))
                     {
                         _otherUserName = userRes.FullName;
@@ -108,14 +114,15 @@ namespace Healthcare.Client.UI.Components
                 }
             }
 
-            await LoadChatHistoryAsync();
             await SubscribeRealtimeAsync();
+            await LoadChatHistoryAsync();
             InitializeAiChat();
         }
 
         public void Cleanup()
         {
             _chatChannel?.Unsubscribe();
+            _chatChannel = null;
         }
 
         private void InitializeAiChat()
@@ -140,17 +147,18 @@ namespace Healthcare.Client.UI.Components
 
                 var response = await client
                     .From<ChatMessageItem>()
-                    .Filter("sender_id", Postgrest.Constants.Operator.In, new List<string> { _currentUserId, _patientId })
-                    .Filter("receiver_id", Postgrest.Constants.Operator.In, new List<string> { _currentUserId, _patientId })
+                    .Filter("sender_id", Postgrest.Constants.Operator.In, new List<string> { _currentUserId, _otherUserId })
+                    .Filter("receiver_id", Postgrest.Constants.Operator.In, new List<string> { _currentUserId, _otherUserId })
                     .Order("created_at", Postgrest.Constants.Ordering.Ascending)
                     .Get();
 
                 DoctorMessageList.Children.Clear();
+                _renderedDoctorMessageIds.Clear();
 
                 foreach (var msg in response.Models)
                 {
                     bool isSelf = msg.SenderId == _currentUserId;
-                    DoctorMessageList.Children.Add(BuildBubble(msg, isSelf));
+                    AppendDoctorBubble(msg, isSelf);
                 }
 
                 ScrollDoctorToBottom();
@@ -181,7 +189,7 @@ namespace Healthcare.Client.UI.Components
                         var msg = change.Model<ChatMessageItem>();
 
                         if (msg != null &&
-                            msg.SenderId == _patientId &&
+                            msg.SenderId == _otherUserId &&
                             msg.ReceiverId == _currentUserId)
                         {
                             DispatcherQueue.TryEnqueue(() =>
@@ -250,17 +258,28 @@ namespace Healthcare.Client.UI.Components
         {
             if (e.Key == Windows.System.VirtualKey.Enter)
             {
+                e.Handled = true;
                 await SendDoctorMessageAsync();
             }
         }
 
         private async Task SendDoctorMessageAsync()
         {
+            if (_isSendingDoctor)
+                return;
+
             var text = DoctorChatInput.Text.Trim();
 
             if (string.IsNullOrEmpty(text))
                 return;
 
+            if (string.IsNullOrWhiteSpace(_otherUserId))
+            {
+                await ShowDialogAsync("Lỗi", "Không xác định được người nhận tin nhắn.");
+                return;
+            }
+
+            _isSendingDoctor = true;
             DoctorChatInput.Text = string.Empty;
             BtnSendDoctor.IsEnabled = false;
 
@@ -268,7 +287,7 @@ namespace Healthcare.Client.UI.Components
             {
                 Id = Guid.NewGuid().ToString(),
                 SenderId = _currentUserId,
-                ReceiverId = _patientId,
+                ReceiverId = _otherUserId,
                 MessageText = text,
                 IsRead = false,
                 CreatedAt = DateTime.UtcNow
@@ -278,8 +297,19 @@ namespace Healthcare.Client.UI.Components
 
             try
             {
-                bool sentViaHttp = false;
+                bool sentDirectly = false;
                 try
+                {
+                    var supabase = SupabaseManager.Instance.Client;
+                    await supabase.From<ChatMessageItem>().Insert(msg);
+                    sentDirectly = true;
+                }
+                catch (Exception directEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[Chat Direct] Failed: {directEx.Message}");
+                }
+
+                if (!sentDirectly)
                 {
                     var response = await _httpClient.PostAsJsonAsync("api/chat/send", new
                     {
@@ -290,17 +320,11 @@ namespace Healthcare.Client.UI.Components
                         IsRead   = msg.IsRead,
                         CreatedAt = msg.CreatedAt
                     });
-                    sentViaHttp = response.IsSuccessStatusCode;
-                }
-                catch (Exception httpEx)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[Chat HTTP] Failed: {httpEx.Message}");
-                }
 
-                if (!sentViaHttp)
-                {
-                    var supabase = SupabaseManager.Instance.Client;
-                    await supabase.From<ChatMessageItem>().Insert(msg);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw new HttpRequestException($"HTTP {(int)response.StatusCode}: {response.ReasonPhrase}");
+                    }
                 }
             }
             catch (Exception ex)
@@ -310,6 +334,7 @@ namespace Healthcare.Client.UI.Components
             finally
             {
                 BtnSendDoctor.IsEnabled = true;
+                _isSendingDoctor = false;
             }
         }
 
@@ -323,17 +348,22 @@ namespace Healthcare.Client.UI.Components
         {
             if (e.Key == Windows.System.VirtualKey.Enter)
             {
+                e.Handled = true;
                 await SendAiMessageAsync();
             }
         }
 
         private async Task SendAiMessageAsync()
         {
+            if (_isSendingAi)
+                return;
+
             var text = AiChatInput.Text.Trim();
 
             if (string.IsNullOrEmpty(text))
                 return;
 
+            _isSendingAi = true;
             AiChatInput.Text = string.Empty;
             BtnSendAi.IsEnabled = false;
 
@@ -360,6 +390,7 @@ namespace Healthcare.Client.UI.Components
             finally
             {
                 BtnSendAi.IsEnabled = true;
+                _isSendingAi = false;
             }
         }
 
@@ -391,6 +422,9 @@ namespace Healthcare.Client.UI.Components
 
         private void AppendDoctorBubble(ChatMessageItem msg, bool isSelf)
         {
+            if (!string.IsNullOrWhiteSpace(msg.Id) && !_renderedDoctorMessageIds.Add(msg.Id))
+                return;
+
             DoctorMessageList.Children.Add(BuildBubble(msg, isSelf));
             ScrollDoctorToBottom();
         }

@@ -107,7 +107,7 @@ namespace Healthcare.Client.SupabaseIntegration
                     FullName = fullName,
                     Phone = phone,
                     Role = "Patient",
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.UtcNow,
                 };
                 
                 var newPatientProfile = new PatientProfile
