@@ -106,7 +106,7 @@ namespace Healthcare.Client.UI.Staff
                     Id = a.Id,
                     PatientName = allUsers.FirstOrDefault(u => u.Id == a.PatientId)?.FullName ?? "N/A",
                     DoctorName = allUsers.FirstOrDefault(u => u.Id == a.DoctorId)?.FullName ?? "Bác sĩ ẩn",
-                    AppointmentDate = a.AppointmentDate,
+                    AppointmentDate = a.AppointmentDate.ToLocalTime(),
                     Status = a.Status,
                     RoomCode = a.RoomCode
                 }).ToList();
@@ -128,7 +128,7 @@ namespace Healthcare.Client.UI.Staff
                     Amount = t.Amount,
                     PaymentMethod = t.PaymentMethod,
                     Status = t.Status,
-                    PaidAt = t.PaidAt
+                    PaidAt = t.PaidAt?.ToLocalTime()
                 }).ToList();
 
             StaffDataGrid.ItemsSource = _allTransactions;

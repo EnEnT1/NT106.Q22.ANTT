@@ -1,4 +1,4 @@
-using Healthcare.Server.SupabaseIntegration;
+﻿using Healthcare.Server.SupabaseIntegration;
 using Microsoft.Extensions.Configuration;
 using Postgrest.Attributes;
 using Postgrest.Models;

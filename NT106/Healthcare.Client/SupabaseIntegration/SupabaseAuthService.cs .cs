@@ -1,4 +1,4 @@
-using Healthcare.Client.Cryptography;
+﻿using Healthcare.Client.Cryptography;
 using Healthcare.Client.Helpers;
 using Healthcare.Client.Models.Identity;
 using Healthcare.Client.UI.Doctor;

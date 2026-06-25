@@ -109,12 +109,12 @@ namespace Healthcare.Client.UI.Doctor
                 int completedCount = allAppointments.Count(x => x.Status == "Completed");
 
                 int todayCount = allAppointments.Count(x =>
-                    x.AppointmentDate >= today &&
-                    x.AppointmentDate < tomorrow);
+                    x.AppointmentDate.ToLocalTime() >= today &&
+                    x.AppointmentDate.ToLocalTime() < tomorrow);
 
                 int urgentCount = allAppointments.Count(x =>
-                    x.AppointmentDate >= today &&
-                    x.AppointmentDate < tomorrow &&
+                    x.AppointmentDate.ToLocalTime() >= today &&
+                    x.AppointmentDate.ToLocalTime() < tomorrow &&
                     (x.Status == "In Progress" || x.Status == "Arrived"));
 
                 TxtExamined.Text = completedCount.ToString("D2");

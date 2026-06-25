@@ -1,4 +1,4 @@
-using Postgrest.Attributes;
+﻿using Postgrest.Attributes;
 using Postgrest.Models;
 
 namespace Healthcare.Client.Models.Identity

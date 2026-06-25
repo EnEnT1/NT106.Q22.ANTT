@@ -1,4 +1,4 @@
-using Microsoft.MixedReality.WebRTC;
+﻿using Microsoft.MixedReality.WebRTC;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

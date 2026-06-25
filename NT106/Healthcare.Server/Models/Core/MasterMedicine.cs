@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Postgrest.Attributes;
 using Postgrest.Models;
 using System.Collections.Generic;

@@ -93,7 +93,7 @@ namespace Healthcare.Client.UI.Patient
                 var appointments = apptResponse.Models ?? new List<Appointment>();
 
                 var upcomingAppt = appointments
-                    .Where(x => x.AppointmentDate.Date >= DateTime.Today &&
+                    .Where(x => x.AppointmentDate.ToLocalTime().Date >= DateTime.Today &&
                                 x.Status != "Completed" &&
                                 x.Status != "Cancelled")
                     .OrderBy(x => x.AppointmentDate)
@@ -149,7 +149,7 @@ namespace Healthcare.Client.UI.Patient
                     }
                 }
 
-                var apptDate = upcomingAppt.AppointmentDate;
+                var apptDate = upcomingAppt.AppointmentDate.ToLocalTime();
                 string[] dayNames = { "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy" };
                 string dayOfWeekStr = dayNames[(int)apptDate.DayOfWeek];
 

@@ -76,15 +76,15 @@ namespace Healthcare.Client.UI.Patient
                 foreach (var app in sortedAppts)
                 {
                     // Logic tính toán xem đã tới giờ hay chưa (Cho phép vào sớm 15p)
-                    var appDateTime = app.AppointmentDate.Date.Add(app.StartTime);
-                    var endTime = app.AppointmentDate.Date.Add(app.EndTime);
+                    var appDateTime = app.AppointmentDate.ToLocalTime().Date.Add(app.StartTime);
+                    var endTime = app.AppointmentDate.ToLocalTime().Date.Add(app.EndTime);
                     bool isJoinable = (DateTime.Now >= appDateTime.AddMinutes(-15)) && (DateTime.Now <= endTime);
 
                     var vm = new OnlineAppointmentViewModel
                     {
                         Id = app.Id,
                         DoctorName = doctors.ContainsKey(app.DoctorId) ? doctors[app.DoctorId] : "Bác sĩ",
-                        AppointmentDate = app.AppointmentDate.ToString("dd/MM/yyyy"),
+                        AppointmentDate = app.AppointmentDate.ToLocalTime().ToString("dd/MM/yyyy"),
                         AppointmentTime = app.StartTime.ToString(@"hh\:mm"),
                         Status = MapStatus(app.Status),
                         RawStatus = app.Status,

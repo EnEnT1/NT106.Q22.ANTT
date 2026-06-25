@@ -120,7 +120,7 @@ namespace Healthcare.Client.UI.Doctor
             ProfileNameText.Text = fullName;
             PatientEmailText.Text = _patient?.Email ?? "Email: --";
             
-            DateText.Text = _appointment.AppointmentDate.ToString("dd MMMM, yyyy");
+            DateText.Text = _appointment.AppointmentDate.ToLocalTime().ToString("dd MMMM, yyyy");
             TimeText.Text = _appointment.StartTime.ToString(@"hh\:mm");
             
             // Tính thời gian kết thúc (Mặc định +30 phút)
@@ -135,7 +135,7 @@ namespace Healthcare.Client.UI.Doctor
 
             // Logic Gọi Video (Chỉ Online và ĐÚNG GIỜ)
             bool isOnline = _appointment.ExaminationType == "Online";
-            DateTime appointmentFullDateTime = _appointment.AppointmentDate.Date.Add(_appointment.StartTime);
+            DateTime appointmentFullDateTime = _appointment.AppointmentDate.ToLocalTime().Date.Add(_appointment.StartTime);
             DateTime appointmentEndFullDateTime = appointmentFullDateTime.AddMinutes(30);
             bool isOnTime = DateTime.Now >= appointmentFullDateTime.AddMinutes(-5) && DateTime.Now <= appointmentEndFullDateTime;
 

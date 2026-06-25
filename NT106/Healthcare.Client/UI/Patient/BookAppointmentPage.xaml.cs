@@ -112,7 +112,7 @@ namespace Healthcare.Client.UI.Patient
         public string AvatarUrl { get; set; }
         public DateTime AppointmentDate { get; set; }
         public string TimeStr { get; set; }
-        public string DateStr => AppointmentDate.ToString("dd/MM/yyyy");
+        public string DateStr => AppointmentDate.ToLocalTime().ToString("dd/MM/yyyy");
         public string Status { get; set; }
         public string Type { get; set; } // Online/Offline
         

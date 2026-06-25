@@ -1,4 +1,4 @@
-using Healthcare.Server.Services;
+﻿using Healthcare.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using Postgrest.Attributes;
 using Postgrest.Models;

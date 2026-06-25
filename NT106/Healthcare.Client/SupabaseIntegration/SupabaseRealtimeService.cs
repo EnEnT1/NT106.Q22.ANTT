@@ -1,4 +1,4 @@
-using Healthcare.Client.Models.Communication;
+﻿using Healthcare.Client.Models.Communication;
 using Healthcare.Client.Cryptography;
 using Healthcare.Client.Models.Identity; 
 using System;

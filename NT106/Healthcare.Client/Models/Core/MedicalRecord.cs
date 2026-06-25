@@ -1,4 +1,4 @@
-using Postgrest.Attributes;
+﻿using Postgrest.Attributes;
 using Postgrest.Models;
 using System;
 using System.Collections.Generic;

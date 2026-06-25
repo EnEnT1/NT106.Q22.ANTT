@@ -1,4 +1,4 @@
-using Healthcare.Client.Helpers;
+﻿using Healthcare.Client.Helpers;
 using Healthcare.Client.Models.Core;
 using Healthcare.Client.SupabaseIntegration;
 using Microsoft.UI.Xaml;

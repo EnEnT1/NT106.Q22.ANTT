@@ -713,7 +713,7 @@ namespace Healthcare.Client.UI.Patient
                         MedicineName = medName,
                         Dosage = string.IsNullOrEmpty(med.QuantityPerTime) ? "1 viên" : med.QuantityPerTime,
                         TimeToTake = new TimeSpan(8, 0, 0), // Mặc định 8:00 sáng
-                        StartDate = DateTime.Now,
+                        StartDate = DateTime.UtcNow,
                         IsActive = true
                     };
                     await client.From<MedicationReminder>().Insert(reminder);

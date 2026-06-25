@@ -1,4 +1,4 @@
-using Healthcare.Client.UI.Shell;
+﻿using Healthcare.Client.UI.Shell;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;

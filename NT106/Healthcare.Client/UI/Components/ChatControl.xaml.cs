@@ -1,4 +1,4 @@
-using Healthcare.Client.SupabaseIntegration;
+﻿using Healthcare.Client.SupabaseIntegration;
 using Healthcare.Client.Models.Core;
 using Healthcare.Client.Models.Identity;
 using Microsoft.UI;

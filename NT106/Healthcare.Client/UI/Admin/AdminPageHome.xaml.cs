@@ -121,7 +121,7 @@ namespace Healthcare.Client.UI.Admin
                 if (transactionsResponse.Models != null)
                 {
                     totalRevenue = transactionsResponse.Models
-                        .Where(t => t.PaidAt.HasValue && t.PaidAt.Value >= currentMonthStart)
+                        .Where(t => t.PaidAt.HasValue && t.PaidAt.Value.ToLocalTime() >= currentMonthStart)
                         .Sum(t => t.Amount);
                 }
                 TxtMonthlyRevenue.Text = totalRevenue.ToString("N0") + " đ";
@@ -209,7 +209,7 @@ namespace Healthcare.Client.UI.Admin
                 Id = a.Id,
                 PatientName = allUsers.FirstOrDefault(u => u.Id == a.PatientId)?.FullName ?? "N/A",
                 DoctorName = allUsers.FirstOrDefault(u => u.Id == a.DoctorId)?.FullName ?? "Bác sĩ ẩn",
-                AppointmentDate = a.AppointmentDate,
+                AppointmentDate = a.AppointmentDate.ToLocalTime(),
                 Status = a.Status,
                 RoomCode = a.RoomCode
             }).ToList();
@@ -229,7 +229,7 @@ namespace Healthcare.Client.UI.Admin
                 Amount = t.Amount,
                 PaymentMethod = t.PaymentMethod,
                 Status = t.Status,
-                PaidAt = t.PaidAt
+                PaidAt = t.PaidAt?.ToLocalTime()
             }).ToList();
 
             AdminDataGrid.ItemsSource = displayList;

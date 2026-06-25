@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Healthcare.Server.SupabaseIntegration;
 using Healthcare.Server.Models.Communication;
 using System;

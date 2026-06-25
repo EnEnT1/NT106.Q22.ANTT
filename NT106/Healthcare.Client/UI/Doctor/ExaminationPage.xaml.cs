@@ -1,4 +1,4 @@
-using Healthcare.Client.Helpers;
+﻿using Healthcare.Client.Helpers;
 using Healthcare.Client.Models.Core;
 using Healthcare.Client.Models.Identity;
 using Healthcare.Client.UI.Components;

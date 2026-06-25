@@ -46,7 +46,7 @@ namespace Healthcare.Client.UI.Components
         public string Title { get; set; } = string.Empty;
         public string Body { get; set; } = string.Empty;
         public bool IsRead { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public NotificationCategory Category { get; set; } = NotificationCategory.System;
 
         /// <summary>Payload tuỳ chọn — chứa ID trang cần điều hướng (vd: labResultId, appointmentId).</summary>
@@ -105,12 +105,12 @@ namespace Healthcare.Client.UI.Components
         {
             get
             {
-                var diff = DateTime.Now - CreatedAt;
+                var diff = DateTime.UtcNow - CreatedAt.ToUniversalTime();
                 if (diff.TotalMinutes < 1) return "Vừa xong";
                 if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes} phút trước";
                 if (diff.TotalHours < 24) return $"{(int)diff.TotalHours} giờ trước";
                 if (diff.TotalDays < 7) return $"{(int)diff.TotalDays} ngày trước";
-                return CreatedAt.ToString("dd/MM/yyyy");
+                return CreatedAt.ToLocalTime().ToString("dd/MM/yyyy");
             }
         }
     }
@@ -485,7 +485,7 @@ namespace Healthcare.Client.UI.Components
                 Title     = "Lịch hẹn được xác nhận",
                 Body      = "Lịch khám với BS. Nguyễn Văn A vào 10:00 AM ngày 20/05/2026 đã được xác nhận.",
                 IsRead    = false,
-                CreatedAt = DateTime.Now.AddMinutes(-5),
+                CreatedAt = DateTime.UtcNow.AddMinutes(-5),
                 Category  = NotificationCategory.Appointment,
                 NavigationPayload = "APT-00123"
             },
@@ -495,7 +495,7 @@ namespace Healthcare.Client.UI.Components
                 Title     = "Kết quả xét nghiệm đã có",
                 Body      = "Kết quả xét nghiệm Sinh hóa máu toàn phần (LAB-10293) đã sẵn sàng để xem.",
                 IsRead    = false,
-                CreatedAt = DateTime.Now.AddHours(-1),
+                CreatedAt = DateTime.UtcNow.AddHours(-1),
                 Category  = NotificationCategory.LabResult,
                 NavigationPayload = "LAB-10293"
             },
@@ -505,7 +505,7 @@ namespace Healthcare.Client.UI.Components
                 Title     = "Nhắc uống thuốc",
                 Body      = "Đã đến giờ uống thuốc Amoxicillin 500mg — 1 viên sau bữa sáng.",
                 IsRead    = false,
-                CreatedAt = DateTime.Now.AddHours(-2),
+                CreatedAt = DateTime.UtcNow.AddHours(-2),
                 Category  = NotificationCategory.Medication
             },
             new()
@@ -514,7 +514,7 @@ namespace Healthcare.Client.UI.Components
                 Title     = "Thanh toán thành công",
                 Body      = "Giao dịch viện phí #TXN-8821 trị giá 450,000₫ đã được ghi nhận.",
                 IsRead    = true,
-                CreatedAt = DateTime.Now.AddDays(-1),
+                CreatedAt = DateTime.UtcNow.AddDays(-1),
                 Category  = NotificationCategory.Payment,
                 NavigationPayload = "TXN-8821"
             },
@@ -524,7 +524,7 @@ namespace Healthcare.Client.UI.Components
                 Title     = "Tin nhắn mới từ BS. Trần Thị B",
                 Body      = "Bác sĩ đã gửi cho bạn một tin nhắn. Nhấn để xem.",
                 IsRead    = true,
-                CreatedAt = DateTime.Now.AddDays(-2),
+                CreatedAt = DateTime.UtcNow.AddDays(-2),
                 Category  = NotificationCategory.Message
             }
         ];
