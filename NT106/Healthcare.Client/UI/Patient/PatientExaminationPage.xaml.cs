@@ -64,10 +64,9 @@ namespace Healthcare.Client.UI.Patient
                     _doctorId = appointmentResponse.DoctorId;
                     await LoadDoctorInfoAsync();
 
-                    // Fallback: if DB has no room_code, generate the same way the doctor does
-                    string roomCode = appointmentResponse.RoomCode;
+                    string roomCode = appointmentResponse.RoomCode?.Trim().ToLower();
                     if (string.IsNullOrWhiteSpace(roomCode))
-                        roomCode = _appointmentId;
+                        roomCode = _appointmentId?.Trim().ToLower();
 
                     try
                     {

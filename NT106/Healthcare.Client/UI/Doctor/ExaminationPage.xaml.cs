@@ -92,11 +92,11 @@ namespace Healthcare.Client.UI.Doctor
                 {
                     _patientId = appointmentResponse.PatientId;
 
-                    string roomCode = appointmentResponse.RoomCode;
+                    string roomCode = appointmentResponse.RoomCode?.Trim().ToLower();
 
                     if (string.IsNullOrWhiteSpace(roomCode))
                     {
-                        roomCode = _appointmentId;
+                        roomCode = _appointmentId?.Trim().ToLower();
                     }
 
                     await LoadPatientInfoAsync();

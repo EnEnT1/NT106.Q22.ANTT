@@ -74,7 +74,7 @@ namespace Healthcare.Client.UI.Components
             {
                 _appointmentId = appointmentId;
                 _targetId = targetId;
-                _roomCode = roomCode;
+                _roomCode = roomCode?.Trim().ToLower() ?? string.Empty;
                 _currentUserId = SessionStorage.CurrentUser?.Id ?? string.Empty;
                 _isDisposed = false;
 
@@ -115,7 +115,9 @@ namespace Healthcare.Client.UI.Components
                     {
                         if (_isDisposed) return;
                         var model = change.Model<WebrtcSignal>();
-                        if (model != null && model.RoomCode == _roomCode && model.SenderId != _currentUserId)
+                        if (model != null && 
+                            string.Equals(model.RoomCode?.Trim(), _roomCode, StringComparison.OrdinalIgnoreCase) && 
+                            model.SenderId != _currentUserId)
                         {
                             DispatcherQueue.TryEnqueue(async () => {
                                 if (_rtc != null)
