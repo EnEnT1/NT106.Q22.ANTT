@@ -97,7 +97,7 @@ namespace Healthcare.Client.UI.Doctor
                     return;
 
                 var client = SupabaseManager.Instance.Client;
-                var today = DateTime.Today;
+                var today = AppointmentDateTimeHelper.NowVietnam.Date;
                 var tomorrow = today.AddDays(1);
 
                 var allAppointmentsResponse = await client.From<Appointment>()
@@ -109,12 +109,12 @@ namespace Healthcare.Client.UI.Doctor
                 int completedCount = allAppointments.Count(x => x.Status == "Completed");
 
                 int todayCount = allAppointments.Count(x =>
-                    x.AppointmentDate.ToLocalTime() >= today &&
-                    x.AppointmentDate.ToLocalTime() < tomorrow);
+                    AppointmentDateTimeHelper.GetStart(x) >= today &&
+                    AppointmentDateTimeHelper.GetStart(x) < tomorrow);
 
                 int urgentCount = allAppointments.Count(x =>
-                    x.AppointmentDate.ToLocalTime() >= today &&
-                    x.AppointmentDate.ToLocalTime() < tomorrow &&
+                    AppointmentDateTimeHelper.GetStart(x) >= today &&
+                    AppointmentDateTimeHelper.GetStart(x) < tomorrow &&
                     (x.Status == "In Progress" || x.Status == "Arrived"));
 
                 TxtExamined.Text = completedCount.ToString("D2");
@@ -139,16 +139,16 @@ namespace Healthcare.Client.UI.Doctor
                     return;
 
                 var client = SupabaseManager.Instance.Client;
-                var today = DateTime.Today;
+                var today = AppointmentDateTimeHelper.NowVietnam.Date;
                 var tomorrow = today.AddDays(1);
 
                 var response = await client.From<Appointment>()
-                    .Where(x => x.DoctorId == doctorId &&
-                                x.AppointmentDate >= today &&
-                                x.AppointmentDate < tomorrow)
+                    .Where(x => x.DoctorId == doctorId)
                     .Get();
 
                 var appointments = (response.Models ?? new List<Appointment>())
+                    .Where(x => AppointmentDateTimeHelper.GetStart(x) >= today &&
+                                AppointmentDateTimeHelper.GetStart(x) < tomorrow)
                     .OrderBy(x => x.StartTime)
                     .ToList();
 
@@ -267,18 +267,18 @@ namespace Healthcare.Client.UI.Doctor
                     return;
 
                 var client = SupabaseManager.Instance.Client;
-                var today = DateTime.Today;
+                var today = AppointmentDateTimeHelper.NowVietnam.Date;
                 var tomorrow = today.AddDays(1);
 
                 _scheduleItems.Clear();
 
                 var response = await client.From<Appointment>()
-                    .Where(x => x.DoctorId == doctorId &&
-                                x.AppointmentDate >= today &&
-                                x.AppointmentDate < tomorrow)
+                    .Where(x => x.DoctorId == doctorId)
                     .Get();
 
                 var appointments = (response.Models ?? new List<Appointment>())
+                    .Where(x => AppointmentDateTimeHelper.GetStart(x) >= today &&
+                                AppointmentDateTimeHelper.GetStart(x) < tomorrow)
                     .OrderBy(x => x.StartTime)
                     .ToList();
 

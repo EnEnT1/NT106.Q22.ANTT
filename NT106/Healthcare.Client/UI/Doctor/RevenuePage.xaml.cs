@@ -152,11 +152,11 @@ namespace Healthcare.Client.UI.Doctor
                 query = query.Where(x => x.PaymentStatus == "unpaid");
             }
 
-            DateTime now = DateTime.Now;
+            DateTime now = Healthcare.Client.Helpers.AppointmentDateTimeHelper.NowVietnam;
 
             if (dateFilter == "Hôm nay")
             {
-                query = query.Where(x => x.ExamDate.Date == DateTime.Today);
+                query = query.Where(x => x.ExamDate.Date == now.Date);
             }
             else if (dateFilter == "Tháng này")
             {

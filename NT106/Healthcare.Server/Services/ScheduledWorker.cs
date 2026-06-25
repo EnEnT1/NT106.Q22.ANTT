@@ -11,6 +11,7 @@ namespace Healthcare.Server.Services
     public class ScheduledWorker : BackgroundService
     {
         private readonly SupabaseAdminHelper _adminHelper;
+        private static readonly TimeSpan VietnamOffset = TimeSpan.FromHours(7);
 
         public ScheduledWorker(SupabaseAdminHelper adminHelper)
         {
@@ -45,14 +46,14 @@ namespace Healthcare.Server.Services
             var response = await client.From<Appointment>().Get();
             var appointments = response.Models ?? new System.Collections.Generic.List<Appointment>();
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow.Add(VietnamOffset);
             var today = now.Date;
             var currentTime = now.TimeOfDay;
 
             var expiredList = appointments
                 .Where(a => (a.Status == "Confirmed" || a.Status == "Arrived") && 
-                            (a.AppointmentDate.Date < today || 
-                             (a.AppointmentDate.Date == today && a.EndTime < currentTime)))
+                            (ToVietnamDate(a.AppointmentDate) < today || 
+                             (ToVietnamDate(a.AppointmentDate) == today && a.EndTime < currentTime)))
                 .ToList();
 
             if (expiredList.Any())
@@ -60,11 +61,23 @@ namespace Healthcare.Server.Services
                 Console.WriteLine($"[Worker] Tìm thấy {expiredList.Count} lịch hẹn quá hạn. Đang chuyển trạng thái sang Missed...");
                 foreach (var appt in expiredList)
                 {
-                    appt.Status = "Missed";
-                    await client.From<Appointment>().Update(appt);
+                    await client.From<Appointment>()
+                        .Where(x => x.Id == appt.Id)
+                        .Set(x => x.Status, "Missed")
+                        .Update();
                 }
                 Console.WriteLine("[Worker] Đã cập nhật xong các lịch hẹn quá hạn.");
             }
+        }
+
+        private static DateTime ToVietnamDate(DateTime value)
+        {
+            if (value.Kind == DateTimeKind.Utc || value.TimeOfDay >= TimeSpan.FromHours(17))
+            {
+                return value.Add(VietnamOffset).Date;
+            }
+
+            return value.Date;
         }
     }
 }

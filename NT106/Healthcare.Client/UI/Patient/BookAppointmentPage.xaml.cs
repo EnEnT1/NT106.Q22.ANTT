@@ -17,7 +17,7 @@ namespace Healthcare.Client.UI.Patient
         public string Id { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
-        public string StartTimeStr => DateTime.Today.Add(StartTime).ToString("HH:mm");
+        public string StartTimeStr => StartTime.ToString(@"hh\:mm");
         public string DurationStr => $"{StartTime:hh\\:mm} - {EndTime:hh\\:mm}";
         public TimeSlot OriginalModel { get; set; }
 
@@ -112,7 +112,7 @@ namespace Healthcare.Client.UI.Patient
         public string AvatarUrl { get; set; }
         public DateTime AppointmentDate { get; set; }
         public string TimeStr { get; set; }
-        public string DateStr => AppointmentDate.ToLocalTime().ToString("dd/MM/yyyy");
+        public string DateStr => AppointmentDateTimeHelper.ToVietnamDate(AppointmentDate).ToString("dd/MM/yyyy");
         public string Status { get; set; }
         public string Type { get; set; } // Online/Offline
         
@@ -247,7 +247,7 @@ namespace Healthcare.Client.UI.Patient
 
         private void GenerateDates()
         {
-            var today = DateTime.Today;
+            var today = AppointmentDateTimeHelper.NowVietnam.Date;
             string[] vnDays = { "CN", "Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7" };
             
             for (int i = 0; i < 14; i++)
@@ -432,6 +432,8 @@ namespace Healthcare.Client.UI.Patient
             var selectedDoctorVM = DoctorsGridView.SelectedItem as DoctorViewModel;
             var selectedSlotVM = TimeSlotsGridView.SelectedItem as TimeSlotViewModel;
             var selectedDateVM = DatesGridView.SelectedItem as DateViewModel;
+            var reservedSlotId = selectedSlotVM?.Id;
+            var appointmentCreated = false;
 
             if (selectedDoctorVM == null || selectedSlotVM == null || selectedDateVM == null)
             {
@@ -486,7 +488,7 @@ namespace Healthcare.Client.UI.Patient
                     Id = Guid.NewGuid().ToString(),
                     PatientId = SessionStorage.CurrentUser.Id,
                     DoctorId = finalDoctorId,
-                    AppointmentDate = DateTime.SpecifyKind(selectedDateVM.DateValue.Date, DateTimeKind.Utc),
+                    AppointmentDate = AppointmentDateTimeHelper.DateForStorage(selectedSlotVM.OriginalModel.SlotDate),
                     StartTime = selectedSlotVM.StartTime,
                     EndTime = selectedSlotVM.EndTime,
                     SlotId = selectedSlotVM.Id,
@@ -502,11 +504,13 @@ namespace Healthcare.Client.UI.Patient
 
                 if (insertedAppt == null)
                 {
+                    await ReleaseReservedSlotAsync(reservedSlotId);
                     await ShowDialog("Lỗi", "Lỗi rớt mạng hoặc CSDL từ chối tạo lịch hẹn. Vui lòng thử lại!");
                     return;
                 }
 
                 // Tính phí (lấy từ Appointment Summary đã nối vào DoctorViewModel)
+                appointmentCreated = true;
                 decimal feeToPay = selectedDoctorVM.ConsultationFee;
 
                 var transaction = new Transaction
@@ -558,7 +562,31 @@ namespace Healthcare.Client.UI.Patient
             }
             catch (Exception ex)
             {
+                if (!appointmentCreated)
+                {
+                    await ReleaseReservedSlotAsync(reservedSlotId);
+                }
+
                 await ShowDialog("Lỗi", "Không thể đăng ký lịch hẹn: " + ex.Message);
+            }
+        }
+
+        private async Task ReleaseReservedSlotAsync(string slotId)
+        {
+            if (string.IsNullOrWhiteSpace(slotId))
+                return;
+
+            try
+            {
+                await _supabase.From<TimeSlot>()
+                    .Where(x => x.Id == slotId)
+                    .Where(x => x.Status == "Booked")
+                    .Set(x => x.Status, "Available")
+                    .Update();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error releasing reserved slot: " + ex.Message);
             }
         }
 

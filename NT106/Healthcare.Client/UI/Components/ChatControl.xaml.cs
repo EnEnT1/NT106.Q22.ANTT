@@ -617,11 +617,15 @@ namespace Healthcare.Client.UI.Components
 
         private static DateTime ParseDateTimeToLocal(DateTime dt)
         {
-            if (dt.Kind == DateTimeKind.Unspecified)
-            {
-                dt = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
-            }
-            return dt.ToLocalTime();
+            // Nếu đã là Local thì không convert nữa
+    if (dt.Kind == DateTimeKind.Local)
+        return dt;
+
+    // Nếu là UTC (hoặc Unspecified nhưng giá trị thực là UTC) → convert
+    if (dt.Kind == DateTimeKind.Unspecified)
+        dt = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
+
+    return dt.ToLocalTime();
         }
     }
 

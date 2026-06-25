@@ -110,7 +110,7 @@ namespace Healthcare.Client.UI.Components
                 if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes} phút trước";
                 if (diff.TotalHours < 24) return $"{(int)diff.TotalHours} giờ trước";
                 if (diff.TotalDays < 7) return $"{(int)diff.TotalDays} ngày trước";
-                return CreatedAt.ToLocalTime().ToString("dd/MM/yyyy");
+                return CreatedAt.ToUniversalTime().AddHours(7).ToString("dd/MM/yyyy");
             }
         }
     }

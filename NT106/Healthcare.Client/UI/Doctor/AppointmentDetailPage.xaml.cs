@@ -120,7 +120,7 @@ namespace Healthcare.Client.UI.Doctor
             ProfileNameText.Text = fullName;
             PatientEmailText.Text = _patient?.Email ?? "Email: --";
             
-            DateText.Text = _appointment.AppointmentDate.ToLocalTime().ToString("dd MMMM, yyyy");
+            DateText.Text = AppointmentDateTimeHelper.ToVietnamDate(_appointment.AppointmentDate).ToString("dd MMMM, yyyy");
             TimeText.Text = _appointment.StartTime.ToString(@"hh\:mm");
             
             // Tính thời gian kết thúc (Mặc định +30 phút)
@@ -135,9 +135,10 @@ namespace Healthcare.Client.UI.Doctor
 
             // Logic Gọi Video (Chỉ Online và ĐÚNG GIỜ)
             bool isOnline = _appointment.ExaminationType == "Online";
-            DateTime appointmentFullDateTime = _appointment.AppointmentDate.ToLocalTime().Date.Add(_appointment.StartTime);
+            DateTime appointmentFullDateTime = AppointmentDateTimeHelper.GetStart(_appointment);
             DateTime appointmentEndFullDateTime = appointmentFullDateTime.AddMinutes(30);
-            bool isOnTime = DateTime.Now >= appointmentFullDateTime.AddMinutes(-5) && DateTime.Now <= appointmentEndFullDateTime;
+            var nowVietnam = AppointmentDateTimeHelper.NowVietnam;
+            bool isOnTime = nowVietnam >= appointmentFullDateTime.AddMinutes(-5) && nowVietnam <= appointmentEndFullDateTime;
 
             if (isOnline && _appointment.Status != "Missed" && _appointment.Status != "Cancelled" && _appointment.Status != "Completed")
             {
@@ -289,8 +290,10 @@ namespace Healthcare.Client.UI.Doctor
             try {
                 if (_appointment == null) return;
                 
-                _appointment.Status = "Confirmed";
-                await _supabase.From<Appointment>().Update(_appointment);
+                await _supabase.From<Appointment>()
+                    .Where(x => x.Id == _appointment.Id)
+                    .Set(x => x.Status, "Confirmed")
+                    .Update();
                 
                 // Sau khi duyệt, tải lại dữ liệu để cập nhật UI
                 await LoadData();
@@ -302,8 +305,10 @@ namespace Healthcare.Client.UI.Doctor
         private async void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
             try {
-                _appointment.Status = "Cancelled";
-                await _supabase.From<Appointment>().Update(_appointment);
+                await _supabase.From<Appointment>()
+                    .Where(x => x.Id == _appointment.Id)
+                    .Set(x => x.Status, "Cancelled")
+                    .Update();
                 await LoadData();
             } catch { }
         }

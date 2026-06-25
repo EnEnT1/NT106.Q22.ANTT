@@ -68,26 +68,16 @@ namespace Healthcare.Server.Controllers
                 if (vnp_ResponseCode == "00")
                 {
                     // 1. Cập nhật transaction
-                    var transaction = await _supabaseClient.From<TransactionModel>()
+                    await _supabaseClient.From<TransactionModel>()
                         .Where(x => x.AppointmentId == appointmentId)
-                        .Single();
-
-                    if (transaction != null)
-                    {
-                        transaction.Status = "Success";
-                        await transaction.Update<TransactionModel>();
-                    }
+                        .Set(x => x.Status, "Success")
+                        .Update();
 
                     // 2. Cập nhật appointment
-                    var appointment = await _supabaseClient.From<AppointmentModel>()
+                    await _supabaseClient.From<AppointmentModel>()
                         .Where(x => x.Id == appointmentId)
-                        .Single();
-
-                    if (appointment != null)
-                    {
-                        appointment.Status = "Confirmed";
-                        await appointment.Update<AppointmentModel>();
-                    }
+                        .Set(x => x.Status, "Confirmed")
+                        .Update();
 
                     return Content(GetPaymentResultHtml(true, "Thanh toán thành công!", appointmentId), "text/html; charset=utf-8");
                 }

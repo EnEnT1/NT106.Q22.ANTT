@@ -60,7 +60,7 @@ namespace Healthcare.Client.UI.Patient
                     .Where(a => a.ExaminationType == "Online")
                     .Get();
 
-                var appointments = response.Models.OrderByDescending(a => a.AppointmentDate).ThenByDescending(a => a.StartTime).ToList();
+                var appointments = response.Models.OrderBy(AppointmentDateTimeHelper.GetStart).ToList();
 
                 // 2. Lấy thông tin Bác sĩ (Optimization: Lấy tất cả user 1 lần hoặc cache)
                 var userResponse = await client.From<User>().Get();
@@ -70,21 +70,23 @@ namespace Healthcare.Client.UI.Patient
                 HistoryAppointments.Clear();
 
                 // Sắp xếp lịch khám theo thời gian tăng dần để tìm cái gần nhất
-                var sortedAppts = appointments.OrderBy(a => a.AppointmentDate).ThenBy(a => a.StartTime).ToList();
+                var sortedAppts = appointments;
+                var now = AppointmentDateTimeHelper.NowVietnam;
                 bool foundNearest = false;
 
                 foreach (var app in sortedAppts)
                 {
                     // Logic tính toán xem đã tới giờ hay chưa (Cho phép vào sớm 15p)
-                    var appDateTime = app.AppointmentDate.ToLocalTime().Date.Add(app.StartTime);
-                    var endTime = app.AppointmentDate.ToLocalTime().Date.Add(app.EndTime);
-                    bool isJoinable = (DateTime.Now >= appDateTime.AddMinutes(-15)) && (DateTime.Now <= endTime);
+                    var appDate = AppointmentDateTimeHelper.ToVietnamDate(app.AppointmentDate);
+                    var appDateTime = appDate.Add(app.StartTime);
+                    var endTime = AppointmentDateTimeHelper.GetEnd(app);
+                    bool isJoinable = now >= appDateTime.AddMinutes(-15) && now <= endTime;
 
                     var vm = new OnlineAppointmentViewModel
                     {
                         Id = app.Id,
                         DoctorName = doctors.ContainsKey(app.DoctorId) ? doctors[app.DoctorId] : "Bác sĩ",
-                        AppointmentDate = app.AppointmentDate.ToLocalTime().ToString("dd/MM/yyyy"),
+                        AppointmentDate = appDate.ToString("dd/MM/yyyy"),
                         AppointmentTime = app.StartTime.ToString(@"hh\:mm"),
                         Status = MapStatus(app.Status),
                         RawStatus = app.Status,
@@ -99,7 +101,7 @@ namespace Healthcare.Client.UI.Patient
 
                     // 2. Chỉ lấy 1 lịch khám CHƯA KẾT THÚC và gần nhất để hiện ở mục "Sắp diễn ra"
                     bool isUpcomingStatus = app.Status == "Confirmed" || app.Status == "Paid" || app.Status == "Success";
-                    if (!foundNearest && isUpcomingStatus && DateTime.Now <= endTime)
+                    if (!foundNearest && isUpcomingStatus && now <= endTime)
                     {
                         UpcomingAppointments.Add(vm);
                         foundNearest = true;

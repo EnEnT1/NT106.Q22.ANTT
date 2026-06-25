@@ -29,6 +29,7 @@ namespace Healthcare.Client.UI.Doctor
         private DispatcherTimer _realtimeTimer;
         private int _currentPage = 1;
         private const int PageSize = 40;
+        private static readonly TimeSpan VietnamOffset = TimeSpan.FromHours(7);
 
         public ObservableCollection<AppointmentViewModel> SundayList { get; } = new();
         public ObservableCollection<AppointmentViewModel> MondayList { get; } = new();
@@ -45,8 +46,9 @@ namespace Healthcare.Client.UI.Doctor
             this.InitializeComponent();
             _supabase = SupabaseManager.Instance.Client;
 
-            _currentWeekSunday = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
-            _currentMonthDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            var todayVietnam = AppointmentDateTimeHelper.NowVietnam.Date;
+            _currentWeekSunday = todayVietnam.AddDays(-(int)todayVietnam.DayOfWeek);
+            _currentMonthDate = new DateTime(todayVietnam.Year, todayVietnam.Month, 1);
 
             _realtimeTimer = new DispatcherTimer();
             _realtimeTimer.Interval = TimeSpan.FromSeconds(1);
@@ -54,13 +56,13 @@ namespace Healthcare.Client.UI.Doctor
             _realtimeTimer.Start();
             RealtimeTimer_Tick(null, null);
 
-            FilterSlotDatePicker.Date = DateTimeOffset.Now;
+            SetPickerDate(FilterSlotDatePicker, AppointmentDateTimeHelper.NowVietnam.Date);
         }
 
         private void RealtimeTimer_Tick(object? sender, object? e)
         {
-            CurrentTimeText.Text = DateTime.Now.ToString("HH:mm:ss");
-            CurrentDateText.Text = DateTime.Now.ToString("dddd, dd/MM/yyyy");
+            CurrentTimeText.Text = AppointmentDateTimeHelper.NowVietnam.ToString("HH:mm:ss");
+            CurrentDateText.Text = AppointmentDateTimeHelper.NowVietnam.ToString("dddd, dd/MM/yyyy");
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -202,12 +204,11 @@ namespace Healthcare.Client.UI.Doctor
 
             if (_filteredDate.HasValue)
             {
-                query = query.Where(a => a.AppointmentDate.Date == _filteredDate.Value.Date);
+                query = query.Where(a => AppointmentDateTimeHelper.ToVietnamDate(a.AppointmentDate) == _filteredDate.Value.Date);
             }
 
             var fullList = query
-                .OrderByDescending(a => a.AppointmentDate)
-                .ThenByDescending(a => a.StartTime)
+                .OrderByDescending(AppointmentDateTimeHelper.GetStart)
                 .ToList();
 
             int totalItems = fullList.Count;
@@ -294,10 +295,11 @@ namespace Healthcare.Client.UI.Doctor
                     labels[i].Foreground = outlineBrush;
             }
 
-            int todayDow = (int)DateTime.Today.DayOfWeek;
+            var todayVietnam = AppointmentDateTimeHelper.NowVietnam.Date;
+            int todayDow = (int)todayVietnam.DayOfWeek;
             DateTime colDate = _currentWeekSunday.AddDays(todayDow);
 
-            if (colDate.Date == DateTime.Today)
+            if (colDate.Date == todayVietnam)
             {
                 if (headers[todayDow] != null)
                     headers[todayDow].Background = accentLightBrush;
@@ -337,8 +339,8 @@ namespace Healthcare.Client.UI.Doctor
             HighlightTodayColumn();
 
             var weekAppts = _allAppointments
-                .Where(a => a.AppointmentDate.ToLocalTime().Date >= _currentWeekSunday.Date
-                         && a.AppointmentDate.ToLocalTime().Date <= endOfWeek.Date)
+                .Where(a => AppointmentDateTimeHelper.ToVietnamDate(a.AppointmentDate) >= _currentWeekSunday.Date
+                         && AppointmentDateTimeHelper.ToVietnamDate(a.AppointmentDate) <= endOfWeek.Date)
                 .OrderBy(a => a.StartTime)
                 .ToList();
 
@@ -347,7 +349,7 @@ namespace Healthcare.Client.UI.Doctor
                 var patient = _allPatients.FirstOrDefault(u => u.Id == appt.PatientId);
                 var trans = _allTransactions.FirstOrDefault(t => t.AppointmentId == appt.Id);
                 var vm = new AppointmentViewModel(appt, patient?.FullName ?? "Bệnh nhân (ẩn danh)", trans?.PaymentMethod);
-                int dow = (int)appt.AppointmentDate.ToLocalTime().DayOfWeek;
+                int dow = (int)AppointmentDateTimeHelper.ToVietnamDate(appt.AppointmentDate).DayOfWeek;
 
                 if (dow == 0) SundayList.Add(vm);
                 if (dow == 1) MondayList.Add(vm);
@@ -373,8 +375,8 @@ namespace Healthcare.Client.UI.Doctor
                 int col = (startDayOfWeek + i - 1) % 7;
                 DateTime cellDate = new DateTime(_currentMonthDate.Year, _currentMonthDate.Month, i);
 
-                int apptCount = _allAppointments.Count(a => a.AppointmentDate.ToLocalTime().Date == cellDate.Date);
-                bool isToday = cellDate.Date == DateTime.Today;
+                int apptCount = _allAppointments.Count(a => AppointmentDateTimeHelper.ToVietnamDate(a.AppointmentDate) == cellDate.Date);
+                bool isToday = cellDate.Date == AppointmentDateTimeHelper.NowVietnam.Date;
 
                 Border cell = new Border
                 {
@@ -477,8 +479,10 @@ namespace Healthcare.Client.UI.Doctor
                 if (appt == null)
                     return;
 
-                appt.Status = status;
-                await appt.Update<Appointment>();
+                await _supabase.From<Appointment>()
+                    .Where(x => x.Id == id)
+                    .Set(x => x.Status, status)
+                    .Update();
 
                 await LoadDataFromSupabase();
             }
@@ -576,8 +580,11 @@ namespace Healthcare.Client.UI.Doctor
                 var query = _supabase.From<TimeSlot>()
                     .Where(x => x.DoctorId == SessionStorage.CurrentUser.Id);
 
-                var filterDate = FilterSlotDatePicker.Date.DateTime.Date.ToUniversalTime();
-                query = query.Where(s => s.SlotDate == filterDate);
+                var filterDate = GetPickerDate(FilterSlotDatePicker);
+                var nextDate = filterDate.AddDays(1);
+                query = query
+                    .Filter("slot_date", Postgrest.Constants.Operator.GreaterThanOrEqual, filterDate.ToString("yyyy-MM-dd"))
+                    .Filter("slot_date", Postgrest.Constants.Operator.LessThan, nextDate.ToString("yyyy-MM-dd"));
 
                 var response = await query.Get();
                 var allSlots = response.Models ?? new List<TimeSlot>();
@@ -612,7 +619,7 @@ namespace Healthcare.Client.UI.Doctor
             if (SessionStorage.CurrentUser == null)
                 return;
 
-            var date = NewSlotDatePicker.Date.DateTime.Date;
+            var date = GetPickerDate(NewSlotDatePicker);
             var start = NewSlotStartTime.Time;
             var end = NewSlotEndTime.Time;
             var duration = TimeSpan.FromMinutes(SlotDurationBox.Value);
@@ -630,7 +637,8 @@ namespace Healthcare.Client.UI.Doctor
             {
                 var existingSlotsResponse = await _supabase.From<TimeSlot>()
                     .Where(x => x.DoctorId == SessionStorage.CurrentUser.Id)
-                    .Where(x => x.SlotDate == date.ToUniversalTime())
+                    .Filter("slot_date", Postgrest.Constants.Operator.GreaterThanOrEqual, date.ToString("yyyy-MM-dd"))
+                    .Filter("slot_date", Postgrest.Constants.Operator.LessThan, date.AddDays(1).ToString("yyyy-MM-dd"))
                     .Get();
                 existingSlots = existingSlotsResponse.Models ?? new List<TimeSlot>();
             }
@@ -656,7 +664,7 @@ namespace Healthcare.Client.UI.Doctor
                     slotsToCreate.Add(new TimeSlot
                     {
                         DoctorId = SessionStorage.CurrentUser.Id,
-                        SlotDate = date.ToUniversalTime(),
+                        SlotDate = AppointmentDateTimeHelper.DateForStorage(date),
                         StartTime = slotStart,
                         EndTime = slotEnd,
                         Status = "Available"
@@ -686,7 +694,7 @@ namespace Healthcare.Client.UI.Doctor
                 await _supabase.From<TimeSlot>().Insert(slotsToCreate);
 
                 // Đồng bộ bộ lọc ngày sang ngày vừa tạo để bác sĩ thấy ngay
-                FilterSlotDatePicker.Date = NewSlotDatePicker.Date;
+                SetPickerDate(FilterSlotDatePicker, date);
 
                 string successMsg = skippedCount > 0 
                     ? $"Đã tạo thành công {slotsToCreate.Count} khung giờ cho ngày {date:dd/MM/yyyy}.\n\n* Lưu ý: Bỏ qua {skippedCount} khung giờ do trùng lịch hiện tại."
@@ -740,7 +748,7 @@ namespace Healthcare.Client.UI.Doctor
             if (SessionStorage.CurrentUser == null)
                 return;
 
-            var date = DateTime.SpecifyKind(FilterSlotDatePicker.Date.DateTime.Date, DateTimeKind.Utc);
+            var date = GetPickerDate(FilterSlotDatePicker);
 
             // Hỏi xác nhận trước khi xoá hàng loạt
             var confirmDialog = new ContentDialog
@@ -761,7 +769,8 @@ namespace Healthcare.Client.UI.Doctor
             {
                 await _supabase.From<TimeSlot>()
                     .Where(x => x.DoctorId == SessionStorage.CurrentUser.Id)
-                    .Where(x => x.SlotDate == date)
+                    .Filter("slot_date", Postgrest.Constants.Operator.GreaterThanOrEqual, date.ToString("yyyy-MM-dd"))
+                    .Filter("slot_date", Postgrest.Constants.Operator.LessThan, date.AddDays(1).ToString("yyyy-MM-dd"))
                     .Where(x => x.Status == "Available")
                     .Delete();
 
@@ -777,6 +786,17 @@ namespace Healthcare.Client.UI.Doctor
         private void FilterSlotDatePicker_DateChanged(object sender, DatePickerValueChangedEventArgs e)
         {
             _ = LoadDoctorSlots();
+        }
+
+        private static DateTime GetPickerDate(DatePicker picker)
+        {
+            return picker.Date.ToOffset(VietnamOffset).Date;
+        }
+
+        private static void SetPickerDate(DatePicker picker, DateTime date)
+        {
+            var plainDate = DateTime.SpecifyKind(date.Date, DateTimeKind.Unspecified);
+            picker.Date = new DateTimeOffset(plainDate, VietnamOffset);
         }
 
         private async Task ShowMsg(string title, string content)
@@ -868,7 +888,7 @@ namespace Healthcare.Client.UI.Doctor
         {
             Id = model.Id ?? string.Empty;
             TimeRange = $"{model.StartTime:hh\\:mm} - {model.EndTime:hh\\:mm}";
-            DateFormatted = model.SlotDate.ToLocalTime().ToString("dd/MM/yyyy");
+            DateFormatted = AppointmentDateTimeHelper.ToVietnamDate(model.SlotDate).ToString("dd/MM/yyyy");
             Status = model.Status ?? string.Empty;
 
             StatusText = Status switch
@@ -950,7 +970,7 @@ namespace Healthcare.Client.UI.Doctor
             PatientName = name ?? "Bệnh nhân (ẩn danh)";
             Time = $"{model.StartTime:hh\\:mm} - {model.EndTime:hh\\:mm}";
             BaseStatus = model.Status ?? string.Empty;
-            DateFormatted = model.AppointmentDate.ToLocalTime().ToString("dd/MM/yyyy");
+            DateFormatted = AppointmentDateTimeHelper.ToVietnamDate(model.AppointmentDate).ToString("dd/MM/yyyy");
             TypeText = model.ExaminationType ?? "Offline";
 
             PaymentText = paymentMethod == "Online"

@@ -92,12 +92,12 @@ namespace Healthcare.Client.UI.Patient
 
                 var appointments = apptResponse.Models ?? new List<Appointment>();
 
+                var now = AppointmentDateTimeHelper.NowVietnam;
                 var upcomingAppt = appointments
-                    .Where(x => x.AppointmentDate.ToLocalTime().Date >= DateTime.Today &&
+                    .Where(x => AppointmentDateTimeHelper.GetEnd(x) >= now &&
                                 x.Status != "Completed" &&
                                 x.Status != "Cancelled")
-                    .OrderBy(x => x.AppointmentDate)
-                    .ThenBy(x => x.StartTime)
+                    .OrderBy(AppointmentDateTimeHelper.GetStart)
                     .FirstOrDefault();
 
                 if (upcomingAppt == null)
@@ -149,12 +149,12 @@ namespace Healthcare.Client.UI.Patient
                     }
                 }
 
-                var apptDate = upcomingAppt.AppointmentDate.ToLocalTime();
+                var apptDate = AppointmentDateTimeHelper.ToVietnamDate(upcomingAppt.AppointmentDate);
                 string[] dayNames = { "Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy" };
                 string dayOfWeekStr = dayNames[(int)apptDate.DayOfWeek];
 
                 AppointmentDateTextBlock.Text = $"{dayOfWeekStr}, {apptDate:dd} Tháng {apptDate:MM}";
-                AppointmentTimeTextBlock.Text = DateTime.Today.Add(upcomingAppt.StartTime).ToString("hh:mm tt");
+                AppointmentTimeTextBlock.Text = AppointmentDateTimeHelper.GetStart(upcomingAppt).ToString("hh:mm tt");
 
                 AppointmentDoctorNameTextBlock.Text = doctorName;
                 AppointmentDoctorSpecialtyTextBlock.Text = specialty;
@@ -511,4 +511,4 @@ namespace Healthcare.Client.UI.Patient
         public string Specialty { get; set; } = "Chưa cập nhật chuyên khoa";
         public Brush StatusColor { get; set; } = new SolidColorBrush(Microsoft.UI.Colors.LightGray);
     }
-}
+}

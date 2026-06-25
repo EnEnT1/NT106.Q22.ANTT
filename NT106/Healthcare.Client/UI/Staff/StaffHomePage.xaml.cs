@@ -106,7 +106,7 @@ namespace Healthcare.Client.UI.Staff
                     Id = a.Id,
                     PatientName = allUsers.FirstOrDefault(u => u.Id == a.PatientId)?.FullName ?? "N/A",
                     DoctorName = allUsers.FirstOrDefault(u => u.Id == a.DoctorId)?.FullName ?? "Bác sĩ ẩn",
-                    AppointmentDate = a.AppointmentDate.ToLocalTime(),
+                    AppointmentDate = Healthcare.Client.Helpers.AppointmentDateTimeHelper.GetStart(a),
                     Status = a.Status,
                     RoomCode = a.RoomCode
                 }).ToList();
@@ -128,7 +128,7 @@ namespace Healthcare.Client.UI.Staff
                     Amount = t.Amount,
                     PaymentMethod = t.PaymentMethod,
                     Status = t.Status,
-                    PaidAt = t.PaidAt?.ToLocalTime()
+                    PaidAt = t.PaidAt.HasValue ? Healthcare.Client.Helpers.AppointmentDateTimeHelper.ToVietnamDateTime(t.PaidAt.Value) : null
                 }).ToList();
 
             StaffDataGrid.ItemsSource = _allTransactions;
@@ -242,9 +242,11 @@ namespace Healthcare.Client.UI.Staff
 
                         if (appt != null)
                         {
-                            appt.Status = "Arrived";
-                            
-                            await appt.Update<Appointment>();
+                            await SupabaseManager.Instance.Client
+                                .From<Appointment>()
+                                .Where(a => a.Id == appt.Id)
+                                .Set(a => a.Status, "Arrived")
+                                .Update();
                             
                             await ShowDialogAsync("Check-in Thành công", $"Đã xác nhận bệnh nhân đến. Vui lòng hướng dẫn bệnh nhân đến Phòng: {apptDisplay.RoomCode}.");
                             LoadDataAsync();

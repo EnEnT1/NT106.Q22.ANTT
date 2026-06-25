@@ -5,6 +5,7 @@ using Healthcare.Client.Models.Identity;
 using Healthcare.Client.Models.Core;
 using Healthcare.Client.SupabaseIntegration;
 using Healthcare.Client.APIClient;
+using Healthcare.Client.Helpers;
 using Healthcare.Client.UI.Auth;
 using System;
 using System.Collections.Generic;
@@ -109,7 +110,8 @@ namespace Healthcare.Client.UI.Admin
             try
             {
                 var client = SupabaseManager.Instance.Client;
-                var currentMonthStart = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                var nowVn = AppointmentDateTimeHelper.NowVietnam;
+                var currentMonthStart = new DateTime(nowVn.Year, nowVn.Month, 1);
                 
                 // 1. Doanh thu tháng này
                 // Sử dụng Filter để tránh lỗi Unsupported method với LINQ Where phức tạp
@@ -121,19 +123,18 @@ namespace Healthcare.Client.UI.Admin
                 if (transactionsResponse.Models != null)
                 {
                     totalRevenue = transactionsResponse.Models
-                        .Where(t => t.PaidAt.HasValue && t.PaidAt.Value.ToLocalTime() >= currentMonthStart)
+                        .Where(t => t.PaidAt.HasValue && AppointmentDateTimeHelper.ToVietnamDate(t.PaidAt.Value) >= currentMonthStart.Date)
                         .Sum(t => t.Amount);
                 }
                 TxtMonthlyRevenue.Text = totalRevenue.ToString("N0") + " đ";
 
                 // 2. Lượt khám hôm nay
-                var today = DateTime.Today;
+                var today = AppointmentDateTimeHelper.NowVietnam.Date;
                 var appointmentsResponse = await client.From<Appointment>()
-                    .Filter("appointment_date", Postgrest.Constants.Operator.GreaterThanOrEqual, today)
-                    .Filter("appointment_date", Postgrest.Constants.Operator.LessThan, today.AddDays(1))
                     .Get();
                     
-                int todayAppts = appointmentsResponse.Models?.Count ?? 0;
+                int todayAppts = appointmentsResponse.Models?
+                    .Count(a => AppointmentDateTimeHelper.ToVietnamDate(a.AppointmentDate) == today) ?? 0;
                 TxtTodayAppointments.Text = todayAppts.ToString();
 
                 // 3. Bệnh nhân mới trong tháng
@@ -145,7 +146,7 @@ namespace Healthcare.Client.UI.Admin
                 if (usersResponse.Models != null)
                 {
                     newPatients = usersResponse.Models
-                        .Count(u => u.CreatedAt >= currentMonthStart);
+                        .Count(u => AppointmentDateTimeHelper.ToVietnamDate(u.CreatedAt) >= currentMonthStart.Date);
                 }
                 TxtNewPatients.Text = newPatients.ToString();
             }
@@ -209,7 +210,7 @@ namespace Healthcare.Client.UI.Admin
                 Id = a.Id,
                 PatientName = allUsers.FirstOrDefault(u => u.Id == a.PatientId)?.FullName ?? "N/A",
                 DoctorName = allUsers.FirstOrDefault(u => u.Id == a.DoctorId)?.FullName ?? "Bác sĩ ẩn",
-                AppointmentDate = a.AppointmentDate.ToLocalTime(),
+                AppointmentDate = Healthcare.Client.Helpers.AppointmentDateTimeHelper.GetStart(a),
                 Status = a.Status,
                 RoomCode = a.RoomCode
             }).ToList();
@@ -229,7 +230,7 @@ namespace Healthcare.Client.UI.Admin
                 Amount = t.Amount,
                 PaymentMethod = t.PaymentMethod,
                 Status = t.Status,
-                PaidAt = t.PaidAt?.ToLocalTime()
+                PaidAt = t.PaidAt.HasValue ? AppointmentDateTimeHelper.ToVietnamDateTime(t.PaidAt.Value) : null
             }).ToList();
 
             AdminDataGrid.ItemsSource = displayList;
