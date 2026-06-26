@@ -1,518 +1,892 @@
 ﻿using Microsoft.UI;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Healthcare.Client.Communication;
-using Healthcare.Client.Models.Communication;
-using Healthcare.Client.SupabaseIntegration;
+
+using Microsoft.Web.WebView2.Core;
+
 using Healthcare.Client.Helpers;
-using Windows.Graphics.Imaging;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Runtime.InteropServices;
+using Healthcare.Client.SupabaseIntegration;
+
 using System;
-using System.Threading.Tasks;
 using System.Diagnostics;
-using Windows.UI;
-using Supabase.Realtime;
-using Supabase.Realtime.PostgresChanges;
-using Postgrest;
-using Microsoft.MixedReality.WebRTC;
+using System.Threading.Tasks;
+
 using Windows.Media.Capture;
-using WinRT;
-using Windows.Foundation;
+using Windows.UI;
 
 namespace Healthcare.Client.UI.Components
 {
-    public sealed partial class VideoCallControl : UserControl
+    public sealed partial class VideoCallControl : UserControl, IDisposable
     {
+        #region Events
+
         public event EventHandler? CallStarted;
         public event EventHandler? CallEnded;
 
-        private string _appointmentId = string.Empty;
-        private string _roomCode = string.Empty;
-        private string _targetId = string.Empty;
-        private string _currentUserId = string.Empty;
+        #endregion
 
-        private WebRtcPeerConnection? _rtc;
-        private RealtimeChannel? _signalChannel;
-        private readonly System.Collections.Generic.HashSet<string> _processedSignalIds = new();
+        #region Daily
 
-        private SoftwareBitmapSource _localSource = new SoftwareBitmapSource();
-        private SoftwareBitmapSource _remoteSource = new SoftwareBitmapSource();
+        // Thay bằng subdomain Daily.co của bạn
+        private const string DailySubdomain = "healthcare-nt106";
+
+        #endregion
+
+        #region Session
+
+        private string _appointmentId = "";
+        private string _roomCode = "";
+        private string _targetUserId = "";
+
+        private string _currentUserId = "";
+        private string _displayName = "User";
+
+        #endregion
+
+        #region State
+
+        private bool _webViewReady;
+        private bool _callActive;
+        private bool _disposed;
+
+        private bool _micEnabled = true;
+        private bool _cameraEnabled = true;
+        private bool _speakerEnabled = true;
+
+        #endregion
+
+        #region Timer
 
         private DispatcherTimer? _callTimer;
-        private TimeSpan _callDuration = TimeSpan.Zero;
+        private TimeSpan _duration = TimeSpan.Zero;
 
-        private bool _isCallActive = false;
-        private bool _isMicOn = true;
-        private bool _isCameraOn = true;
-        private bool _isSpeakerOn = true;
-        private bool _isDisposed = false;
-        private volatile bool _isLocalRendering = false;
-        private volatile bool _isRemoteRendering = false;
+        #endregion
 
         public VideoCallControl()
         {
-            try
-            {
-                this.InitializeComponent();
-                LocalVideo.Source = _localSource;
-                RemoteVideo.Source = _remoteSource;
-                this.Unloaded += OnUnloaded;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[VideoCallControl] Constructor Error: {ex.Message}");
-            }
+            InitializeComponent();
+
+            Loaded += VideoCallControl_Loaded;
+            Unloaded += VideoCallControl_Unloaded;
         }
 
-        private void OnUnloaded(object sender, RoutedEventArgs e) => Cleanup();
+        private void VideoCallControl_Loaded(object sender, RoutedEventArgs e)
+        {
+        }
 
-        public async Task InitializeAsync(string appointmentId, string targetId, string roomCode)
+        private void VideoCallControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Cleanup();
+        }
+
+        public async Task InitializeAsync(
+            string appointmentId,
+            string targetUserId,
+            string roomCode)
         {
             try
             {
                 _appointmentId = appointmentId;
-                _targetId = targetId;
-                _roomCode = roomCode?.Trim().ToLower() ?? string.Empty;
-                _currentUserId = SessionStorage.CurrentUser?.Id ?? string.Empty;
-                _isDisposed = false;
-                _processedSignalIds.Clear();
+                _targetUserId = targetUserId;
 
-                ResetUiToWaitingState();
+                _roomCode = string.IsNullOrWhiteSpace(roomCode)
+                    ? appointmentId
+                    : roomCode;
 
-                // Yêu cầu quyền truy cập Camera và Micro trước khi bắt đầu kết nối
-                await RequestCameraAndMicrophonePermissionsAsync();
+                _roomCode = _roomCode.Trim().ToLower();
 
-                // Dọn dẹp cũ nến có
-                if (_rtc != null) { _rtc.Dispose(); }
+                _currentUserId =
+                    SessionStorage.CurrentUser?.Id ?? "";
 
-                _rtc = new WebRtcPeerConnection();
-                _rtc.OnLocalFrameReady += OnLocalFrameReceived;
-                _rtc.OnRemoteFrameReady += OnRemoteFrameReceived;
-                _rtc.OnSignalingGenerated += OnLocalSignalingGenerated;
+                _displayName =
+                    SessionStorage.CurrentUser?.FullName ??
+                    "Người dùng";
 
-                await _rtc.InitializeAsync();
-                await SubscribeToSignalsAsync();
-                Debug.WriteLine("[VideoCallControl] Initialized successfully.");
+                ResetUi();
+
+                await CheckPermissionsAsync();
+
+                await VideoWebView.EnsureCoreWebView2Async();
+
+                _webViewReady = true;
+
+                VideoWebView.CoreWebView2.Settings.IsWebMessageEnabled = true;
+
+                VideoWebView.CoreWebView2.PermissionRequested +=
+                    CoreWebView2_PermissionRequested;
+
+                VideoWebView.CoreWebView2.WebMessageReceived +=
+                    CoreWebView2_WebMessageReceived;
+
+                Debug.WriteLine("VideoCall initialized.");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[VideoCallControl] InitializeAsync Error: {ex.Message}");
-                await ShowDetailedErrorAsync("Lỗi khởi tạo cuộc gọi", ex.Message);
+                Debug.WriteLine(ex);
+
+                await ShowError(
+                    "Khởi tạo Video Call thất bại",
+                    ex.Message);
             }
         }
 
-        private async Task SubscribeToSignalsAsync()
+        private void CoreWebView2_PermissionRequested(
+            CoreWebView2 sender,
+            CoreWebView2PermissionRequestedEventArgs args)
         {
-            try 
+            if (args.PermissionKind ==
+                    CoreWebView2PermissionKind.Camera ||
+                args.PermissionKind ==
+                    CoreWebView2PermissionKind.Microphone)
             {
-                var client = SupabaseManager.Instance.Client;
-                try
-                {
-                    await client.Realtime.ConnectAsync();
-                }
-                catch (Exception connEx)
-                {
-                    Debug.WriteLine($"[VideoCallControl] Realtime Connect failed: {connEx.Message}");
-                }
+                args.State =
+                    CoreWebView2PermissionState.Allow;
+            }
+        }
+                public async Task StartCallAsync()
+        {
+            if (!_webViewReady)
+            {
+                await ShowError(
+                    "Video Call",
+                    "WebView2 chưa được khởi tạo.");
 
-                _signalChannel = client.Realtime.Channel("webrtc_" + _roomCode, "public", "webrtc_signals");
+                return;
+            }
 
-                _signalChannel.AddPostgresChangeHandler(
-                    PostgresChangesOptions.ListenType.Inserts,
-                    (sender, change) =>
+            try
+            {
+                SetConnecting(true);
+
+                string roomName = $"hc-{_roomCode}";
+
+                string roomUrl =
+                    $"https://{DailySubdomain}.daily.co/{roomName}";
+
+                string userName =
+                    Uri.EscapeDataString(_displayName);
+
+                string html = $@"
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset='UTF-8'/>
+
+<meta
+name='viewport'
+content='width=device-width,initial-scale=1'/>
+
+<style>
+
+html,
+body
+{{
+margin:0;
+padding:0;
+width:100%;
+height:100%;
+overflow:hidden;
+background:#111827;
+}}
+
+#call
+{{
+width:100%;
+height:100%;
+}}
+
+</style>
+
+</head>
+
+<body>
+
+<div id='call'></div>
+
+<script src='https://unpkg.com/@daily-co/daily-js'></script>
+
+<script>
+
+let frame = null;
+
+async function start()
+{{
+    frame = Daily.createFrame(
+        document.getElementById('call'),
+        {{
+            iframeStyle:
+            {{
+                width:'100%',
+                height:'100%',
+                border:'0'
+            }},
+
+            showLeaveButton:false,
+            showFullscreenButton:false,
+            showParticipantsBar:false,
+            showLocalVideo:true
+        }});
+
+    frame
+        .on('joined-meeting',()=>
+        {{
+            chrome.webview.postMessage('joined');
+        }});
+
+    frame
+        .on('left-meeting',()=>
+        {{
+            chrome.webview.postMessage('left');
+        }});
+
+    frame
+        .on('participant-joined',(e)=>
+        {{
+            chrome.webview.postMessage('participant');
+        }});
+
+    frame
+        .on('participant-left',(e)=>
+        {{
+            chrome.webview.postMessage('participant-left');
+        }});
+
+    frame
+        .on('error',(e)=>
+        {{
+            chrome.webview.postMessage(
+                'error:' + JSON.stringify(e));
+        }});
+
+    await frame.join(
+    {{
+        url:'{roomUrl}',
+        userName:decodeURIComponent('{userName}'),
+        startAudioOff:false,
+        startVideoOff:false
+    }});
+}}
+
+window.toggleMic = function(enable)
+{{
+    if(frame)
+        frame.setLocalAudio(enable);
+}}
+
+window.toggleCamera = function(enable)
+{{
+    if(frame)
+        frame.setLocalVideo(enable);
+}}
+
+window.leaveMeeting = function()
+{{
+    if(frame)
+        frame.leave();
+}}
+
+window.startShare = async function()
+{{
+    if(frame)
+        await frame.startScreenShare();
+}}
+
+window.stopShare = async function()
+{{
+    if(frame)
+        await frame.stopScreenShare();
+}}
+
+start();
+
+</script>
+
+</body>
+
+</html>";
+
+                VideoWebView.NavigateToString(html);
+
+                WaitingPlaceholder.Visibility =
+                    Visibility.Collapsed;
+
+                VideoWebView.Visibility =
+                    Visibility.Visible;
+            }
+            catch (Exception ex)
+            {
+                SetConnecting(false);
+
+                Debug.WriteLine(ex);
+
+                await ShowError(
+                    "Không thể bắt đầu cuộc gọi",
+                    ex.Message);
+            }
+        }
+                private void CoreWebView2_WebMessageReceived(
+            CoreWebView2 sender,
+            CoreWebView2WebMessageReceivedEventArgs args)
+        {
+            try
+            {
+                string message = args.TryGetWebMessageAsString();
+
+                Debug.WriteLine($"Daily Message: {message}");
+
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    switch (message)
                     {
-                        if (_isDisposed) return;
-                        var model = change.Model<WebrtcSignal>();
-                        if (model != null)
-                        {
-                            DispatcherQueue.TryEnqueue(async () => {
-                                await HandleSignalAsync(model);
-                            });
-                        }
-                    });
+                        case "joined":
 
-                await _signalChannel.Subscribe();
-                await ReplayExistingSignalsAsync();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[VideoCallControl] Subscribe Error: {ex.Message}");
-            }
-        }
+                            SetConnecting(false);
+                            SetCallActive(true);
 
-        private async Task ReplayExistingSignalsAsync()
-        {
-            try
-            {
-                var response = await SupabaseManager.Instance.Client
-                    .From<WebrtcSignal>()
-                    .Where(s => s.RoomCode == _roomCode)
-                    .Order("created_at", Postgrest.Constants.Ordering.Ascending)
-                    .Get();
+                            break;
 
-                foreach (var signal in response.Models)
-                {
-                    await HandleSignalAsync(signal);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[VideoCallControl] Replay signals failed: {ex.Message}");
-            }
-        }
+                        case "left":
 
-        private async Task HandleSignalAsync(WebrtcSignal model)
-        {
-            if (_isDisposed || _rtc == null || !IsIncomingSignal(model) || !TryMarkSignalProcessed(model))
-                return;
+                            StopTimer();
 
-            await _rtc.HandleIncomingSignal(model.SignalType, model.Payload);
-            if (model.SignalType.Equals("offer", StringComparison.OrdinalIgnoreCase) && !_isCallActive)
-            {
-                SetCallActive(true);
-            }
-        }
+                            _callActive = false;
 
-        private bool IsIncomingSignal(WebrtcSignal model)
-        {
-            return string.Equals(model.RoomCode?.Trim(), _roomCode, StringComparison.OrdinalIgnoreCase)
-                && !string.Equals(model.SenderId, _currentUserId, StringComparison.Ordinal);
-        }
+                            VideoWebView.Visibility =
+                                Visibility.Collapsed;
 
-        private bool TryMarkSignalProcessed(WebrtcSignal model)
-        {
-            var key = !string.IsNullOrWhiteSpace(model.Id)
-                ? model.Id
-                : $"{model.SenderId}:{model.SignalType}:{model.CreatedAt:O}:{model.Payload?.GetHashCode()}";
+                            WaitingPlaceholder.Visibility =
+                                Visibility.Visible;
 
-            lock (_processedSignalIds)
-            {
-                return _processedSignalIds.Add(key);
-            }
-        }
+                            TxtWaitingStatus.Text =
+                                "Cuộc gọi đã kết thúc";
 
-        private async void OnLocalSignalingGenerated(string type, string data)
-        {
-            if (_isDisposed) return;
-            try
-            {
-                var signal = new WebrtcSignal { RoomCode = _roomCode, SenderId = _currentUserId, SignalType = type, Payload = data, CreatedAt = DateTime.UtcNow };
-                await SupabaseManager.Instance.Client.From<WebrtcSignal>().Insert(signal);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[VideoCallControl] Signal Send Error: {ex.Message}");
-            }
-        }
+                            CallEnded?.Invoke(
+                                this,
+                                EventArgs.Empty);
 
-        private void OnLocalFrameReceived(Argb32VideoFrame frame)
-        {
-            if (_isDisposed || _isLocalRendering) return;
-            var bitmap = ProcessFrameSync(frame);
-            if (bitmap != null)
-            {
-                _isLocalRendering = true;
-                DispatcherQueue.TryEnqueue(async () => {
-                    try { if (!_isDisposed) await _localSource.SetBitmapAsync(bitmap); } catch { }
-                    finally 
-                    { 
-                        bitmap.Dispose(); 
-                        _isLocalRendering = false;
+                            break;
+
+                        case "participant":
+
+                            TxtWaitingStatus.Text =
+                                "Đã có người tham gia";
+
+                            break;
+
+                        case "participant-left":
+
+                            TxtWaitingStatus.Text =
+                                "Đối phương đã rời cuộc gọi";
+
+                            break;
+
+                        default:
+
+                            if (message.StartsWith("error:"))
+                            {
+                                Debug.WriteLine(message);
+
+                                TxtWaitingStatus.Text =
+                                    "Có lỗi xảy ra";
+                            }
+
+                            break;
                     }
                 });
             }
-        }
-
-        private void OnRemoteFrameReceived(Argb32VideoFrame frame)
-        {
-            if (_isDisposed || _isRemoteRendering) return;
-            var bitmap = ProcessFrameSync(frame);
-            if (bitmap != null)
-            {
-                _isRemoteRendering = true;
-                DispatcherQueue.TryEnqueue(async () => {
-                    try 
-                    { 
-                        if (_isDisposed) return;
-                        if (!_isCallActive) SetCallActive(true);
-                        await _remoteSource.SetBitmapAsync(bitmap); 
-                    } 
-                    catch { }
-                    finally 
-                    { 
-                        bitmap.Dispose(); 
-                        _isRemoteRendering = false;
-                    }
-                });
-            }
-        }
-
-        private SoftwareBitmap? ProcessFrameSync(Argb32VideoFrame frame)
-        {
-            if (_isDisposed || frame.data == IntPtr.Zero || frame.width == 0 || frame.height == 0) return null;
-
-            try
-            {
-                // Sử dụng định dạng mặc định cho WinUI 3 (Bgra8 Premultiplied)
-                var softwareBitmap = new SoftwareBitmap(BitmapPixelFormat.Bgra8, (int)frame.width, (int)frame.height, BitmapAlphaMode.Premultiplied);
-                
-                using (var buffer = softwareBitmap.LockBuffer(BitmapBufferAccessMode.Write))
-                using (var reference = buffer.CreateReference())
-                {
-                    unsafe {
-                        byte* dataPtr; uint capacity;
-                        if (TryGetBuffer(reference, out dataPtr, out capacity))
-                        {
-                            long requiredSize = (long)frame.width * frame.height * 4;
-                            if (capacity >= requiredSize)
-                            {
-                                System.Buffer.MemoryCopy((void*)frame.data, (void*)dataPtr, capacity, requiredSize);
-                            }
-                            else
-                            {
-                                Debug.WriteLine($"[VideoCallControl] Buffer capacity too small: {capacity} < {requiredSize}");
-                                softwareBitmap.Dispose();
-                                return null;
-                            }
-                        }
-                        else
-                        {
-                            throw new Exception("COM interface IMemoryBufferByteAccess not supported on this reference.");
-                        }
-                    }
-                }
-                return softwareBitmap;
-            }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[VideoCallControl] ProcessFrameSync Exception: {ex.Message}");
-                return null;
+                Debug.WriteLine(ex);
             }
-        }
-
-        public void Cleanup()
-        {
-            if (_isDisposed) return;
-            _isDisposed = true;
-
-            try
-            {
-                StopTimer();
-                _signalChannel?.Unsubscribe();
-                _signalChannel = null;
-                _processedSignalIds.Clear();
-                
-                _rtc?.Dispose();
-                _rtc = null;
-
-                Debug.WriteLine("[VideoCallControl] Cleanup completed.");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[VideoCallControl] Cleanup Error: {ex.Message}");
-            }
-        }
-
-        public async Task StartCallAsync()
-        {
-            if (_rtc == null)
-            {
-                Debug.WriteLine("[VideoCallControl] Cannot start call because RTC is null.");
-                return;
-            }
-
-            try
-            {
-                SetConnectingState(true);
-
-                Debug.WriteLine("[VideoCallControl] Starting call...");
-                _rtc.StartCall();
-
-                TxtWaitingStatus.Text = "Đang gọi bệnh nhân...";
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[VideoCallControl] StartCallAsync Error: {ex.Message}");
-                await ShowDetailedErrorAsync("Lỗi bắt đầu cuộc gọi", ex.Message);
-            }
-        }
-
-        private void ResetUiToWaitingState()
-        {
-            _isCallActive = false; _isMicOn = true; _isCameraOn = true; _isSpeakerOn = true;
-            WaitingPlaceholder.Visibility = Visibility.Visible;
-            LiveBadge.Visibility = Visibility.Collapsed;
-            QualityBadge.Visibility = Visibility.Collapsed;
-            TxtWaitingStatus.Text = "Đang chờ kết nối...";
-            TxtDuration.Text = "LIVE 00:00";
-            TxtQuality.Text = "HD Quality";
-            IconMic.Glyph = "\uE720"; IconCamera.Glyph = "\uE714"; IconSpeaker.Glyph = "\uE767";
-            BtnMic.Background = new SolidColorBrush(HexToColor("#00000066"));
-            BtnCamera.Background = new SolidColorBrush(HexToColor("#00000066"));
-            BtnSpeaker.Background = new SolidColorBrush(HexToColor("#00000066"));
-            PipContainer.Opacity = 1.0; ConnectingRing.IsActive = false;
-        }
-
-        private void SetConnectingState(bool connecting)
-        {
-            ConnectingRing.IsActive = connecting;
-            TxtWaitingStatus.Text = connecting ? "Đang kết nối..." : "Đang chờ kết nối...";
         }
 
         private void SetCallActive(bool active)
         {
-            _isCallActive = active;
-            WaitingPlaceholder.Visibility = active ? Visibility.Collapsed : Visibility.Visible;
-            LiveBadge.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
-            QualityBadge.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
-            if (active) { StartTimer(); CallStarted?.Invoke(this, EventArgs.Empty); }
-            else { CallEnded?.Invoke(this, EventArgs.Empty); }
+            _callActive = active;
+
+            WaitingPlaceholder.Visibility =
+                active
+                    ? Visibility.Collapsed
+                    : Visibility.Visible;
+
+            VideoWebView.Visibility =
+                active
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+
+            LiveBadge.Visibility =
+                active
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+
+            QualityBadge.Visibility =
+                active
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+
+            if (active)
+            {
+                StartTimer();
+
+                TxtWaitingStatus.Text =
+                    "Đang trong cuộc gọi";
+
+                CallStarted?.Invoke(
+                    this,
+                    EventArgs.Empty);
+            }
+            else
+            {
+                StopTimer();
+
+                CallEnded?.Invoke(
+                    this,
+                    EventArgs.Empty);
+            }
+        }
+
+        private void SetConnecting(bool connecting)
+        {
+            ConnectingRing.IsActive = connecting;
+
+            WaitingPlaceholder.Visibility =
+                Visibility.Visible;
+
+            TxtWaitingStatus.Text =
+                connecting
+                    ? "Đang kết nối..."
+                    : "Đang chờ...";
+        }
+
+        private void ResetUi()
+        {
+            _callActive = false;
+
+            _micEnabled = true;
+            _cameraEnabled = true;
+            _speakerEnabled = true;
+
+            WaitingPlaceholder.Visibility =
+                Visibility.Visible;
+
+            VideoWebView.Visibility =
+                Visibility.Collapsed;
+
+            LiveBadge.Visibility =
+                Visibility.Collapsed;
+
+            QualityBadge.Visibility =
+                Visibility.Collapsed;
+
+            TxtWaitingStatus.Text =
+                "Đang chờ kết nối...";
+
+            TxtDuration.Text =
+                "LIVE 00:00";
+
+            TxtQuality.Text =
+                "HD";
+
+            ConnectingRing.IsActive = false;
+
+            IconMic.Glyph = "\uE720";
+            IconCamera.Glyph = "\uE714";
+            IconSpeaker.Glyph = "\uE767";
+
+            BtnMic.Background =
+                new SolidColorBrush(HexToColor("#00000066"));
+
+            BtnCamera.Background =
+                new SolidColorBrush(HexToColor("#00000066"));
+
+            BtnSpeaker.Background =
+                new SolidColorBrush(HexToColor("#00000066"));
         }
 
         private void StartTimer()
         {
-            StopTimer(); _callDuration = TimeSpan.Zero;
-            _callTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-            _callTimer.Tick += (_, _) => {
-                _callDuration = _callDuration.Add(TimeSpan.FromSeconds(1));
-                TxtDuration.Text = $"LIVE {_callDuration:mm\\:ss}";
+            StopTimer();
+
+            _duration = TimeSpan.Zero;
+
+            _callTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1)
             };
+
+            _callTimer.Tick += CallTimer_Tick;
+
             _callTimer.Start();
         }
 
-        private void StopTimer() { _callTimer?.Stop(); _callTimer = null; }
-
-        private void BtnMic_Click(object sender, RoutedEventArgs e)
+        private void StopTimer()
         {
-            _isMicOn = !_isMicOn;
-            IconMic.Glyph = _isMicOn ? "\uE720" : "\uE71A";
-            BtnMic.Background = new SolidColorBrush(_isMicOn ? HexToColor("#00000066") : HexToColor("#DC2626"));
-            _rtc?.ToggleMic(!_isMicOn);
+            if (_callTimer != null)
+            {
+                _callTimer.Tick -= CallTimer_Tick;
+                _callTimer.Stop();
+                _callTimer = null;
+            }
+
+            _duration = TimeSpan.Zero;
         }
 
-        private void BtnCamera_Click(object sender, RoutedEventArgs e)
+        private void CallTimer_Tick(object? sender, object e)
         {
-            _isCameraOn = !_isCameraOn;
-            IconCamera.Glyph = _isCameraOn ? "\uE714" : "\uE8BA";
-            BtnCamera.Background = new SolidColorBrush(_isCameraOn ? HexToColor("#00000066") : HexToColor("#DC2626"));
-            PipContainer.Opacity = _isCameraOn ? 1.0 : 0.3;
-            _rtc?.ToggleCamera(!_isCameraOn);
+            _duration += TimeSpan.FromSeconds(1);
+
+            TxtDuration.Text =
+                $"LIVE {_duration:mm\\:ss}";
+        }
+                #region Button Events
+
+        private async void BtnMic_Click(object sender, RoutedEventArgs e)
+        {
+            _micEnabled = !_micEnabled;
+
+            IconMic.Glyph =
+                _micEnabled
+                    ? "\uE720"
+                    : "\uE74F";
+
+            BtnMic.Background =
+                new SolidColorBrush(
+                    _micEnabled
+                        ? HexToColor("#00000066")
+                        : HexToColor("#DC2626"));
+
+            if (!_webViewReady || !_callActive)
+                return;
+
+            try
+            {
+                await VideoWebView.CoreWebView2.ExecuteScriptAsync(
+                    $"window.toggleMic({(_micEnabled ? "true" : "false")});");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
         }
 
-        private void BtnSpeaker_Click(object sender, RoutedEventArgs e)
+        private async void BtnCamera_Click(object sender, RoutedEventArgs e)
         {
-            _isSpeakerOn = !_isSpeakerOn;
-            IconSpeaker.Glyph = _isSpeakerOn ? "\uE767" : "\uE74F";
-            BtnSpeaker.Background = new SolidColorBrush(_isSpeakerOn ? HexToColor("#00000066") : HexToColor("#DC2626"));
+            _cameraEnabled = !_cameraEnabled;
+
+            IconCamera.Glyph =
+                _cameraEnabled
+                    ? "\uE714"
+                    : "\uE8B9";
+
+            BtnCamera.Background =
+                new SolidColorBrush(
+                    _cameraEnabled
+                        ? HexToColor("#00000066")
+                        : HexToColor("#DC2626"));
+
+            if (!_webViewReady || !_callActive)
+                return;
+
+            try
+            {
+                await VideoWebView.CoreWebView2.ExecuteScriptAsync(
+                    $"window.toggleCamera({(_cameraEnabled ? "true" : "false")});");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+        }
+
+        private async void BtnSpeaker_Click(object sender, RoutedEventArgs e)
+        {
+            _speakerEnabled = !_speakerEnabled;
+
+            IconSpeaker.Glyph =
+                _speakerEnabled
+                    ? "\uE767"
+                    : "\uE74F";
+
+            BtnSpeaker.Background =
+                new SolidColorBrush(
+                    _speakerEnabled
+                        ? HexToColor("#00000066")
+                        : HexToColor("#DC2626"));
+
+            if (!_webViewReady)
+                return;
+
+            try
+            {
+                string script =
+                    _speakerEnabled
+                    ? @"
+document.querySelectorAll('audio,video')
+.forEach(x=>x.muted=false);"
+                    : @"
+document.querySelectorAll('audio,video')
+.forEach(x=>x.muted=true);";
+
+                await VideoWebView.CoreWebView2.ExecuteScriptAsync(script);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
         }
 
         private async void BtnEndCall_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                var dialog = new ContentDialog { Title = "Kết thúc cuộc gọi", Content = "Bạn có chắc muốn kết thúc cuộc gọi video?", PrimaryButtonText = "Kết thúc", CloseButtonText = "Huỷ", DefaultButton = ContentDialogButton.Close, XamlRoot = this.XamlRoot };
-                if (await dialog.ShowAsync() == ContentDialogResult.Primary) { Cleanup(); SetCallActive(false); ResetUiToWaitingState(); }
+                ContentDialog dialog = new()
+                {
+                    Title = "Kết thúc cuộc gọi",
+
+                    Content =
+                        "Bạn có chắc chắn muốn kết thúc cuộc gọi?",
+
+                    PrimaryButtonText = "Kết thúc",
+
+                    CloseButtonText = "Huỷ",
+
+                    DefaultButton = ContentDialogButton.Close,
+
+                    XamlRoot = this.XamlRoot
+                };
+
+                if (await dialog.ShowAsync() !=
+                    ContentDialogResult.Primary)
+                    return;
+
+                if (_webViewReady)
+                {
+                    try
+                    {
+                        await VideoWebView.CoreWebView2.ExecuteScriptAsync(
+                            "window.leaveMeeting();");
+                    }
+                    catch
+                    {
+                    }
+                }
+
+                Cleanup();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
         }
 
         private void BtnMore_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var flyout = new MenuFlyout();
-                flyout.Items.Add(new MenuFlyoutItem { Text = "Chia sẻ màn hình" });
-                flyout.Items.Add(new MenuFlyoutItem { Text = "Cài đặt chất lượng" });
-                flyout.ShowAt(BtnMore);
-            }
-            catch { }
-        }
+            MenuFlyout flyout = new();
 
-        private async Task RequestCameraAndMicrophonePermissionsAsync()
-        {
-            try
+            MenuFlyoutItem shareScreen = new()
             {
-                var settings = new MediaCaptureInitializationSettings
+                Text = "Chia sẻ màn hình"
+            };
+
+            MenuFlyoutItem stopShare = new()
+            {
+                Text = "Dừng chia sẻ"
+            };
+
+            MenuFlyoutItem reload = new()
+            {
+                Text = "Tải lại Video"
+            };
+
+            shareScreen.Click += async (_, __) =>
+            {
+                if (!_webViewReady)
+                    return;
+
+                try
                 {
-                    StreamingCaptureMode = StreamingCaptureMode.AudioAndVideo
-                };
-                using (var mediaCapture = new MediaCapture())
-                {
-                    await mediaCapture.InitializeAsync(settings);
+                    await VideoWebView.CoreWebView2.ExecuteScriptAsync(
+                        "window.startShare();");
                 }
-            }
-            catch (UnauthorizedAccessException ex)
+                catch
+                {
+                }
+            };
+
+            stopShare.Click += async (_, __) =>
             {
-                throw new Exception("Ứng dụng chưa được cấp quyền truy cập Camera hoặc Micro. Vui lòng bật quyền truy cập trong Settings > Privacy của Windows.", ex);
-            }
-            catch (Exception ex)
+                if (!_webViewReady)
+                    return;
+
+                try
+                {
+                    await VideoWebView.CoreWebView2.ExecuteScriptAsync(
+                        "window.stopShare();");
+                }
+                catch
+                {
+                }
+            };
+
+            reload.Click += async (_, __) =>
             {
-                // Bỏ qua lỗi nếu không có phần cứng thực tế (chỉ kiểm tra quyền truy cập)
-                Debug.WriteLine($"[Permission Request] Thiết bị không sẵn sàng: {ex.Message}");
-            }
+                if (_callActive)
+                {
+                    Cleanup();
+
+                    await StartCallAsync();
+                }
+            };
+
+            flyout.Items.Add(shareScreen);
+            flyout.Items.Add(stopShare);
+            flyout.Items.Add(new MenuFlyoutSeparator());
+            flyout.Items.Add(reload);
+
+            flyout.ShowAt(BtnMore);
         }
 
-        private async Task ShowDetailedErrorAsync(string title, string message)
+        #endregion
+                #region Cleanup
+
+        public void Cleanup()
         {
+            if (_disposed)
+                return;
+
+            _disposed = true;
+
             try
             {
-                var d = new ContentDialog { Title = title, Content = $"Chi tiết: {message}\n\nVui lòng kiểm tra quyền truy cập Camera/Micro và kết nối mạng.", CloseButtonText = "Đóng", XamlRoot = this.XamlRoot };
-                await d.ShowAsync();
-            }
-            catch { }
-        }
+                StopTimer();
 
-        private static Color HexToColor(string hex)
-        {
-            hex = hex.TrimStart('#');
-            if (hex.Length == 8) hex = hex.Substring(2); 
-            return Color.FromArgb(255, Convert.ToByte(hex.Substring(0, 2), 16), Convert.ToByte(hex.Substring(2, 2), 16), Convert.ToByte(hex.Substring(4, 2), 16));
-        }
-
-        private static unsafe bool TryGetBuffer(IMemoryBufferReference reference, out byte* buffer, out uint capacity)
-        {
-            buffer = null;
-            capacity = 0;
-            try
-            {
-                IntPtr pUnk = ((WinRT.IWinRTObject)reference).NativeObject.ThisPtr;
-                if (pUnk == IntPtr.Zero) return false;
-
-                Guid iid = new Guid("5B0D3235-4DBA-4D44-865E-8F1D0E4FD04D");
-                int hr = Marshal.QueryInterface(pUnk, ref iid, out IntPtr pByteAccess);
-                if (hr == 0 && pByteAccess != IntPtr.Zero)
+                if (_webViewReady)
                 {
                     try
                     {
-                        IntPtr* vtable = *(IntPtr**)pByteAccess;
-                        IntPtr getBufferPtr = vtable[3];
-                        delegate* unmanaged[Stdcall]<IntPtr, byte**, uint*, int> getBuffer = 
-                            (delegate* unmanaged[Stdcall]<IntPtr, byte**, uint*, int>)getBufferPtr;
-                        
-                        byte* pBuffer = null;
-                        uint size = 0;
-                        int result = getBuffer(pByteAccess, &pBuffer, &size);
-                        if (result == 0)
-                        {
-                            buffer = pBuffer;
-                            capacity = size;
-                            return true;
-                        }
+                        VideoWebView.CoreWebView2.WebMessageReceived -=
+                            CoreWebView2_WebMessageReceived;
+
+                        VideoWebView.CoreWebView2.PermissionRequested -=
+                            CoreWebView2_PermissionRequested;
+
+                        VideoWebView.CoreWebView2.ExecuteScriptAsync(
+                            "if(window.leaveMeeting) window.leaveMeeting();");
                     }
-                    finally
+                    catch
                     {
-                        Marshal.Release(pByteAccess);
+                    }
+
+                    try
+                    {
+                        VideoWebView.NavigateToString(
+@"<!DOCTYPE html>
+<html>
+<body style='background:#111827;'></body>
+</html>");
+                    }
+                    catch
+                    {
                     }
                 }
+
+                _callActive = false;
+                _webViewReady = false;
+
+                ResetUi();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[TryGetBuffer] Error: {ex.Message}");
+                Debug.WriteLine(ex);
             }
-            return false;
         }
+
+        public void Dispose()
+        {
+            Cleanup();
+
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
+
+        #region Permission
+
+        private async Task CheckPermissionsAsync()
+        {
+            try
+            {
+                MediaCaptureInitializationSettings settings = new()
+                {
+                    StreamingCaptureMode =
+                        StreamingCaptureMode.AudioAndVideo
+                };
+
+                using MediaCapture capture = new();
+
+                await capture.InitializeAsync(settings);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw new Exception(
+                    "Ứng dụng chưa được cấp quyền Camera hoặc Microphone.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+        }
+
+        #endregion
+
+        #region Dialog
+
+        private async Task ShowError(
+            string title,
+            string message)
+        {
+            try
+            {
+                ContentDialog dialog = new()
+                {
+                    Title = title,
+
+                    Content = message,
+
+                    CloseButtonText = "Đóng",
+
+                    XamlRoot = this.XamlRoot
+                };
+
+                await dialog.ShowAsync();
+            }
+            catch
+            {
+            }
+        }
+
+        #endregion
+
+        #region Helper
+
+        private static Color HexToColor(string hex)
+        {
+            hex = hex.Replace("#", "");
+
+            if (hex.Length == 8)
+                hex = hex.Substring(2);
+
+            return Color.FromArgb(
+                255,
+                Convert.ToByte(hex.Substring(0, 2), 16),
+                Convert.ToByte(hex.Substring(2, 2), 16),
+                Convert.ToByte(hex.Substring(4, 2), 16));
+        }
+
+        #endregion
     }
 }

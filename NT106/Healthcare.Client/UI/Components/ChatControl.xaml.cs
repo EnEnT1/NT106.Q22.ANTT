@@ -174,13 +174,10 @@ namespace Healthcare.Client.UI.Components
             try
             {
                 var client = SupabaseManager.Instance.Client;
-                try
-                {
-                    await client.Realtime.ConnectAsync();
-                }
-                catch { }
+                try { await client.Realtime.ConnectAsync(); } catch { }
 
-                _chatChannel = client.Realtime.Channel("chat_" + _appointmentId, "public", "chat_messages");
+                // Dùng wildcard channel để lắng nghe toàn bộ bảng chat_messages
+                _chatChannel = client.Realtime.Channel("realtime:public:chat_messages");
 
                 _chatChannel.AddPostgresChangeHandler(
                     PostgresChangesOptions.ListenType.Inserts,
@@ -188,22 +185,23 @@ namespace Healthcare.Client.UI.Components
                     {
                         var msg = change.Model<ChatMessageItem>();
 
-                        if (msg != null &&
-                            msg.SenderId == _otherUserId &&
-                            msg.ReceiverId == _currentUserId)
+                        // Lọc đúng tin nhắn: từ otherUser → currentUser
+                        if (msg == null) return;
+                        bool isForMe = msg.ReceiverId == _currentUserId 
+                                       && msg.SenderId == _otherUserId;
+                        if (!isForMe) return;
+
+                        DispatcherQueue.TryEnqueue(() =>
                         {
-                            DispatcherQueue.TryEnqueue(() =>
-                            {
-                                AppendDoctorBubble(msg, false);
-                            });
-                        }
+                            AppendDoctorBubble(msg, false);
+                        });
                     });
 
                 await _chatChannel.Subscribe();
             }
-            catch
+            catch (Exception ex)
             {
-               
+              System.Diagnostics.Debug.WriteLine($"[ChatControl] Subscribe error: {ex.Message}");
             }
         }
 
@@ -290,7 +288,7 @@ namespace Healthcare.Client.UI.Components
                 ReceiverId = _otherUserId,
                 MessageText = text,
                 IsRead = false,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc)
             };
 
             AppendDoctorBubble(msg, true);
@@ -617,15 +615,7 @@ namespace Healthcare.Client.UI.Components
 
         private static DateTime ParseDateTimeToLocal(DateTime dt)
         {
-            // Nếu đã là Local thì không convert nữa
-    if (dt.Kind == DateTimeKind.Local)
-        return dt;
-
-    // Nếu là UTC (hoặc Unspecified nhưng giá trị thực là UTC) → convert
-    if (dt.Kind == DateTimeKind.Unspecified)
-        dt = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
-
-    return dt.ToLocalTime();
+            return dt;
         }
     }
 
