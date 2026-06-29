@@ -153,7 +153,6 @@ namespace Healthcare.Client.UI.Components
                 VideoWebView.CoreWebView2.WebMessageReceived +=
                     CoreWebView2_WebMessageReceived;
 
-                // Khi Daily.co page load xong → hiện UI call và kích hoạt timer
                 VideoWebView.CoreWebView2.NavigationCompleted +=
                     CoreWebView2_NavigationCompleted;
 
@@ -207,7 +206,7 @@ namespace Healthcare.Client.UI.Components
                 await EnsureRoomExistsAsync(roomName);
 
                 string roomUrl = $"https://{DailySubdomain}.daily.co/{roomName}";
-                string userName = Uri.EscapeDataString(_displayName);
+                string userName = Uri.UnescapeDataString(_displayName);
 
                 _activeRoomUrl = roomUrl;
                 _activeUserName = userName;
@@ -237,7 +236,20 @@ namespace Healthcare.Client.UI.Components
     <script>
         let callFrame = null;
         
-        function startCall(roomUrl, userName) {{
+        async function startCall(roomUrl, userName) {{
+            console.log('startCall called with:', roomUrl, userName);
+            // Defensive loop to wait for Daily SDK to load in case CDN is slow
+            for (let i = 0; i < 50; i++) {{
+                if (window.Daily) break;
+                await new Promise(r => setTimeout(r, 100));
+            }}
+
+            if (!window.Daily) {{
+                console.error('Daily SDK not loaded after timeout');
+                chrome.webview.postMessage(JSON.stringify({{ type: 'error', error: 'Daily JS SDK could not be loaded.' }}));
+                return;
+            }}
+
             callFrame = Daily.createFrame(document.getElementById('call'), {{
                 iframeStyle: {{
                     width: '100%',
@@ -246,7 +258,7 @@ namespace Healthcare.Client.UI.Components
                 }},
                 showLeaveButton: false,
                 showFullscreenButton: false,
-                showChat: false, // Hide Daily prebuilt chat UI to use our custom ChatControl
+                showChat: false,
             }});
             
             callFrame.on('joined-meeting', () => {{
@@ -308,8 +320,8 @@ namespace Healthcare.Client.UI.Components
 
                 await System.IO.File.WriteAllTextAsync(tempHtmlPath, html, Encoding.UTF8);
 
-                // Navigate WebView2
-                VideoWebView.CoreWebView2.Navigate("http://videocall.local/index.html");
+                // Navigate WebView2 using HTTPS to mark the origin as SECURE (crucial for Camera/Mic APIs!)
+                VideoWebView.CoreWebView2.Navigate("https://videocall.local/index.html");
 
                 WaitingPlaceholder.Visibility = Visibility.Collapsed;
                 VideoWebView.Visibility = Visibility.Visible;
@@ -402,8 +414,10 @@ namespace Healthcare.Client.UI.Components
                 if (args.IsSuccess)
                 {
                     SetConnecting(false);
-                    // Bắt đầu cuộc gọi bằng cách gọi hàm JS
-                    await VideoWebView.CoreWebView2.ExecuteScriptAsync($"startCall('{_activeRoomUrl}', '{Uri.UnescapeDataString(_activeUserName)}');");
+                    // Bắt đầu cuộc gọi bằng cách gọi hàm JS (truyền JSON an toàn tuyệt đối tránh lỗi dấu nháy và ký tự tiếng Việt)
+                    string roomUrlJson = JsonSerializer.Serialize(_activeRoomUrl);
+                    string userNameJson = JsonSerializer.Serialize(_activeUserName);
+                    await VideoWebView.CoreWebView2.ExecuteScriptAsync($"startCall({roomUrlJson}, {userNameJson});");
                     Debug.WriteLine("[VideoCall] WebView2 wrapper loaded successfully.");
                 }
                 else
