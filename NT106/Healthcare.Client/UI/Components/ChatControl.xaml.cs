@@ -1,4 +1,4 @@
-﻿using Healthcare.Client.SupabaseIntegration;
+using Healthcare.Client.SupabaseIntegration;
 using Healthcare.Client.Models.Core;
 using Healthcare.Client.Models.Identity;
 using Microsoft.UI;
@@ -14,12 +14,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Windows.Media.Core;
-using Windows.Media.Playback;
-using Windows.Media.SpeechSynthesis;
 using Windows.UI;
-using Supabase.Realtime;
-using Supabase.Realtime.PostgresChanges;
 using System.Linq;
 
 namespace Healthcare.Client.UI.Components
@@ -34,15 +29,10 @@ namespace Healthcare.Client.UI.Components
         private string _otherUserId = string.Empty;
         private string _otherUserName = string.Empty;
         private bool _isDoctorUser = false;
-        private bool _isSendingDoctor = false;
-        private bool _isSendingAi = false;
+        private bool _isSending = false;
 
-        private RealtimeChannel? _chatChannel;
-        private readonly HashSet<string> _renderedDoctorMessageIds = new();
-
-        private MediaPlayer? _ttsPlayer;
-
-        private readonly List<string> _quickNotes = new();
+        private VideoCallControl? _videoCall;
+        private readonly HashSet<string> _renderedMessageIds = new();
 
         private readonly HttpClient _httpClient = new HttpClient
         {
@@ -60,17 +50,24 @@ namespace Healthcare.Client.UI.Components
             Cleanup();
         }
 
-        public async Task InitializeAsync(string appointmentId, string currentUserId, string patientId)
+        public async Task InitializeAsync(string appointmentId, string currentUserId, string patientId, VideoCallControl videoCall)
         {
             _appointmentId = appointmentId;
             _currentUserId = currentUserId;
             _patientId = patientId;
+            _videoCall = videoCall;
+
             _otherUserId = string.Empty;
             _otherUserName = string.Empty;
-            _renderedDoctorMessageIds.Clear();
+            _renderedMessageIds.Clear();
 
             _isDoctorUser = _currentUserId != _patientId;
-            TextTabDoctor.Text = _isDoctorUser ? "Bệnh nhân" : "Bác sĩ";
+
+            // Subscribe to Daily.co chat messages
+            if (_videoCall != null)
+            {
+                _videoCall.ChatMessageReceived += VideoCall_ChatMessageReceived;
+            }
 
             if (_isDoctorUser)
             {
@@ -114,29 +111,35 @@ namespace Healthcare.Client.UI.Components
                 }
             }
 
-            await SubscribeRealtimeAsync();
             await LoadChatHistoryAsync();
-            InitializeAiChat();
         }
 
         public void Cleanup()
         {
-            _chatChannel?.Unsubscribe();
-            _chatChannel = null;
+            if (_videoCall != null)
+            {
+                _videoCall.ChatMessageReceived -= VideoCall_ChatMessageReceived;
+                _videoCall = null;
+            }
         }
 
-        private void InitializeAiChat()
+        private void VideoCall_ChatMessageReceived(object? sender, ChatMessageEventArgs e)
         {
-            AiMessageList.Children.Clear();
-            var welcome = new ChatMessageItem
+            // Tránh render lại tin nhắn chính mình gửi (vì e.IsLocal = true khi ta gửi trong Daily)
+            if (e.IsLocal) return;
+
+            DispatcherQueue.TryEnqueue(() =>
             {
-                Id = Guid.NewGuid().ToString(),
-                SenderId = "AI",
-                ReceiverId = _currentUserId,
-                MessageText = "Xin chào! Tôi là Trợ lý Y tế AI. Tôi có thể hỗ trợ giải đáp các câu hỏi cơ bản về sức khỏe và triệu chứng của bạn.",
-                CreatedAt = DateTime.UtcNow
-            };
-            AiMessageList.Children.Add(BuildBubble(welcome, false, "Trợ lý AI"));
+                var msg = new ChatMessageItem
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    SenderId = _otherUserId,
+                    ReceiverId = _currentUserId,
+                    MessageText = e.Text,
+                    CreatedAt = DateTime.UtcNow
+                };
+                AppendBubble(msg, false);
+            });
         }
 
         private async Task LoadChatHistoryAsync()
@@ -152,16 +155,16 @@ namespace Healthcare.Client.UI.Components
                     .Order("created_at", Postgrest.Constants.Ordering.Ascending)
                     .Get();
 
-                DoctorMessageList.Children.Clear();
-                _renderedDoctorMessageIds.Clear();
+                MessageList.Children.Clear();
+                _renderedMessageIds.Clear();
 
                 foreach (var msg in response.Models)
                 {
                     bool isSelf = msg.SenderId == _currentUserId;
-                    AppendDoctorBubble(msg, isSelf);
+                    AppendBubble(msg, isSelf);
                 }
 
-                ScrollDoctorToBottom();
+                ScrollToBottom();
             }
             catch (Exception ex)
             {
@@ -169,104 +172,26 @@ namespace Healthcare.Client.UI.Components
             }
         }
 
-        private async Task SubscribeRealtimeAsync()
+        private async void BtnSend_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var client = SupabaseManager.Instance.Client;
-                try { await client.Realtime.ConnectAsync(); } catch { }
-
-                // Dùng wildcard channel để lắng nghe toàn bộ bảng chat_messages
-                _chatChannel = client.Realtime.Channel("realtime:public:chat_messages");
-
-                _chatChannel.AddPostgresChangeHandler(
-                    PostgresChangesOptions.ListenType.Inserts,
-                    (sender, change) =>
-                    {
-                        var msg = change.Model<ChatMessageItem>();
-
-                        // Lọc đúng tin nhắn: từ otherUser → currentUser
-                        if (msg == null) return;
-                        bool isForMe = msg.ReceiverId == _currentUserId 
-                                       && msg.SenderId == _otherUserId;
-                        if (!isForMe) return;
-
-                        DispatcherQueue.TryEnqueue(() =>
-                        {
-                            AppendDoctorBubble(msg, false);
-                        });
-                    });
-
-                await _chatChannel.Subscribe();
-            }
-            catch (Exception ex)
-            {
-              System.Diagnostics.Debug.WriteLine($"[ChatControl] Subscribe error: {ex.Message}");
-            }
+            await SendMessageAsync();
         }
 
-        // Tab Switching Logic
-        private void BtnTabDoctor_Click(object sender, RoutedEventArgs e)
-        {
-            PanelDoctorChat.Visibility = Visibility.Visible;
-            PanelAiChat.Visibility = Visibility.Collapsed;
-
-            // Highlight Doctor Tab
-            BtnTabDoctor.BorderBrush = new SolidColorBrush(HexToColor("#0059BB"));
-            BtnTabDoctor.BorderThickness = new Thickness(0, 0, 0, 2);
-            IconTabDoctor.Foreground = new SolidColorBrush(HexToColor("#0059BB"));
-            TextTabDoctor.Foreground = new SolidColorBrush(HexToColor("#0059BB"));
-            TextTabDoctor.FontWeight = FontWeights.Bold;
-
-            // Unhighlight AI Tab
-            BtnTabAi.BorderBrush = new SolidColorBrush(Colors.Transparent);
-            BtnTabAi.BorderThickness = new Thickness(0);
-            IconTabAi.Foreground = new SolidColorBrush(HexToColor("#64748B"));
-            TextTabAi.Foreground = new SolidColorBrush(HexToColor("#64748B"));
-            TextTabAi.FontWeight = FontWeights.Medium;
-        }
-
-        private void BtnTabAi_Click(object sender, RoutedEventArgs e)
-        {
-            PanelDoctorChat.Visibility = Visibility.Collapsed;
-            PanelAiChat.Visibility = Visibility.Visible;
-
-            // Highlight AI Tab
-            BtnTabAi.BorderBrush = new SolidColorBrush(HexToColor("#10B981"));
-            BtnTabAi.BorderThickness = new Thickness(0, 0, 0, 2);
-            IconTabAi.Foreground = new SolidColorBrush(HexToColor("#10B981"));
-            TextTabAi.Foreground = new SolidColorBrush(HexToColor("#10B981"));
-            TextTabAi.FontWeight = FontWeights.Bold;
-
-            // Unhighlight Doctor Tab
-            BtnTabDoctor.BorderBrush = new SolidColorBrush(Colors.Transparent);
-            BtnTabDoctor.BorderThickness = new Thickness(0);
-            IconTabDoctor.Foreground = new SolidColorBrush(HexToColor("#64748B"));
-            TextTabDoctor.Foreground = new SolidColorBrush(HexToColor("#64748B"));
-            TextTabDoctor.FontWeight = FontWeights.Medium;
-        }
-
-        // Send Doctor Message
-        private async void BtnSendDoctor_Click(object sender, RoutedEventArgs e)
-        {
-            await SendDoctorMessageAsync();
-        }
-
-        private async void DoctorChatInput_KeyDown(object sender, KeyRoutedEventArgs e)
+        private async void ChatInput_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             if (e.Key == Windows.System.VirtualKey.Enter)
             {
                 e.Handled = true;
-                await SendDoctorMessageAsync();
+                await SendMessageAsync();
             }
         }
 
-        private async Task SendDoctorMessageAsync()
+        private async Task SendMessageAsync()
         {
-            if (_isSendingDoctor)
+            if (_isSending)
                 return;
 
-            var text = DoctorChatInput.Text.Trim();
+            var text = ChatInput.Text.Trim();
 
             if (string.IsNullOrEmpty(text))
                 return;
@@ -277,9 +202,9 @@ namespace Healthcare.Client.UI.Components
                 return;
             }
 
-            _isSendingDoctor = true;
-            DoctorChatInput.Text = string.Empty;
-            BtnSendDoctor.IsEnabled = false;
+            _isSending = true;
+            ChatInput.Text = string.Empty;
+            BtnSend.IsEnabled = false;
 
             var msg = new ChatMessageItem
             {
@@ -291,10 +216,18 @@ namespace Healthcare.Client.UI.Components
                 CreatedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc)
             };
 
-            AppendDoctorBubble(msg, true);
+            // 1. Hiển thị lên giao diện cục bộ ngay
+            AppendBubble(msg, true);
 
             try
             {
+                // 2. Gửi qua Daily.co peer-to-peer (Instant Delivery)
+                if (_videoCall != null)
+                {
+                    await _videoCall.SendChatMessageAsync(text);
+                }
+
+                // 3. Gửi lên Database lưu lịch sử
                 bool sentDirectly = false;
                 try
                 {
@@ -304,170 +237,50 @@ namespace Healthcare.Client.UI.Components
                 }
                 catch (Exception directEx)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[Chat Direct] Failed: {directEx.Message}");
+                    System.Diagnostics.Debug.WriteLine($"[Chat Direct] DB Save Failed: {directEx.Message}");
                 }
 
                 if (!sentDirectly)
                 {
-                    var response = await _httpClient.PostAsJsonAsync("api/chat/send", new
+                    await _httpClient.PostAsJsonAsync("api/chat/send", new
                     {
-                        Id       = msg.Id,
+                        Id = msg.Id,
                         SenderId = msg.SenderId,
                         ReceiverId = msg.ReceiverId,
                         MessageText = msg.MessageText,
-                        IsRead   = msg.IsRead,
+                        IsRead = msg.IsRead,
                         CreatedAt = msg.CreatedAt
                     });
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        throw new HttpRequestException($"HTTP {(int)response.StatusCode}: {response.ReasonPhrase}");
-                    }
                 }
             }
             catch (Exception ex)
             {
-                await ShowDialogAsync("Lỗi", "Không gửi được tin nhắn: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[ChatControl] Save message err: {ex.Message}");
             }
             finally
             {
-                BtnSendDoctor.IsEnabled = true;
-                _isSendingDoctor = false;
+                BtnSend.IsEnabled = true;
+                _isSending = false;
             }
         }
 
-        // Send AI Message
-        private async void BtnSendAi_Click(object sender, RoutedEventArgs e)
+        private void AppendBubble(ChatMessageItem msg, bool isSelf)
         {
-            await SendAiMessageAsync();
-        }
-
-        private async void AiChatInput_KeyDown(object sender, KeyRoutedEventArgs e)
-        {
-            if (e.Key == Windows.System.VirtualKey.Enter)
-            {
-                e.Handled = true;
-                await SendAiMessageAsync();
-            }
-        }
-
-        private async Task SendAiMessageAsync()
-        {
-            if (_isSendingAi)
+            if (!string.IsNullOrWhiteSpace(msg.Id) && !_renderedMessageIds.Add(msg.Id))
                 return;
 
-            var text = AiChatInput.Text.Trim();
-
-            if (string.IsNullOrEmpty(text))
-                return;
-
-            _isSendingAi = true;
-            AiChatInput.Text = string.Empty;
-            BtnSendAi.IsEnabled = false;
-
-            var msg = new ChatMessageItem
-            {
-                Id = Guid.NewGuid().ToString(),
-                SenderId = _currentUserId,
-                ReceiverId = "AI",
-                MessageText = text,
-                IsRead = false,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            AppendAiBubble(msg, true);
-
-            try
-            {
-                await SendMessageToAiAsync(text);
-            }
-            catch (Exception ex)
-            {
-                await ShowDialogAsync("Lỗi", "Không kết nối được trợ lý AI: " + ex.Message);
-            }
-            finally
-            {
-                BtnSendAi.IsEnabled = true;
-                _isSendingAi = false;
-            }
+            MessageList.Children.Add(BuildBubble(msg, isSelf));
+            ScrollToBottom();
         }
 
-        private async Task SendMessageToAiAsync(string userMessage)
+        private void ScrollToBottom()
         {
-            try
-            {
-                var response = await _httpClient.PostAsJsonAsync("api/ai/chat", new
-                {
-                    message = userMessage
-                });
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    AppendAiResponseBubble("AI hiện chưa phản hồi được. Vui lòng thử lại sau.");
-                    return;
-                }
-
-                var result = await response.Content.ReadFromJsonAsync<AiChatResponse>();
-
-                AppendAiResponseBubble(result?.Reply ?? "AI chưa có câu trả lời phù hợp.");
-            }
-            catch (Exception ex)
-            {
-                AppendAiResponseBubble("Không kết nối được với hệ thống hỗ trợ. Vui lòng kiểm tra lại kết nối mạng.");
-                System.Diagnostics.Debug.WriteLine($"[Ai Chat Error]: {ex.Message}");
-            }
+            ChatScrollViewer.UpdateLayout();
+            ChatScrollViewer.ChangeView(null, ChatScrollViewer.ScrollableHeight, null);
         }
 
-        private void AppendDoctorBubble(ChatMessageItem msg, bool isSelf)
+        private UIElement BuildBubble(ChatMessageItem msg, bool isSelf)
         {
-            if (!string.IsNullOrWhiteSpace(msg.Id) && !_renderedDoctorMessageIds.Add(msg.Id))
-                return;
-
-            DoctorMessageList.Children.Add(BuildBubble(msg, isSelf));
-            ScrollDoctorToBottom();
-        }
-
-        private void AppendAiBubble(ChatMessageItem msg, bool isSelf)
-        {
-            AiMessageList.Children.Add(BuildBubble(msg, isSelf, isSelf ? "Bạn" : "Trợ lý AI"));
-            ScrollAiToBottom();
-        }
-
-        private void AppendAiResponseBubble(string content)
-        {
-            var msg = new ChatMessageItem
-            {
-                Id = Guid.NewGuid().ToString(),
-                SenderId = "AI",
-                ReceiverId = _currentUserId,
-                MessageText = content,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            AiMessageList.Children.Add(BuildBubble(msg, false, "Trợ lý AI"));
-            ScrollAiToBottom();
-        }
-
-        private void ScrollDoctorToBottom()
-        {
-            DoctorScrollViewer.UpdateLayout();
-            DoctorScrollViewer.ChangeView(null, DoctorScrollViewer.ScrollableHeight, null);
-        }
-
-        private void ScrollAiToBottom()
-        {
-            AiScrollViewer.UpdateLayout();
-            AiScrollViewer.ChangeView(null, AiScrollViewer.ScrollableHeight, null);
-        }
-
-        private UIElement BuildBubble(ChatMessageItem msg, bool isSelf, string? displayName = null)
-        {
-            if (msg.MessageText?.StartsWith("[TTS] ") == true)
-            {
-                string ttsText = msg.MessageText.Substring(6); // strip "[TTS] "
-                return BuildTtsBubble(ttsText, msg.CreatedAt, isSelf);
-            }
-
             var wrapper = new StackPanel
             {
                 Spacing = 3,
@@ -476,7 +289,7 @@ namespace Healthcare.Client.UI.Components
                 Margin = new Thickness(0, 4, 0, 4)
             };
 
-            var time = ParseDateTimeToLocal(msg.CreatedAt);
+            var time = msg.CreatedAt.ToLocalTime();
 
             string defaultOtherName = _isDoctorUser ? "Bệnh nhân" : "Bác sĩ";
             string nameToShow = !string.IsNullOrEmpty(_otherUserName) ? _otherUserName : defaultOtherName;
@@ -485,7 +298,7 @@ namespace Healthcare.Client.UI.Components
             {
                 Text = isSelf
                     ? $"Bạn • {time:HH:mm}"
-                    : $"{displayName ?? nameToShow} • {time:HH:mm}",
+                    : $"{nameToShow} • {time:HH:mm}",
                 FontSize = 9,
                 FontWeight = FontWeights.Bold,
                 Foreground = new SolidColorBrush(HexToColor("#64748B")),
@@ -507,84 +320,6 @@ namespace Healthcare.Client.UI.Components
             });
 
             return wrapper;
-        }
-
-        private UIElement BuildTtsBubble(string text, DateTime createdAt, bool isSelf)
-        {
-            var time = ParseDateTimeToLocal(createdAt);
-
-            var wrapper = new StackPanel
-            {
-                Spacing = 4,
-                HorizontalAlignment = isSelf ? HorizontalAlignment.Right : HorizontalAlignment.Left,
-                MaxWidth = 260,
-                Margin = new Thickness(0, 4, 0, 4)
-            };
-
-            wrapper.Children.Add(new TextBlock
-            {
-                Text = isSelf ? $"Giọng nói bác sĩ • {time:HH:mm}" : $"Bác sĩ • {time:HH:mm}",
-                FontSize = 9,
-                FontWeight = FontWeights.Bold,
-                Foreground = new SolidColorBrush(HexToColor("#64748B")),
-                HorizontalAlignment = isSelf ? HorizontalAlignment.Right : HorizontalAlignment.Left
-            });
-
-            var btn = new Button
-            {
-                Background = new SolidColorBrush(isSelf ? HexToColor("#0F172A") : HexToColor("#0059BB")),
-                Foreground = new SolidColorBrush(Colors.White),
-                CornerRadius = new CornerRadius(isSelf ? 12 : 2, isSelf ? 2 : 12, 12, 12),
-                Padding = new Thickness(14, 9, 14, 9),
-                BorderThickness = new Thickness(0),
-                IsEnabled = !isSelf
-            };
-
-            var btnContent = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-            btnContent.Children.Add(new FontIcon
-            {
-                FontFamily = new FontFamily("Segoe MDL2 Assets"),
-                Glyph = isSelf ? "\uE8F4" : "\uE768",
-                FontSize = 14,
-                Foreground = new SolidColorBrush(Colors.White)
-            });
-            btnContent.Children.Add(new TextBlock
-            {
-                Text = isSelf ? "Đã gửi giọng nói" : "▶ Nghe giọng bác sĩ",
-                FontSize = 12,
-                FontWeight = FontWeights.SemiBold,
-                Foreground = new SolidColorBrush(Colors.White)
-            });
-            btn.Content = btnContent;
-
-            if (!isSelf)
-            {
-                string ttsText = text;
-                btn.Click += (s, e) => PlayTtsAsync(ttsText);
-            }
-
-            wrapper.Children.Add(btn);
-            return wrapper;
-        }
-
-        private async void PlayTtsAsync(string text)
-        {
-            try
-            {
-                _ttsPlayer?.Pause();
-                _ttsPlayer = null;
-
-                using var synth = new SpeechSynthesizer();
-                var stream = await synth.SynthesizeTextToStreamAsync(text);
-
-                _ttsPlayer = new MediaPlayer();
-                _ttsPlayer.Source = MediaSource.CreateFromStream(stream, stream.ContentType);
-                _ttsPlayer.Play();
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[TTS] Playback error: {ex.Message}");
-            }
         }
 
         private async Task ShowDialogAsync(string title, string message)
@@ -611,11 +346,6 @@ namespace Healthcare.Client.UI.Components
                 Convert.ToByte(hex.Substring(2, 2), 16),
                 Convert.ToByte(hex.Substring(4, 2), 16)
             );
-        }
-
-        private static DateTime ParseDateTimeToLocal(DateTime dt)
-        {
-            return dt;
         }
     }
 
@@ -646,12 +376,5 @@ namespace Healthcare.Client.UI.Components
         public string Diagnosis { get; set; } = string.Empty;
 
         public List<string> QuickNotes { get; set; } = new();
-    }
-
-    public class AiChatResponse
-    {
-        public bool Success { get; set; }
-
-        public string Reply { get; set; } = string.Empty;
     }
 }

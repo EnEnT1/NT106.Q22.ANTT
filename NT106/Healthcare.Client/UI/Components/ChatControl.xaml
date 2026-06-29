@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
     x:Class="Healthcare.Client.UI.Components.ChatControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -9,187 +9,84 @@
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Header -->
         <Border Grid.Row="0"
                 Background="White"
                 BorderBrush="#E5E7EB"
                 BorderThickness="0,0,0,1"
-                Padding="16">
-            <StackPanel Spacing="4">
-                <TextBlock Text="Hộp thoại tư vấn trực tuyến"
-                           FontSize="18"
-                           FontWeight="Bold"
-                           Foreground="#1E293B"/>
-                <TextBlock Text="Trao đổi trực tiếp và hỗ trợ y tế thông minh"
-                           FontSize="12"
-                           Foreground="#64748B"/>
+                Padding="16,12">
+            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <FontIcon FontFamily="Segoe MDL2 Assets"
+                          Glyph="&#xE8F2;"
+                          FontSize="16"
+                          Foreground="#0059BB"/>
+                <StackPanel Spacing="2">
+                    <TextBlock Text="Hộp thoại tư vấn"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               Foreground="#1E293B"/>
+                    <TextBlock x:Name="TxtSubtitle"
+                               Text="Trao đổi trực tiếp trong cuộc khám"
+                               FontSize="11"
+                               Foreground="#64748B"/>
+                </StackPanel>
             </StackPanel>
         </Border>
 
-        <!-- Tabs để tách phần nhắn của Bác sĩ và Trợ lý AI -->
-        <Grid Grid.Row="1" Background="#F8FAFC" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            
-            <Button x:Name="BtnTabDoctor"
-                    Grid.Column="0"
-                    Click="BtnTabDoctor_Click"
-                    HorizontalAlignment="Stretch"
-                    Background="Transparent"
-                    BorderThickness="0,0,0,2"
-                    BorderBrush="#0059BB"
-                    CornerRadius="0"
-                    Padding="12,8">
-                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE77B;" FontSize="14" x:Name="IconTabDoctor" Foreground="#0059BB"/>
-                    <TextBlock Text="Bác sĩ / Bệnh nhân" FontWeight="SemiBold" FontSize="13" x:Name="TextTabDoctor" Foreground="#0059BB"/>
-                </StackPanel>
-            </Button>
+        <!-- Message list -->
+        <ScrollViewer x:Name="ChatScrollViewer"
+                      Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      Padding="12,8">
+            <StackPanel x:Name="MessageList" Spacing="6"/>
+        </ScrollViewer>
 
-            <Button x:Name="BtnTabAi"
-                    Grid.Column="1"
-                    Click="BtnTabAi_Click"
-                    HorizontalAlignment="Stretch"
-                    Background="Transparent"
-                    BorderThickness="0,0,0,0"
-                    BorderBrush="Transparent"
-                    CornerRadius="0"
-                    Padding="12,8">
-                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE99A;" FontSize="14" x:Name="IconTabAi" Foreground="#64748B"/>
-                    <TextBlock Text="Trợ lý AI (Chatbot)" FontWeight="Medium" FontSize="13" x:Name="TextTabAi" Foreground="#64748B"/>
-                </StackPanel>
-            </Button>
-        </Grid>
-
-        <Grid Grid.Row="2">
-            <!-- Tab 1: Chat với Bác sĩ / Bệnh nhân -->
-            <Grid x:Name="PanelDoctorChat" Visibility="Visible">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <ScrollViewer x:Name="DoctorScrollViewer"
-                               Grid.Row="0"
-                               VerticalScrollBarVisibility="Auto"
-                               Padding="16">
-                    <StackPanel x:Name="DoctorMessageList" Spacing="6"/>
-                </ScrollViewer>
-
-                <Border Grid.Row="1"
-                        Background="White"
-                        BorderBrush="#E5E7EB"
-                        BorderThickness="1,1,1,0"
-                        Padding="12">
-                    <Grid ColumnSpacing="10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBox x:Name="DoctorChatInput"
-                                  Grid.Column="0"
-                                  PlaceholderText="Nhập tin nhắn trao đổi trực tiếp..."
-                                  KeyDown="DoctorChatInput_KeyDown"
-                                  MinHeight="42"
-                                  TextWrapping="Wrap"
-                                  AcceptsReturn="False"/>
-
-                        <Button x:Name="BtnSendDoctor"
-                                Grid.Column="1"
-                                Click="BtnSendDoctor_Click"
-                                Background="#0059BB"
-                                Foreground="White"
-                                BorderThickness="0"
-                                CornerRadius="10"
-                                Padding="14,10">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <FontIcon FontFamily="Segoe MDL2 Assets"
-                                           Glyph="&#xE724;"
-                                           FontSize="13"
-                                           Foreground="White"/>
-                                <TextBlock Text="Gửi"
-                                           FontSize="13"
-                                           FontWeight="SemiBold"
-                                           Foreground="White"/>
-                            </StackPanel>
-                        </Button>
-                    </Grid>
-                </Border>
-            </Grid>
-
-            <!-- Tab 2: Chat với Trợ lý AI -->
-            <Grid x:Name="PanelAiChat" Visibility="Collapsed">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <ScrollViewer x:Name="AiScrollViewer"
-                               Grid.Row="0"
-                               VerticalScrollBarVisibility="Auto"
-                               Padding="16">
-                    <StackPanel x:Name="AiMessageList" Spacing="6"/>
-                </ScrollViewer>
-
-                <Border Grid.Row="1"
-                        Background="White"
-                        BorderBrush="#E5E7EB"
-                        BorderThickness="1,1,1,0"
-                        Padding="12">
-                    <Grid ColumnSpacing="10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBox x:Name="AiChatInput"
-                                  Grid.Column="0"
-                                  PlaceholderText="Hỏi trợ lý AI về triệu chứng, sức khỏe..."
-                                  KeyDown="AiChatInput_KeyDown"
-                                  MinHeight="42"
-                                  TextWrapping="Wrap"
-                                  AcceptsReturn="False"/>
-
-                        <Button x:Name="BtnSendAi"
-                                Grid.Column="1"
-                                Click="BtnSendAi_Click"
-                                Background="#10B981"
-                                Foreground="White"
-                                BorderThickness="0"
-                                CornerRadius="10"
-                                Padding="14,10">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <FontIcon FontFamily="Segoe MDL2 Assets"
-                                           Glyph="&#xE724;"
-                                           FontSize="13"
-                                           Foreground="White"/>
-                                <TextBlock Text="Hỏi AI"
-                                           FontSize="13"
-                                           FontWeight="SemiBold"
-                                           Foreground="White"/>
-                            </StackPanel>
-                        </Button>
-                    </Grid>
-                </Border>
-            </Grid>
-        </Grid>
-
-        <Border Grid.Row="3"
+        <!-- Input area -->
+        <Border Grid.Row="2"
                 Background="#F8FAFC"
                 BorderBrush="#E5E7EB"
-                BorderThickness="1,1,1,0"
+                BorderThickness="0,1,0,0"
                 Padding="12">
-            <TextBlock Text="Thông tin từ AI chỉ mang tính chất tham khảo, không thể thay thế ý kiến chuyên môn của bác sĩ."
-                       FontSize="11"
-                       Foreground="#64748B"/>
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="ChatInput"
+                         Grid.Column="0"
+                         PlaceholderText="Nhập tin nhắn..."
+                         KeyDown="ChatInput_KeyDown"
+                         MinHeight="42"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="False"
+                         CornerRadius="10"
+                         BorderBrush="#E5E7EB"/>
+
+                <Button x:Name="BtnSend"
+                        Grid.Column="1"
+                        Click="BtnSend_Click"
+                        Background="#0059BB"
+                        Foreground="White"
+                        BorderThickness="0"
+                        CornerRadius="10"
+                        Padding="14,10">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon FontFamily="Segoe MDL2 Assets"
+                                  Glyph="&#xE724;"
+                                  FontSize="13"
+                                  Foreground="White"/>
+                        <TextBlock Text="Gửi"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="White"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
         </Border>
     </Grid>
 </UserControl>

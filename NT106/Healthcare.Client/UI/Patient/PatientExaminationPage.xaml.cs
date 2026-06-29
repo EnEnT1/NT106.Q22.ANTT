@@ -1,4 +1,4 @@
-﻿using Healthcare.Client.Helpers;
+using Healthcare.Client.Helpers;
 using Healthcare.Client.Models.Core;
 using Healthcare.Client.Models.Identity;
 using Healthcare.Client.UI.Components;
@@ -71,7 +71,7 @@ namespace Healthcare.Client.UI.Patient
                     try
                     {
                         await VideoCall.InitializeAsync(_appointmentId, _doctorId, roomCode);
-                        // Patient does NOT call StartCallAsync - they wait for the doctor's offer
+                        await VideoCall.StartCallAsync();
                     }
                     catch (Exception videoEx)
                     {
@@ -80,7 +80,7 @@ namespace Healthcare.Client.UI.Patient
 
                     try
                     {
-                        await Chat.InitializeAsync(_appointmentId, _currentUserId, _currentUserId);
+                        await Chat.InitializeAsync(_appointmentId, _currentUserId, _currentUserId, VideoCall);
                     }
                     catch (Exception chatEx)
                     {

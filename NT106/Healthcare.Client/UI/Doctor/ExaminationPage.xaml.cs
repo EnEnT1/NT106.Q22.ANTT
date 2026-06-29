@@ -1,4 +1,4 @@
-﻿using Healthcare.Client.Helpers;
+using Healthcare.Client.Helpers;
 using Healthcare.Client.Models.Core;
 using Healthcare.Client.Models.Identity;
 using Healthcare.Client.UI.Components;
@@ -106,7 +106,7 @@ namespace Healthcare.Client.UI.Doctor
                     // Bác sĩ là người gọi nên phải StartCallAsync()
                     await VideoCall.StartCallAsync();
 
-                    await Chat.InitializeAsync(_appointmentId, _currentUserId, _patientId);
+                    await Chat.InitializeAsync(_appointmentId, _currentUserId, _patientId, VideoCall);
                 }
                 else
                 {
